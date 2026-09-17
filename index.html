@@ -1393,7 +1393,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Cliente do Supabase — é ele quem fala com o banco na nuvem -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
     <script>
         // ============================================================
@@ -1401,6 +1401,12 @@
         // ============================================================
         const SUPABASE_URL = 'https://fhhjmlwmwhregkwaliye.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoaGptbHdtd2hyZWdrd2FsaXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzgzNzcsImV4cCI6MjEwNTI1NDM3N30.asniZX5kavJZ3YnSTqsUnhLYe1F6_ANyUvNMGcZHTyA';
+
+        if (!window.supabase) {
+            document.getElementById('authMessage').innerText =
+                'Não foi possível carregar a biblioteca do Supabase (problema de rede ou CDN fora do ar). Recarregue a página ou tente novamente em alguns minutos.';
+            throw new Error('window.supabase indefinido — script da CDN não carregou.');
+        }
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
