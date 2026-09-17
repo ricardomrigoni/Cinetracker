@@ -978,12 +978,15 @@
         <div class="confirm-box" style="max-width:360px;">
             <div class="confirm-title">🎞️ CineTracker</div>
             <div class="confirm-message" id="authMessage">
-                Entre com o e-mail cadastrado (Israel ou Ricardo) para acessar o catálogo. Você vai receber um link mágico por e-mail — não precisa de senha.
+                Entre com o e-mail e a senha cadastrados (Israel ou Ricardo) para acessar o catálogo.
             </div>
-            <input type="email" id="authEmailInput" placeholder="seu@email.com"
-                   style="width:100%; padding:10px 12px; margin:12px 0; border-radius:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--text-main); font-family:'Manrope',sans-serif;">
+            <input type="email" id="authEmailInput" placeholder="seu@email.com" autocomplete="username"
+                   style="width:100%; padding:10px 12px; margin:12px 0 8px; border-radius:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--text-main); font-family:'Manrope',sans-serif;">
+            <input type="password" id="authPasswordInput" placeholder="Senha" autocomplete="current-password"
+                   onkeyup="if(event.key==='Enter') cloud.signIn()"
+                   style="width:100%; padding:10px 12px; margin-bottom:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--text-main); font-family:'Manrope',sans-serif;">
             <div class="confirm-actions">
-                <button class="btn btn-primary" id="authSendBtn" onclick="cloud.sendMagicLink()" style="width:100%; justify-content:center;">Enviar link mágico</button>
+                <button class="btn btn-primary" id="authSendBtn" onclick="cloud.signIn()" style="width:100%; justify-content:center;">Entrar</button>
             </div>
         </div>
     </div>
@@ -1463,23 +1466,22 @@
             },
 
             // --- Autenticação ---
-            async sendMagicLink() {
-                const input = document.getElementById('authEmailInput');
-                const email = (input.value || '').trim();
+            async signIn() {
+                const email = (document.getElementById('authEmailInput').value || '').trim();
+                const password = document.getElementById('authPasswordInput').value || '';
                 const msgEl = document.getElementById('authMessage');
-                if (!email) { showToast('Digite um e-mail.', 'error'); return; }
+                if (!email || !password) { showToast('Preencha e-mail e senha.', 'error'); return; }
                 const btn = document.getElementById('authSendBtn');
                 btn.disabled = true;
-                const { error } = await supabaseClient.auth.signInWithOtp({
-                    email,
-                    options: { emailRedirectTo: window.location.href }
-                });
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 btn.disabled = false;
                 if (error) {
-                    showToast('Não foi possível enviar o link: ' + error.message, 'error');
+                    msgEl.innerText = 'E-mail ou senha incorretos, ou essa conta ainda não foi criada no Supabase.';
+                    showToast('Não foi possível entrar: ' + error.message, 'error');
                     return;
                 }
-                msgEl.innerText = `Link enviado para ${email}. Abra seu e-mail nesse mesmo aparelho/navegador e clique no link para entrar.`;
+                // Sucesso: onAuthStateChange (registrado em cloud.init) cuida de esconder
+                // essa tela e carregar os dados — nada mais a fazer aqui.
             },
 
             async signOut() {
