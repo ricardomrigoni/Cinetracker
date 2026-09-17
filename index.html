@@ -1516,8 +1516,14 @@
             },
 
             // --- Escrita: cada método volta uma Promise; quem chama decide se espera ---
+            // Atualiza um filme já existente. Nunca manda a coluna "id" no corpo da
+            // escrita — o Postgres a gera automaticamente e rejeita qualquer tentativa
+            // de sobrescrevê-la (mesmo com o mesmo valor). O "id" só serve aqui pra
+            // dizer QUAL linha atualizar, via .eq().
             async upsertMovie(m) {
-                const { error } = await supabaseClient.from('movies').upsert(this.movieToDb(m));
+                const payload = this.movieToDb(m);
+                delete payload.id;
+                const { error } = await supabaseClient.from('movies').update(payload).eq('id', m.id);
                 if (error) showToast('Não foi possível salvar na nuvem: ' + error.message, 'error');
             },
             async insertMovie(m) {
@@ -1544,6 +1550,56 @@
                 if (error) showToast('Não foi possível excluir na nuvem: ' + error.message, 'error');
             },
 
+            // --- Substituição total: usada pela importação de arquivo (JSON/TXT), que
+            // sempre troca o catálogo inteiro, não só adiciona itens. ---
+            async replaceAllMovies(movies) {
+                const del = await supabaseClient.from('movies').delete().gt('id', 0);
+                if (del.error) { showToast('Não foi possível limpar os filmes antigos na nuvem: ' + del.error.message, 'error'); return null; }
+                if (!movies.length) return [];
+                const rows = movies.map(m => { const r = this.movieToDb(m); delete r.id; return r; });
+                const { data, error } = await supabaseClient.from('movies').insert(rows).select();
+                if (error) { showToast('Não foi possível enviar os filmes para a nuvem: ' + error.message, 'error'); return null; }
+                return data.map(row => this.movieFromDb(row));
+            },
+            async replaceAllPending(pending) {
+                const del = await supabaseClient.from('pending_movies').delete().gt('id', 0);
+                if (del.error) { showToast('Não foi possível limpar a lista de sorteio antiga na nuvem: ' + del.error.message, 'error'); return null; }
+                if (!pending.length) return [];
+                const rows = pending.map(p => { const r = this.pendingToDb(p); delete r.id; return r; });
+                const { data, error } = await supabaseClient.from('pending_movies').insert(rows).select();
+                if (error) { showToast('Não foi possível enviar a lista de sorteio para a nuvem: ' + error.message, 'error'); return null; }
+                return data.map(row => this.pendingFromDb(row));
+            },
+
+            // --- Tempo real: propaga mudanças de um aparelho pro outro sem precisar de F5 ---
+            realtimeChannel: null,
+            subscribeRealtime() {
+                if (this.realtimeChannel) return; // já inscrito, não duplica
+                this.realtimeChannel = supabaseClient
+                    .channel('cinetracker-sync')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'movies' }, (payload) => {
+                        if (payload.eventType === 'DELETE') {
+                            app.movies = app.movies.filter(m => m.id !== payload.old.id);
+                        } else {
+                            const incoming = this.movieFromDb(payload.new);
+                            const idx = app.movies.findIndex(m => m.id === incoming.id);
+                            if (idx >= 0) app.movies[idx] = incoming; else app.movies.push(incoming);
+                        }
+                        app.processData();
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'pending_movies' }, (payload) => {
+                        if (payload.eventType === 'DELETE') {
+                            app.pending = app.pending.filter(p => p.id !== payload.old.id);
+                        } else {
+                            const incoming = this.pendingFromDb(payload.new);
+                            const idx = app.pending.findIndex(p => p.id === incoming.id);
+                            if (idx >= 0) app.pending[idx] = incoming; else app.pending.push(incoming);
+                        }
+                        app.renderPending();
+                    })
+                    .subscribe();
+            },
+
             // --- Ponto de entrada, chamado uma vez ao carregar a página ---
             async init() {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1551,6 +1607,7 @@
                 if (session) {
                     this.showAuthGate(false);
                     await this.loadAll();
+                    this.subscribeRealtime();
                 } else {
                     this.showAuthGate(true);
                 }
@@ -1559,6 +1616,7 @@
                     if (newSession) {
                         this.showAuthGate(false);
                         await this.loadAll();
+                        this.subscribeRealtime();
                     } else {
                         this.showAuthGate(true);
                     }
@@ -2384,16 +2442,15 @@
                 reader.onload = ev => {
                     const content = ev.target.result;
                     const isJson = file.name.toLowerCase().endsWith('.json') || content.trim().startsWith('{');
-                    try {
-                        if (isJson) {
-                            this.parseJSON(content);
-                        } else {
-                            this.parseTXT(content);
-                        }
-                    } catch (err) {
+                    // parseJSON/parseTXT agora são assíncronos (precisam confirmar e
+                    // sincronizar com a nuvem), por isso o erro é tratado com .catch
+                    // em vez de try/catch — um throw síncrono dentro de função async
+                    // não seria capturado pelo try/catch daqui.
+                    const task = isJson ? this.parseJSON(content) : this.parseTXT(content);
+                    task.catch(err => {
                         console.error('Erro ao importar arquivo', err);
                         showToast('Não foi possível importar o arquivo. Verifique se o formato está correto.', 'error');
-                    }
+                    });
                 };
                 reader.onerror = () => {
                     console.error('Erro ao ler o arquivo', reader.error);
@@ -2408,7 +2465,8 @@
             // Importa o formato JSON estruturado (exportado por exportJSON ou pelo
             // rascunho automático). Faz uma validação mínima e recalcula a média de
             // cada filme, em vez de confiar cegamente no valor salvo no arquivo.
-            parseJSON(text) {
+            // Como isso SUBSTITUI o catálogo inteiro (local e na nuvem), pede confirmação antes.
+            async parseJSON(text) {
                 const data = JSON.parse(text);
                 if (!data || !Array.isArray(data.movies)) {
                     throw new Error('Estrutura de JSON inválida: campo "movies" ausente.');
@@ -2418,9 +2476,23 @@
                 if (data.version && data.version > CINE_JSON_VERSION) {
                     showToast('Este arquivo foi exportado por uma versão mais nova do CineTracker. Alguns dados podem não aparecer corretamente.', 'info');
                 }
-                this.applyJSONPayload(data);
+                const ok = await showConfirm(
+                    `Isso substitui TODO o catálogo salvo na nuvem (visível também no outro aparelho) pelos ${data.movies.length} filmes deste arquivo. Essa ação não pode ser desfeita.`,
+                    { title: 'Importar e substituir tudo?', okLabel: 'Substituir', danger: true }
+                );
+                if (!ok) return;
+
+                this.applyJSONPayload(data); // já reflete na tela local
+
+                const savedMovies = await cloud.replaceAllMovies(this.movies);
+                if (savedMovies) this.movies = savedMovies;
+                const savedPending = await cloud.replaceAllPending(this.pending);
+                if (savedPending) this.pending = savedPending;
+
+                this.processData();
+                this.renderPending();
                 markSynced();
-                showToast(`${this.movies.length} filme${this.movies.length !== 1 ? 's' : ''} importado${this.movies.length !== 1 ? 's' : ''} com sucesso.`, 'success');
+                showToast(`${this.movies.length} filme${this.movies.length !== 1 ? 's' : ''} importado${this.movies.length !== 1 ? 's' : ''} e salvo${this.movies.length !== 1 ? 's' : ''} na nuvem.`, 'success');
             }
 
             // Aplica um payload no formato JSON (do import manual OU do rascunho automático)
@@ -2461,9 +2533,9 @@
                 this.processData();
             }
 
-            parseTXT(txt) {
+            async parseTXT(txt) {
                 const lines = txt.split('\n');
-                this.movies = [];
+                const importedMovies = [];
                 let mode = 'movies'; // 'movies' | 'pending'
                 let importedPending = null; // só substitui a watchlist atual se a seção existir no arquivo
                 let skippedLines = 0; // linhas com formato inesperado, ignoradas silenciosamente
@@ -2529,23 +2601,35 @@
                         poster: null
                     };
                     movie.avg = (movie.scIsr + movie.scRic) / 2;
-                    this.movies.push(movie);
+                    importedMovies.push(movie);
                 }
+
+                const ok = await showConfirm(
+                    `Isso substitui TODO o catálogo salvo na nuvem (visível também no outro aparelho) pelos ${importedMovies.length} filmes deste arquivo. Essa ação não pode ser desfeita.`,
+                    { title: 'Importar e substituir tudo?', okLabel: 'Substituir', danger: true }
+                );
+                if (!ok) return;
+                this.movies = importedMovies;
 
                 // Só substitui a watchlist salva se o arquivo importado trouxer a seção [SORTEAR];
                 // caso contrário (ex: exports antigos), preserva o que já está salvo no navegador.
                 if (importedPending !== null) {
                     this.pending = importedPending;
-                    this.savePendingStorage();
+                }
+                const savedMovies = await cloud.replaceAllMovies(this.movies);
+                if (savedMovies) this.movies = savedMovies;
+                if (importedPending !== null) {
+                    const savedPending = await cloud.replaceAllPending(this.pending);
+                    if (savedPending) this.pending = savedPending;
                 }
                 this.renderPending();
-                
+
                 this.hasUnsavedChanges = false; // Reset após carregar arquivo
                 this.processData();
                 markSynced();
 
                 const n = this.movies.length;
-                let msg = `${n} filme${n !== 1 ? 's' : ''} importado${n !== 1 ? 's' : ''} com sucesso.`;
+                let msg = `${n} filme${n !== 1 ? 's' : ''} importado${n !== 1 ? 's' : ''} e salvo${n !== 1 ? 's' : ''} na nuvem.`;
                 if (skippedLines > 0) msg += ` ${skippedLines} linha${skippedLines !== 1 ? 's' : ''} com formato inválido foi(ram) ignorada(s).`;
                 showToast(msg, skippedLines > 0 ? 'info' : 'success');
             }
