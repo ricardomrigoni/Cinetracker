@@ -1026,9 +1026,6 @@
             .multi-select-menu { min-width: 0; width: max-content; max-width: 88vw; }
             .multi-select-btn { min-width: 0; }
 
-            /* Botões de exportar/importar: texto some, fica só o ícone, pra caber na fileira */
-            #exportMenuWrap .multi-select-btn { padding-left: 14px; padding-right: 28px; }
-
             /* Estatísticas: gráficos mais compactos horizontalmente */
             .stats-page-container { padding: 16px 14px 50px 14px; gap: 18px; }
             .chart-viz { height: 190px; } /* precisa caber os 170px do SVG + rótulos, senão sobrepõe o título */
@@ -1094,14 +1091,7 @@
                 Importar
                 <input type="file" id="fileInput" accept=".txt,.json">
             </label>
-            <div class="multi-select" id="exportMenuWrap">
-                <button class="btn btn-primary multi-select-btn" onclick="app.toggleExportMenu()">Exportar Dados</button>
-                <div class="multi-select-menu multi-select-menu-right" id="exportMenu">
-                    <div class="multi-select-option" onclick="app.exportJSON()">📦 JSON (recomendado)</div>
-                    <div class="multi-select-divider"></div>
-                    <div class="multi-select-option" onclick="app.exportTXT()">📄 TXT (planilha)</div>
-                </div>
-            </div>
+            <button class="btn btn-primary" onclick="app.exportJSON()" title="Baixa um arquivo JSON com todo o catálogo — use como backup">📦 Exportar JSON</button>
         </div>
     </header>
 
@@ -1447,18 +1437,6 @@
             <div class="confirm-actions">
                 <button class="btn" id="confirmCancelBtn">Cancelar</button>
                 <button class="btn btn-danger" id="confirmOkBtn">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Aviso de rascunho recuperável (autosave) -->
-    <div class="confirm-overlay" id="draftOverlay">
-        <div class="confirm-box">
-            <div class="confirm-title">Recuperar rascunho não salvo?</div>
-            <div class="confirm-message" id="draftMessage"></div>
-            <div class="confirm-actions">
-                <button class="btn" id="draftDiscardBtn">Descartar</button>
-                <button class="btn btn-primary" id="draftRestoreBtn">Recuperar</button>
             </div>
         </div>
     </div>
@@ -2394,8 +2372,6 @@
                     if (dirWrap && !dirWrap.contains(e.target)) this.closeDirectorMenu();
                     const genWrap = document.getElementById('genreFilterWrap');
                     if (genWrap && !genWrap.contains(e.target)) this.closeGenreMenu();
-                    const exportWrap = document.getElementById('exportMenuWrap');
-                    if (exportWrap && !exportWrap.contains(e.target)) this.closeExportMenu();
                     const statsExportWrap = document.getElementById('statsExportMenuWrap');
                     if (statsExportWrap && !statsExportWrap.contains(e.target)) this.closeStatsExportMenu();
                 });
@@ -2426,9 +2402,6 @@
                         e.returnValue = ''; // Necessário para Chrome
                     }
                 });
-
-                // Verifica se há um rascunho salvo automaticamente que valha a pena recuperar
-                this.checkDraftRecovery();
             }
 
             // --- Navegação entre abas ---
@@ -2839,68 +2812,6 @@
                 this.fetchPosters();
                 this.handleFilter();
                 this.renderStats();
-                this.scheduleAutosave();
-            }
-
-            // Salva um rascunho automático no localStorage a cada alteração (com um
-            // pequeno atraso, para não escrever no disco a cada tecla). Isso é só uma
-            // rede de segurança contra fechamentos inesperados — não substitui a
-            // exportação manual, que continua sendo a forma "oficial" de guardar os dados.
-            scheduleAutosave() {
-                clearTimeout(this._autosaveTimer);
-                this._autosaveTimer = setTimeout(() => this.saveDraftToStorage(), 1000);
-            }
-
-            saveDraftToStorage() {
-                if (!this.movies.length && !this.pending.length) return; // nada a proteger ainda
-                try {
-                    const draft = { savedAt: new Date().toISOString(), payload: this.buildJSONPayload() };
-                    localStorage.setItem('cinetracker_draft', JSON.stringify(draft));
-                } catch (e) {
-                    // Provavelmente localStorage cheio (quota excedida) — não é crítico
-                    // o suficiente para incomodar com um toast a cada alteração.
-                    console.error('Não foi possível salvar o rascunho automático', e);
-                }
-            }
-
-            // Ao abrir o app, verifica se existe um rascunho salvo automaticamente que seja
-            // mais novo que o último arquivo importado/exportado — nesse caso, oferece para
-            // recuperá-lo, já que ele representa trabalho que nunca chegou a ser salvo fora do navegador.
-            checkDraftRecovery() {
-                let draftRaw;
-                try { draftRaw = localStorage.getItem('cinetracker_draft'); } catch (e) { return; }
-                if (!draftRaw) return;
-
-                let draft;
-                try { draft = JSON.parse(draftRaw); } catch (e) { return; }
-                if (!draft || !draft.payload || !Array.isArray(draft.payload.movies) || !draft.payload.movies.length) return;
-
-                const lastSync = localStorage.getItem('cinetracker_last_sync_at');
-                if (lastSync && draft.savedAt <= lastSync) return; // nada de novo desde o último arquivo
-
-                const savedDate = new Date(draft.savedAt);
-                const dateLabel = isNaN(savedDate.getTime()) ? '' : ` em ${savedDate.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}`;
-                const n = draft.payload.movies.length;
-                const pendingN = Array.isArray(draft.payload.pending) ? draft.payload.pending.length : 0;
-                let msg = `Encontramos um rascunho salvo automaticamente${dateLabel}, com ${n} filme${n !== 1 ? 's' : ''}`;
-                if (pendingN) msg += ` e ${pendingN} sugestão${pendingN !== 1 ? 'ões' : ''} na lista de sorteio`;
-                msg += '. Isso costuma acontecer quando o navegador fecha antes de exportar. Deseja recuperá-lo?';
-                document.getElementById('draftMessage').textContent = msg;
-
-                const overlay = document.getElementById('draftOverlay');
-                const restoreBtn = document.getElementById('draftRestoreBtn');
-                const discardBtn = document.getElementById('draftDiscardBtn');
-                overlay.classList.add('open');
-
-                restoreBtn.onclick = () => {
-                    this.applyJSONPayload(draft.payload);
-                    overlay.classList.remove('open');
-                    showToast('Rascunho recuperado com sucesso. Não esqueça de exportar para guardar em um arquivo.', 'success');
-                };
-                discardBtn.onclick = () => {
-                    try { localStorage.removeItem('cinetracker_draft'); } catch (e) {}
-                    overlay.classList.remove('open');
-                };
             }
 
             formatDuration(mins) {
@@ -3789,56 +3700,8 @@
                 downloadTextFile(JSON.stringify(payload, null, 2), `cinetracker_${dateSuffix}.json`, 'application/json');
                 this.hasUnsavedChanges = false;
                 markSynced();
-                this.closeExportMenu();
                 showToast('Arquivo JSON exportado com sucesso.', 'success');
             }
-
-            // Exportação alternativa "legível/planilha": o formato .txt original, útil para
-            // abrir direto numa planilha. Mantido por compatibilidade com versões anteriores.
-            exportTXT() {
-                const sorted = [...this.movies].sort((a,b) => a.rankAvg - b.rankAvg);
-
-                // Evita que um ";" dentro de um texto livre (título, resenha, etc.)
-                // seja confundido com o separador de campos.
-                const safe = v => (v === null || v === undefined ? '' : String(v)).replace(/;/g, ',');
-
-                // TítuloOriginal fica ao final para manter compatibilidade com arquivos
-                // exportados antes dessa coluna existir.
-                let txt = "Posição;Título;Diretor;Ano;Tempo;Gênero;Israel;Ricardo;Média;IMDb;Data;Local;ResenhaIsrael;ResenhaRicardo;TítuloOriginal\n";
-
-                sorted.forEach(m => {
-                    const fmtN = n => n.toFixed(2).replace('.', ',');
-                    const [y, mm, dd] = m.date.split('-');
-                    const dateBr = `${dd}/${mm}/${y}`;
-
-                    txt += `${m.rankAvg};${safe(m.title)};${safe(m.director)};${m.year};${m.duration};${safe(m.genres)};` +
-                           `${fmtN(m.scIsr)};${fmtN(m.scRic)};${fmtN(m.avg)};${fmtN(m.scImdb)};` +
-                           `${dateBr};${safe(m.local)};${safe(m.revIsr)};${safe(m.revRic)};${safe(m.originalTitle)}\n`;
-                });
-
-                // Anexa a lista de "Sortear Filme" (watchlist) em uma seção separada,
-                // para que nada seja perdido ao reimportar o arquivo depois.
-                const sortedPending = [...this.pending].sort((a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' }));
-                txt += "\n[SORTEAR]\n";
-                txt += "Título;SugeridoPor\n";
-                sortedPending.forEach(p => { txt += `${safe(p.title)};${safe(p.by || 'Ambos')}\n`; });
-
-                downloadTextFile(txt, 'CineTracker_Data.txt', 'text/plain');
-                this.hasUnsavedChanges = false; // Reset após salvar
-                markSynced();
-                this.closeExportMenu();
-                showToast('Arquivo TXT exportado com sucesso.', 'success');
-            }
-
-            toggleExportMenu() {
-                const menu = document.getElementById('exportMenu');
-                if (menu) menu.classList.toggle('open');
-            }
-            closeExportMenu() {
-                const menu = document.getElementById('exportMenu');
-                if (menu) menu.classList.remove('open');
-            }
-
 
             // --- 5. ESTATÍSTICAS ---
             // `list` é o recorte (respeitando o filtro de período da aba de Estatísticas).
