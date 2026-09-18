@@ -1,74 +1,106 @@
-            line-height: 1.05;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CineTracker Israel & Ricardo</title>
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            /* ============================================================
+               MATINÊ — tema claro. Papel de cartaz antigo + tinta + vermelho
+               de cortina de cinema. Nada de azul-Apple: aqui é sessão da tarde.
+               ============================================================ */
+            --bg-body: #f2ead9;
+            --bg-panel: #fffaf0;
+            --bg-card: #fffaf0;
+            --bg-modal-left: #ece0c6;
+
+            --bg-input: rgba(43, 30, 15, 0.06);
+            --bg-input-focus: #ffffff;
+            --bg-secondary: rgba(43, 30, 15, 0.045);
+
+            --border: #ddcda5;
+            --text-main: #2a2016;
+            --text-muted: #8a7857;
+            --accent: #a6272c;
+            --accent-hover: #7f1e22;
+            --chart-bar: #a6272c;
+            --gold: #b8912c;
+            --gold-soft: rgba(184, 145, 44, 0.16);
+
+            cursor: pointer; box-shadow: var(--card-shadow);
+            transition: transform 0.15s ease, background 0.15s ease;
+            animation: back-fab-in 0.25s cubic-bezier(0.25,0.8,0.25,1);
         }
-        .stat-lbl {
-            font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-top: 8px;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            padding-top: 8px; border-top: 1px dashed var(--border);
+        .back-fab:hover { background: var(--gold-soft); transform: translateY(-2px); }
+        .back-fab-arrow { font-size: 1.05rem; line-height: 1; }
+        @keyframes back-fab-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 700px) { .back-fab { left: 16px; bottom: 16px; padding: 10px 16px 10px 14px; } }
+
+        .toast {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: var(--bg-panel); color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 16px;
+            box-shadow: var(--card-shadow);
+            font-size: 0.85rem; font-weight: 600; line-height: 1.4;
+            animation: toast-in 0.25s cubic-bezier(0.25,0.8,0.25,1);
+            border-left: 4px solid var(--gold);
         }
-        .stat-sublabel { font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-        .stat-highlight { color: var(--accent); }
-        .stat-full { grid-column: 1 / -1; }
+        .toast.toast-error { border-left-color: var(--score-low); }
+        .toast.toast-success { border-left-color: var(--score-high); }
+        .toast.toast-info { border-left-color: var(--gold); }
+        .toast-icon { font-size: 1.05rem; line-height: 1.3; flex-shrink: 0; }
+        .toast-close { margin-left: auto; cursor: pointer; color: var(--text-muted); font-weight: 700; flex-shrink: 0; padding-left: 6px; }
+        .toast.toast-out { animation: toast-out 0.2s ease forwards; }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
 
-        /* --- Chart Section --- */
-        .chart-panel { padding: 26px; border-top: 3px solid var(--gold); }
-        .chart-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
-        .chart-title { font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
-        .chart-scale-note { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
-
-        .chart-viz.chart-viz-tall { height: 240px; }
-
-        .chart-viz {
-            flex-grow: 1;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 8px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed var(--border);
-            height: 180px;
+        /* --- Modal de confirmação genérico --- */
+        .confirm-overlay {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(10, 7, 3, 0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            justify-content: center; align-items: center; padding: 20px;
         }
+        .confirm-overlay.open { display: flex; }
+            </div>
 
-        .bar-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-            justify-content: flex-end;
-            position: relative;
-        }
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Gêneros Mais Assistidos</span></div>
+                <div class="rank-list rank-list-scroll" id="rankGenresCount"></div>
+            </div>
 
-        .bar {
-            width: 60%;
-            background: var(--chart-bar);
-            border-radius: 4px 4px 0 0;
-            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            min-height: 4px;
-            opacity: 0.85;
-        }
-        .bar:hover { opacity: 1; transform: scaleX(1.15); }
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Diretores Mais Bem Avaliados <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(mín. 2 filmes)</span></span></div>
+                <div class="rank-list rank-list-scroll" id="rankDirectorsAvg"></div>
+            </div>
 
-        .bar-label {
-            margin-top: 10px;
-            font-size: 0.66rem;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            color: var(--text-muted);
-        }
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Gêneros Mais Bem Avaliados <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(mín. 2 filmes)</span></span></div>
+                <div class="rank-list rank-list-scroll" id="rankGenresAvg"></div>
+            </div>
 
-        // Grade de "medalhões" (anéis de progresso 0–10) — usado nos rankings
-        // "Mais Bem Avaliados" (diretores/gêneros)
-        function buildGaugeGrid(items, opts = {}) {
-            if (!items.length) return '<div class="empty-hint">Sem dados suficientes.</div>';
-            const size = opts.size || 76;
-            const stroke = 7;
-            const r = (size - stroke) / 2;
-            const circumference = 2 * Math.PI * r;
-            const cards = items.map(item => {
-                const val = opts.valueFn(item);
-                const pct = Math.max(0, Math.min(1, val / 10));
-                const dash = (circumference * pct).toFixed(1);
-                const color = scoreColor(val);
+            <div class="stats-row">
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">Maior Divergência de Opinião <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(top 5)</span></span></div>
+                    <div class="rank-list" id="divergenceList"></div>
+                </div>
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">Locais</span></div>
+                    <div class="rank-list" id="localsList"></div>
+                </div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <h4 style="margin:0 0 6px 0; font-weight:700; color:var(--text-main); font-size:1.15rem;">Curiosidades</h4>
+                <div style="color:var(--text-muted); font-size:0.85rem;">Mais alguns números interessantes do histórico de vocês.</div>
+            </div>
+
+            <div class="stats-overview-grid" id="statsExtra"></div>
+
                 const name = opts.nameFn(item);
                 const safeName = escapeHtml(name);
                 const click = opts.clickFn ? ` onclick="${opts.clickFn(item)}"` : '';
@@ -90,147 +122,124 @@
         // Lista "dumbbell" (dois pontos conectados numa régua 0–10) — usada na
         // Maior Divergência de Opinião
         function buildDumbbellList(items) {
-            const colorAt = i => (hasOther && i === grouped.length - 1) ? 'var(--text-muted)' : PIE_PALETTE[i % PIE_PALETTE.length];
-
-            const size = opts.size || 220;
-            const cx = size / 2, cy = size / 2;
-            const rOuter = size / 2 - 7;
-            const rInner = opts.hole ? rOuter * opts.hole : 0;
-            const gapDeg = grouped.length > 1 ? (opts.gapDeg || 1.6) : 0;
-
-            let acc = 0;
-            const slices = grouped.map((it, i) => {
-                const start = (acc / total) * 360;
-                acc += it.count;
-                const end = (acc / total) * 360;
-                if (end - start <= gapDeg * 1.2) return ''; // fatia praticamente zero: não desenha lasca quebrada
-                const path = pieSlicePath(cx, cy, rOuter, rInner, start + gapDeg / 2, end - gapDeg / 2);
-                return `<path d="${path}" style="fill:${colorAt(i)}; stroke:var(--bg-panel); stroke-width:2.5;"><title>${escapeHtml(it.name)}: ${it.count} (${(it.count/total*100).toFixed(0)}%)</title></path>`;
-            }).join('');
-
-            const centerLabel = opts.centerLabel ? `
-                <text x="${cx}" y="${cy - 5}" text-anchor="middle" class="pie-center-value">${escapeHtml(opts.centerLabel)}</text>
-                <text x="${cx}" y="${cy + 15}" text-anchor="middle" class="pie-center-sub">${escapeHtml(opts.centerSub || '')}</text>
-            ` : '';
-
-            const legend = grouped.map((it, i) => {
-                const pct = (it.count / total * 100);
-                const valueTxt = opts.legendValueFn ? opts.legendValueFn(it, pct) : `${it.count} · ${pct.toFixed(0)}%`;
+            if (!items.length || items[0].diff <= 0) return '<div class="empty-hint">Sem divergências ainda.</div>';
+            return items.map((m, idx) => {
+                const pIsr = (m.scIsr / 10) * 100;
+                const pRic = (m.scRic / 10) * 100;
+                const left = Math.min(pIsr, pRic);
+                const right = Math.max(pIsr, pRic);
                 return `
-                    <div class="donut-legend-item">
-                        <span class="donut-dot" style="background:${colorAt(i)};"></span>
-                        <span class="donut-legend-name">${escapeHtml(it.name)}</span>
-                        <span class="donut-legend-value">${valueTxt}</span>
-                    </div>
-                `;
-            }).join('');
-
-            return `
-                this.pushNavState();
-                this.switchTab('catalogo');
-                const key = normalizeKey(name);
-
-                // Limpa outros filtros de diretor ativos e seleciona só este,
-                // marcando a caixinha correspondente no menu suspenso
-                this.selectedDirectors = new Set([key]);
-                document.querySelectorAll('#directorOptionsList input[type="checkbox"]').forEach(cb => {
-                    cb.checked = (cb.value === key);
-                });
-                const allOpt = document.getElementById('directorOptAll');
-                if (allOpt) allOpt.checked = false;
-                this.updateDirectorFilterButtonLabel();
-
-                // Garante que o dropdown, se aberto depois, mostre a lista completa (não
-                // filtrada por uma busca anterior) e sem o menu aberto por engano
-                const dirSearch = document.getElementById('directorSearchInput');
-                if (dirSearch) dirSearch.value = '';
-                this.filterDirectorOptions('');
-                this.closeDirectorMenu();
-
-                document.getElementById('searchInput').value = '';
-                this.handleFilter();
-            }
-
-            // --- Gerenciamento de Tema ---
-            toggleTheme() {
-                const current = document.body.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.body.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-                this.updateThemeIcon(next);
-            }
-
-            updateThemeIcon(theme) {
-                    prevStyles.push({ el, maxHeight: el.style.maxHeight, overflow: el.style.overflow, overflowX: el.style.overflowX });
-                    el.style.maxHeight = 'none';
-                    el.style.overflow = 'visible';
-                    el.style.overflowX = 'visible';
-                });
-
-                const bg = getComputedStyle(document.body).getPropertyValue('--bg-body').trim() || '#f2ead9';
-
-                try {
-                    return await html2canvas(target, {
-                        backgroundColor: bg,
-                        scale: 2,
-                        useCORS: true,
-                        windowWidth: Math.max(target.scrollWidth, 1200)
-                    });
-                } finally {
-                    prevStyles.forEach(({ el, maxHeight, overflow, overflowX }) => {
-                        el.style.maxHeight = maxHeight;
-                        el.style.overflow = overflow;
-                        el.style.overflowX = overflowX;
-                    });
-                }
-            }
-
-            async exportStatsAsImage() {
-                this.closeStatsExportMenu();
-                showToast('Gerando imagem do resumo...', 'info', 3000);
-                try {
-                    const canvas = await this.captureStatsCanvas();
-                    canvas.toBlob(blob => {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `cinetracker_resumo_${new Date().toISOString().split('T')[0]}.png`;
-                        a.click();
-                            <div class="pending-by" style="${p.by === 'Israel' ? 'color:var(--color-israel)' : p.by === 'Ricardo' ? 'color:var(--color-ricardo)' : ''}">${p.by && p.by !== 'Ambos' ? 'Sugestão de ' + escapeHtml(p.by) : 'Sugestão de ambos'}</div>
+                    <div class="dumbbell-item" title="${escapeHtml(m.title)}">
+                        <div class="dumbbell-top">
+                            <span class="rank-item-name">${idx+1}. ${escapeHtml(m.title)}</span>
+                            <span class="rank-item-value">Δ ${m.diff.toFixed(1)}</span>
                         </div>
-                        <div class="pending-del" onclick="app.deletePending(${p.id})" title="Remover">×</div>
-                    </div>
-                `).join('');
-            }
+                        <div class="dumbbell-track">
+                const importedMovies = [];
+                let mode = 'movies'; // 'movies' | 'pending'
+                let importedPending = null; // só substitui a watchlist atual se a seção existir no arquivo
+                let skippedLines = 0; // linhas com formato inesperado, ignoradas silenciosamente
 
-            resetDraw() {
-                const resultEl = document.getElementById('drawResult');
-                const actionsEl = document.getElementById('drawActions');
-                const posterEl = document.getElementById('drawPoster');
-                if (resultEl) { resultEl.style.display = 'none'; resultEl.classList.remove('draw-final'); }
-                if (actionsEl) actionsEl.style.display = 'none';
-                if (posterEl) { posterEl.style.display = 'none'; posterEl.src = ''; }
-                this.lastDrawnId = null;
-                this.drawRequestId++; // invalida qualquer busca de capa ainda em andamento
-            }
+                // Detecta o separador de campos: novo padrão é ";", mas arquivos exportados
+                // antes dessa mudança ainda usam TAB — assim ambos continuam funcionando.
+                const delimiter = (lines[0] || '').includes('\t') ? '\t' : ';';
+                
+                // Ignora cabeçalho (i=1)
+                for (let i = 1; i < lines.length; i++) {
+                    const rawLine = lines[i];
+                    const line = rawLine.trim();
 
-            drawRandom() {
-                if (!this.pending.length) {
-                    alert('Adicione pelo menos um filme à lista antes de sortear.');
+                    // Detecta o início da seção da watchlist "Sortear Filme"
+                    if (line === '[SORTEAR]') {
+                        mode = 'pending';
+                        importedPending = [];
+                        continue;
+                    }
+
+                    if (mode === 'pending') {
+                        if (!line || line.startsWith('Título')) continue; // linha vazia ou cabeçalho da seção
+                        const c = rawLine.split(delimiter);
+                        const pTitle = (c[0] || '').trim();
+                        if (!pTitle) continue;
+                        importedPending.push({ id: importedPending.length + 1, title: pTitle, by: (c[1] || 'Ambos').trim() });
+                        continue;
+                    }
+
+                    if (!line) continue;
+                    
+                    const c = line.split(delimiter);
+                    if (c.length < 10) { skippedLines++; continue; }
+
+                        </div>
+                    `;
                     return;
                 }
-                const resultEl = document.getElementById('drawResult');
-                const actionsEl = document.getElementById('drawActions');
-                const posterEl = document.getElementById('drawPoster');
-                const btn = document.getElementById('drawBtn');
-                const titleEl = resultEl.querySelector('.draw-title');
 
-                this.drawRequestId++;
-                const requestId = this.drawRequestId;
+                if (!this.filtered.length) {
+                    grid.innerHTML = `
+                        <div class="catalog-empty-state">
+                            <div class="catalog-empty-icon">🔍</div>
+                            <div class="catalog-empty-title">Nenhum filme encontrado</div>
+                            <div class="catalog-empty-text">Nenhum filme corresponde aos filtros ou à busca atual. Tente ajustar o período, o diretor, o gênero ou o termo pesquisado.</div>
+                        </div>
+                    `;
+                    return;
+                }
 
-                btn.disabled = true;
-                actionsEl.style.display = 'none';
-                resultEl.classList.remove('draw-final');
+                // O selo de ranking e a nota exibida acompanham o critério de ordenação escolhido
+                const rankKey = { avg: 'rankAvg', isr: 'rankIsr', ric: 'rankRic' }[this.sortBy] || 'rankAvg';
+                const scoreFn = { avg: m => m.avg, isr: m => m.scIsr, ric: m => m.scRic }[this.sortBy] || (m => m.avg);
+
+                // Monta tudo em um array e insere de uma vez só (mais rápido que
+                // concatenar innerHTML dentro do loop, principalmente em catálogos grandes).
+                grid.innerHTML = this.filtered.map(m => {
+                    const safeTitle = escapeHtml(m.title);
+                    const img = m.poster || `https://via.placeholder.com/300x450/2b2013/e0a93b?text=${encodeURIComponent(m.title || 'Sem+Capa')}`;
+                    const score = scoreFn(m);
+                    const mainGenre = (m.genres || '').split(',')[0].trim();
+                    // Só mostra o "esqueleto" pulsando enquanto ainda faz sentido esperar uma
+                    // capa (a busca automática ainda não desistiu dessa); depois de falhar,
+                    // a nova tentativa passa a ser manual, então a imagem fica estática.
+                    const stillLoading = !m.poster && !m.posterFailed;
+                    const directorTxt = (m.director || '').trim();
+                    return `
+                        <div class="movie-card" onclick="app.openModal(${m.id})" title="${safeTitle}">
+                            <div class="rank-badge">#${m[rankKey]}</div>
+                const diffCount = prevCount > 0 ? total - prevCount : null;
+
+                return {
+                    year, total, avgNossa, avgIsr, avgRic, mins,
+                    topGenre, topDirector, bestMovie,
+                    topMonth: monthNames[topMonthIdx], topMonthCount: monthCount[topMonthIdx],
+                    diffCount
+                };
+            }
+
+            openRecap() {
+                const years = [...new Set(this.movies.map(m => (m.date || '').split('-')[0]))].filter(Boolean).sort().reverse();
+                if (!years.length) {
+                    showToast('Ainda não há filmes suficientes para gerar um recap.', 'info');
+                    return;
+                }
+                const sel = document.getElementById('recapYearSelect');
+                sel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+                sel.value = years[0];
+                this.renderRecap(years[0]);
+                document.getElementById('recapOverlay').classList.add('open');
+            }
+
+            closeRecap() {
+                document.getElementById('recapOverlay').classList.remove('open');
+            }
+
+            renderRecap(year) {
+                const r = this.computeRecap(year);
+                const card = document.getElementById('recapCard');
+                if (!r) {
+                    card.innerHTML = `<div class="recap-eyebrow">Recap</div><div class="recap-year">${escapeHtml(year)}</div><div class="recap-block-sub">Nenhum filme registrado nesse ano.</div>`;
+                    return;
+                }
+                const diffTxt = r.diffCount === null ? '' :
         // acordo. Isso existe porque, no celular, o cabeçalho quebra em várias linhas
         // (fica mais alto que os 74px do layout desktop) — sem essa sincronização, o
         // menu de abas (que usa --header-h para saber onde "grudar") ficava
