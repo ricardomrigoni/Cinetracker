@@ -761,7 +761,7 @@
             .modal-left { width: 100%; height: 250px; border-right: none; border-bottom: 1px dashed var(--border); }
             .modal-right { width: 100%; padding: 28px; }
             .reviews-container { grid-template-columns: 1fr; }
-            .chart-viz { height: 120px; }
+            .chart-viz { height: 190px; }
         }
 
         /* --- Navegação / abas --- */
@@ -998,9 +998,14 @@
             /* Nos botões só-texto (sem ícone), mantém o texto; nos com ícone unicode
                na frente, o próprio emoji já comunica a ação mesmo compacto */
 
-            /* Abas: garante rolagem horizontal suave sem cortar o texto */
-            .tab-nav { padding: 10px 14px; gap: 8px; }
-            .tab-nav .btn { font-size: 0.82rem; padding: 9px 14px; }
+            /* Abas: as 3 cabem lado a lado, sem precisar rolar */
+            .tab-nav { padding: 8px 10px; gap: 6px; overflow-x: visible; }
+            .tab-nav .btn {
+                flex: 1 1 0; min-width: 0;
+                font-size: 0.7rem; padding: 8px 4px;
+                white-space: normal; text-align: center; line-height: 1.15;
+                justify-content: center; gap: 4px;
+            }
 
             /* Grade de filmes: cards um pouco menores para caber 2 por linha com folga */
             .movies-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; }
@@ -1022,7 +1027,7 @@
 
             /* Estatísticas: gráficos mais compactos horizontalmente */
             .stats-page-container { padding: 16px 14px 50px 14px; gap: 18px; }
-            .chart-viz { height: 100px; }
+            .chart-viz { height: 190px; } /* precisa caber os 170px do SVG + rótulos, senão sobrepõe o título */
 
             /* Botão flutuante "Voltar": não fica colado na borda */
             .back-fab { left: 12px; bottom: 12px; }
@@ -1878,7 +1883,12 @@
             let minV = opts.zeroBase ? 0 : Math.min(...values);
             if (maxV === minV) maxV = minV + 1;
             const padTop = 30, padBottom = 26, padX = 22;
-            const containerW = Math.max(opts.containerWidth || 0, 320);
+            // Usa a largura real e medida do contêiner; só cai num valor padrão se
+            // essa medição vier zerada (elemento ainda oculto no momento da chamada).
+            // Antes havia um piso artificial de 320px que forçava o gráfico a ficar
+            // mais largo que a tela em aparelhos estreitos, causando rolagem horizontal
+            // indevida mesmo em gráficos que deveriam caber inteiros na tela.
+            const containerW = (opts.containerWidth && opts.containerWidth > 0) ? opts.containerWidth : 320;
             const wide = n > (opts.wideThreshold || 12);
             // A largura do SVG é sempre igual à largura real do contêiner (medida em
             // pixels), em vez de esticar um viewBox fixo — é isso que evitava a
