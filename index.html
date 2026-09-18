@@ -1,32 +1,266 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CineTracker Israel & Ricardo</title>
-    <style>
+            line-height: 1.05;
+        }
+        .stat-lbl {
+            font-size: 0.68rem; color: var(--text-muted); font-weight: 700; margin-top: 8px;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            padding-top: 8px; border-top: 1px dashed var(--border);
+        }
+        .stat-sublabel { font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+        .stat-highlight { color: var(--accent); }
+        .stat-full { grid-column: 1 / -1; }
 
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
+        /* --- Chart Section --- */
+        .chart-panel { padding: 26px; border-top: 3px solid var(--gold); }
+        .chart-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+        .chart-title { font-size: 0.95rem; font-weight: 800; color: var(--text-main); }
+        .chart-scale-note { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
 
-        :root {
-            /* ============================================================
-               MATINÊ — tema claro. Papel de cartaz antigo + tinta + vermelho
-               de cortina de cinema. Nada de azul-Apple: aqui é sessão da tarde.
-               ============================================================ */
-            --bg-body: #f2ead9;
-            --bg-panel: #fffaf0;
-            --bg-card: #fffaf0;
-            --bg-modal-left: #ece0c6;
+        .chart-viz.chart-viz-tall { height: 240px; }
 
-            --bg-input: rgba(43, 30, 15, 0.06);
-            --bg-input-focus: #ffffff;
-            --bg-secondary: rgba(43, 30, 15, 0.045);
+        .chart-viz {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+            height: 180px;
+        }
 
-            --border: #ddcda5;
-            --text-main: #2a2016;
-            --text-muted: #8a7857;
-            --accent: #a6272c;
-            --accent-hover: #7f1e22;
-            --chart-bar: #a6272c;
-            --gold: #b8912c;
-            --gold-soft: rgba(184, 145, 44, 0.16);
+        .bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .bar {
+            width: 60%;
+            background: var(--chart-bar);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            min-height: 4px;
+            opacity: 0.85;
+        }
+        .bar:hover { opacity: 1; transform: scaleX(1.15); }
+
+        .bar-label {
+            margin-top: 10px;
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: var(--text-muted);
+        }
+
+        // Grade de "medalhões" (anéis de progresso 0–10) — usado nos rankings
+        // "Mais Bem Avaliados" (diretores/gêneros)
+        function buildGaugeGrid(items, opts = {}) {
+            if (!items.length) return '<div class="empty-hint">Sem dados suficientes.</div>';
+            const size = opts.size || 76;
+            const stroke = 7;
+            const r = (size - stroke) / 2;
+            const circumference = 2 * Math.PI * r;
+            const cards = items.map(item => {
+                const val = opts.valueFn(item);
+                const pct = Math.max(0, Math.min(1, val / 10));
+                const dash = (circumference * pct).toFixed(1);
+                const color = scoreColor(val);
+                const name = opts.nameFn(item);
+                const safeName = escapeHtml(name);
+                const click = opts.clickFn ? ` onclick="${opts.clickFn(item)}"` : '';
+                const extra = opts.extraFn ? opts.extraFn(item) : '';
+                return `
+                    <div class="gauge-item${opts.clickFn ? ' bubble-clickable' : ''}"${click} title="${safeName}">
+                        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                            <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" style="stroke:var(--bg-input);" stroke-width="${stroke}"/>
+                            <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" style="stroke:${color};" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${dash} ${circumference.toFixed(1)}" transform="rotate(-90 ${size/2} ${size/2})"/>
+                            <text x="50%" y="53%" text-anchor="middle" class="gauge-value">${val.toFixed(1)}</text>
+                        </svg>
+                        <div class="gauge-label">${safeName}${extra}</div>
+                    </div>
+                `;
+            }).join('');
+            return `<div class="gauge-grid">${cards}</div>`;
+        }
+
+        // Lista "dumbbell" (dois pontos conectados numa régua 0–10) — usada na
+        // Maior Divergência de Opinião
+        function buildDumbbellList(items) {
+            const colorAt = i => (hasOther && i === grouped.length - 1) ? 'var(--text-muted)' : PIE_PALETTE[i % PIE_PALETTE.length];
+
+            const size = opts.size || 220;
+            const cx = size / 2, cy = size / 2;
+            const rOuter = size / 2 - 7;
+            const rInner = opts.hole ? rOuter * opts.hole : 0;
+            const gapDeg = grouped.length > 1 ? (opts.gapDeg || 1.6) : 0;
+
+            let acc = 0;
+            const slices = grouped.map((it, i) => {
+                const start = (acc / total) * 360;
+                acc += it.count;
+                const end = (acc / total) * 360;
+                if (end - start <= gapDeg * 1.2) return ''; // fatia praticamente zero: não desenha lasca quebrada
+                const path = pieSlicePath(cx, cy, rOuter, rInner, start + gapDeg / 2, end - gapDeg / 2);
+                return `<path d="${path}" style="fill:${colorAt(i)}; stroke:var(--bg-panel); stroke-width:2.5;"><title>${escapeHtml(it.name)}: ${it.count} (${(it.count/total*100).toFixed(0)}%)</title></path>`;
+            }).join('');
+
+            const centerLabel = opts.centerLabel ? `
+                <text x="${cx}" y="${cy - 5}" text-anchor="middle" class="pie-center-value">${escapeHtml(opts.centerLabel)}</text>
+                <text x="${cx}" y="${cy + 15}" text-anchor="middle" class="pie-center-sub">${escapeHtml(opts.centerSub || '')}</text>
+            ` : '';
+
+            const legend = grouped.map((it, i) => {
+                const pct = (it.count / total * 100);
+                const valueTxt = opts.legendValueFn ? opts.legendValueFn(it, pct) : `${it.count} · ${pct.toFixed(0)}%`;
+                return `
+                    <div class="donut-legend-item">
+                        <span class="donut-dot" style="background:${colorAt(i)};"></span>
+                        <span class="donut-legend-name">${escapeHtml(it.name)}</span>
+                        <span class="donut-legend-value">${valueTxt}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                this.pushNavState();
+                this.switchTab('catalogo');
+                const key = normalizeKey(name);
+
+                // Limpa outros filtros de diretor ativos e seleciona só este,
+                // marcando a caixinha correspondente no menu suspenso
+                this.selectedDirectors = new Set([key]);
+                document.querySelectorAll('#directorOptionsList input[type="checkbox"]').forEach(cb => {
+                    cb.checked = (cb.value === key);
+                });
+                const allOpt = document.getElementById('directorOptAll');
+                if (allOpt) allOpt.checked = false;
+                this.updateDirectorFilterButtonLabel();
+
+                // Garante que o dropdown, se aberto depois, mostre a lista completa (não
+                // filtrada por uma busca anterior) e sem o menu aberto por engano
+                const dirSearch = document.getElementById('directorSearchInput');
+                if (dirSearch) dirSearch.value = '';
+                this.filterDirectorOptions('');
+                this.closeDirectorMenu();
+
+                document.getElementById('searchInput').value = '';
+                this.handleFilter();
+            }
+
+            // --- Gerenciamento de Tema ---
+            toggleTheme() {
+                const current = document.body.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.body.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                this.updateThemeIcon(next);
+            }
+
+            updateThemeIcon(theme) {
+                    prevStyles.push({ el, maxHeight: el.style.maxHeight, overflow: el.style.overflow, overflowX: el.style.overflowX });
+                    el.style.maxHeight = 'none';
+                    el.style.overflow = 'visible';
+                    el.style.overflowX = 'visible';
+                });
+
+                const bg = getComputedStyle(document.body).getPropertyValue('--bg-body').trim() || '#f2ead9';
+
+                try {
+                    return await html2canvas(target, {
+                        backgroundColor: bg,
+                        scale: 2,
+                        useCORS: true,
+                        windowWidth: Math.max(target.scrollWidth, 1200)
+                    });
+                } finally {
+                    prevStyles.forEach(({ el, maxHeight, overflow, overflowX }) => {
+                        el.style.maxHeight = maxHeight;
+                        el.style.overflow = overflow;
+                        el.style.overflowX = overflowX;
+                    });
+                }
+            }
+
+            async exportStatsAsImage() {
+                this.closeStatsExportMenu();
+                showToast('Gerando imagem do resumo...', 'info', 3000);
+                try {
+                    const canvas = await this.captureStatsCanvas();
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `cinetracker_resumo_${new Date().toISOString().split('T')[0]}.png`;
+                        a.click();
+                            <div class="pending-by" style="${p.by === 'Israel' ? 'color:var(--color-israel)' : p.by === 'Ricardo' ? 'color:var(--color-ricardo)' : ''}">${p.by && p.by !== 'Ambos' ? 'Sugestão de ' + escapeHtml(p.by) : 'Sugestão de ambos'}</div>
+                        </div>
+                        <div class="pending-del" onclick="app.deletePending(${p.id})" title="Remover">×</div>
+                    </div>
+                `).join('');
+            }
+
+            resetDraw() {
+                const resultEl = document.getElementById('drawResult');
+                const actionsEl = document.getElementById('drawActions');
+                const posterEl = document.getElementById('drawPoster');
+                if (resultEl) { resultEl.style.display = 'none'; resultEl.classList.remove('draw-final'); }
+                if (actionsEl) actionsEl.style.display = 'none';
+                if (posterEl) { posterEl.style.display = 'none'; posterEl.src = ''; }
+                this.lastDrawnId = null;
+                this.drawRequestId++; // invalida qualquer busca de capa ainda em andamento
+            }
+
+            drawRandom() {
+                if (!this.pending.length) {
+                    alert('Adicione pelo menos um filme à lista antes de sortear.');
+                    return;
+                }
+                const resultEl = document.getElementById('drawResult');
+                const actionsEl = document.getElementById('drawActions');
+                const posterEl = document.getElementById('drawPoster');
+                const btn = document.getElementById('drawBtn');
+                const titleEl = resultEl.querySelector('.draw-title');
+
+                this.drawRequestId++;
+                const requestId = this.drawRequestId;
+
+                btn.disabled = true;
+                actionsEl.style.display = 'none';
+                resultEl.classList.remove('draw-final');
+        // acordo. Isso existe porque, no celular, o cabeçalho quebra em várias linhas
+        // (fica mais alto que os 74px do layout desktop) — sem essa sincronização, o
+        // menu de abas (que usa --header-h para saber onde "grudar") ficava
+        // posicionado por baixo do cabeçalho de verdade, escondido/sobreposto.
+        // Usa ResizeObserver em vez de só "load"/"resize" porque a altura do
+        // cabeçalho também muda depois (fonte carregando, botão Sair aparecendo
+        // após o login) e um observer pega qualquer uma dessas mudanças sozinho.
+        function syncHeaderHeight() {
+            const header = document.querySelector('header');
+            if (header) document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+        }
+        const headerElForObserver = document.querySelector('header');
+        if (window.ResizeObserver && headerElForObserver) {
+            new ResizeObserver(syncHeaderHeight).observe(headerElForObserver);
+        } else {
+            window.addEventListener('load', syncHeaderHeight);
+            window.addEventListener('resize', syncHeaderHeight);
+        }
+        syncHeaderHeight(); // roda já na primeira renderização, não só depois do "load"
+
+        const app = new CineApp();
+        cloud.init(); // busca sessão salva e, se houver, carrega os dados da nuvem
+
+        // Fechar com ESC
+        window.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            const recapOverlay = document.getElementById('recapOverlay');
+            if (recapOverlay && recapOverlay.classList.contains('open')) { app.closeRecap(); return; }
+            app.closeModal();
+        });
+    </script>
+</body>
+</html>
