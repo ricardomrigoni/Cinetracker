@@ -4664,6 +4664,19 @@
             }
         }
 
+        // Mede a altura REAL do cabeçalho e ajusta a variável CSS --header-h de
+        // acordo. Isso existe porque, no celular, o cabeçalho quebra em duas linhas
+        // (fica mais alto que os 74px fixos usados no layout desktop) — sem essa
+        // medição, o menu de abas (que usa --header-h para saber onde "grudar")
+        // ficava posicionado por baixo do cabeçalho de verdade, escondido.
+        function syncHeaderHeight() {
+            const header = document.querySelector('header');
+            if (header) document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+        }
+        window.addEventListener('load', syncHeaderHeight);
+        window.addEventListener('resize', syncHeaderHeight);
+        syncHeaderHeight(); // roda já na primeira renderização, não só depois do "load"
+
         const app = new CineApp();
         cloud.init(); // busca sessão salva e, se houver, carrega os dados da nuvem
 
