@@ -999,7 +999,11 @@
                na frente, o próprio emoji já comunica a ação mesmo compacto */
 
             /* Abas: as 3 cabem lado a lado, sem precisar rolar */
-            .tab-nav { padding: 8px 10px; gap: 6px; overflow-x: visible; }
+            /* Sem "sticky" no celular: elimina de vez qualquer chance de o menu
+               ficar preso numa posição errada por causa de cálculo de altura do
+               cabeçalho. Ele passa a ficar sempre exatamente onde está no código:
+               logo abaixo do cabeçalho, sem exceção. */
+            .tab-nav { padding: 8px 10px; gap: 6px; overflow-x: visible; position: static; top: auto; height: auto; }
             .tab-nav .btn {
                 flex: 1 1 0; min-width: 0;
                 font-size: 0.7rem; padding: 8px 4px;
