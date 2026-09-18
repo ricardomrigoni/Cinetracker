@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CineTracker Israel & Ricardo</title>
     <style>
 
@@ -1028,6 +1028,23 @@
             /* Estatísticas: gráficos mais compactos horizontalmente */
             .stats-page-container { padding: 16px 14px 50px 14px; gap: 18px; }
             .chart-viz { height: 190px; } /* precisa caber os 170px do SVG + rótulos, senão sobrepõe o título */
+            /* Rede de segurança: nenhum gráfico (SVG com largura em pixels fixos)
+               pode empurrar a página inteira para o lado. Isso é o que causava a
+               necessidade de arrastar a tela toda horizontalmente. */
+            .chart-viz svg { max-width: 100%; height: auto; }
+            .app-body, .tab-page, .stats-page-container, .gallery-container,
+            .sortear-container, .stats-overview-grid, .chart-panel, .highlight-card-flex {
+                max-width: 100vw; overflow-x: hidden;
+            }
+            /* A CAUSA REAL do card mais largo que a tela: por padrão, uma coluna de
+               grid em "1fr" nunca fica menor que o conteúdo mais largo dela (aqui,
+               "29D 15H", "DRAMA (94 FILMES)" etc.), mesmo que outros cards da mesma
+               coluna tenham conteúdo curto ("347"). O minmax(0, 1fr) remove esse piso
+               automático, deixando a coluna de fato ocupar só o espaço disponível —
+               e o texto que não couber quebra a linha em vez de esticar o card. */
+            .stats-grid, .stats-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .stat-card, .chart-panel { min-width: 0; }
+            .stat-val { white-space: normal; word-break: break-word; font-size: 1.7rem; }
 
             /* Botão flutuante "Voltar": não fica colado na borda */
             .back-fab { left: 12px; bottom: 12px; }
