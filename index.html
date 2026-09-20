@@ -696,6 +696,40 @@
         }
         .imdb-fetch-btn:hover { border-color: var(--accent); }
         .imdb-fetch-btn:disabled { opacity: .6; cursor: default; }
+        /* --- Aba "Israel & Ricardo" (curiosidades individuais) --- */
+        .profiles-versus { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+        .profiles-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+        @media (max-width: 1000px) { .profiles-cols { grid-template-columns: 1fr; } }
+        .profile-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+        .profile-head {
+            background: var(--bg-panel); border: 1px solid var(--border); border-left: 6px solid var(--pc);
+            border-radius: 10px; padding: 16px 22px; box-shadow: var(--card-shadow);
+        }
+        .profile-name { font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 2.4rem; line-height: 1; color: var(--pc); letter-spacing: 0.5px; }
+        .profile-sub { color: var(--text-muted); font-size: 0.82rem; font-weight: 600; margin-top: 4px; }
+        .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .fav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 560px) { .fav-grid, .profile-stats { grid-template-columns: 1fr; } }
+        .fav-card { background: var(--bg-secondary); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+        .fav-card[onclick] { cursor: pointer; }
+        .fav-card[onclick]:hover .fav-name { color: var(--accent); }
+        .fav-lbl { font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .fav-name { font-weight: 800; color: var(--text-main); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .fav-meta { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .top-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border); cursor: pointer; }
+        .top-item:last-child { border-bottom: none; }
+        .top-item:hover .top-title { color: var(--accent); }
+        .top-pos { width: 26px; text-align: right; font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.25rem; color: var(--text-muted); flex: none; }
+        .top-title { flex: 1; min-width: 0; font-weight: 700; font-size: 0.88rem; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .top-side { font-size: 0.74rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; flex: none; }
+        .top-score, .diff-chip { flex: none; min-width: 42px; text-align: center; border-radius: 6px; padding: 3px 8px; font-size: 0.82rem; font-weight: 800; color: #fff; }
+        .hist { display: flex; align-items: stretch; gap: 6px; height: 150px; margin-top: 6px; }
+        .hist-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+        .hist-count { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); height: 14px; }
+        .hist-barwrap { flex: 1; min-height: 0; width: 100%; display: flex; align-items: flex-end; }
+        .hist-bar { width: 100%; border-radius: 4px 4px 0 0; opacity: 0.9; }
+        .hist-lbl { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+        .sub-title { font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 2px 0; }
         .omdb-on .imdb-fetch-btn { display: inline-block; }
         .s-box .imdb-fetch-btn { margin-left: 4px; padding: 0 7px; font-size: 0.8rem; line-height: 1.5; }
 
@@ -1111,6 +1145,7 @@
     <nav class="tab-nav">
         <button class="btn btn-primary" id="navBtn-catalogo" onclick="app.switchTab('catalogo')">🎬 Catálogo</button>
         <button class="btn" id="navBtn-estatisticas" onclick="app.switchTab('estatisticas')">📊 Estatísticas</button>
+        <button class="btn" id="navBtn-perfis" onclick="app.switchTab('perfis')">🎭 Israel &amp; Ricardo</button>
         <button class="btn" id="navBtn-sortear" onclick="app.switchTab('sortear')">🎟️ Sortear Filme</button>
         <div class="tab-nav-hint">Sessão contínua desde 2022.<br>Que comecem os créditos.</div>
     </nav>
@@ -1292,6 +1327,18 @@
         </div>
     </div>
     <!-- /tab-estatisticas -->
+
+    <div id="tab-perfis" class="tab-page" style="display:none;">
+        <div class="stats-page-container">
+            <div>
+                <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Israel &amp; Ricardo</h3>
+                <div style="color:var(--text-muted); font-size:0.9rem;">Curiosidades de cada um: gostos, top 10 e os filmes em que a nota de cada um mais foge do IMDb. Considera todo o histórico; nota 0 conta como "sem nota". Clique em um filme para abri-lo.</div>
+            </div>
+            <div class="profiles-versus" id="profilesVersus"></div>
+            <div class="profiles-cols" id="profilesCols"></div>
+        </div>
+    </div>
+    <!-- /tab-perfis -->
 
     <div id="tab-sortear" class="tab-page" style="display:none;">
         <div class="sortear-container">
@@ -2096,6 +2143,210 @@
             }).join('');
         }
 
+        // ============================================================
+        // --- Aba "Israel & Ricardo": cálculos e HTML dos perfis ---
+        // ============================================================
+        const PROFILE_PEOPLE = [
+            { key: 'isr', name: 'Israel',  color: 'var(--color-israel)',  score: m => m.scIsr, otherScore: m => m.scRic, otherName: 'Ricardo' },
+            { key: 'ric', name: 'Ricardo', color: 'var(--color-ricardo)', score: m => m.scRic, otherScore: m => m.scIsr, otherName: 'Israel' }
+        ];
+
+        function pearsonCorr(xs, ys) {
+            const n = xs.length;
+            if (n < 5) return null;
+            const mx = xs.reduce((a, b) => a + b, 0) / n;
+            const my = ys.reduce((a, b) => a + b, 0) / n;
+            let num = 0, dx = 0, dy = 0;
+            for (let i = 0; i < n; i++) {
+                num += (xs[i] - mx) * (ys[i] - my);
+                dx += (xs[i] - mx) ** 2;
+                dy += (ys[i] - my) ** 2;
+            }
+            const den = Math.sqrt(dx * dy);
+            return den ? num / den : null;
+        }
+        function corrLabel(r) {
+            const a = Math.abs(r);
+            return a < 0.2 ? 'muito fraca' : a < 0.4 ? 'fraca' : a < 0.6 ? 'moderada' : a < 0.8 ? 'forte' : 'muito forte';
+        }
+
+        // Melhor e pior grupo (diretor, gênero, década...) pela média da nota da pessoa.
+        // Só entram grupos com pelo menos minCount filmes, para um único filme não dominar.
+        function groupExtremes(list, extractFn, minCount, scoreFn) {
+            const g = new Map();
+            list.forEach(m => {
+                const seen = new Set();
+                extractFn(m).forEach(raw => {
+                    const label = (raw || '').trim();
+                    if (!label) return;
+                    const k = normalizeKey(label);
+                    if (seen.has(k)) return;
+                    seen.add(k);
+                    let e = g.get(k);
+                    if (!e) { e = { labels: {}, sum: 0, count: 0 }; g.set(k, e); }
+                    e.labels[label] = (e.labels[label] || 0) + 1;
+                    e.sum += scoreFn(m);
+                    e.count++;
+                });
+            });
+            const arr = [...g.values()].filter(e => e.count >= minCount)
+                .map(e => ({ label: pickMostCommonLabel(e.labels), avg: e.sum / e.count, count: e.count }));
+            if (!arr.length) return { best: null, worst: null };
+            const tie = (a, b) => b.count - a.count || a.label.localeCompare(b.label, 'pt-BR', { sensitivity: 'base' });
+            const best = [...arr].sort((a, b) => (b.avg - a.avg) || tie(a, b))[0];
+            // "Menos favorito" nunca repete o favorito: se todos os grupos empatam na média,
+            // não há contraste a mostrar.
+            const worstCand = [...arr].sort((a, b) => (a.avg - b.avg) || tie(a, b)).find(e => e !== best);
+            const worst = worstCand && worstCand.avg < best.avg - 1e-9 ? worstCand : null;
+            return { best, worst };
+        }
+
+        function computePersonProfile(movies, p) {
+            const sc = p.score, other = p.otherScore;
+            const byTitle = (a, b) => (a.title || '').localeCompare(b.title || '', 'pt-BR', { sensitivity: 'base' });
+            const rated = movies.filter(m => sc(m) > 0);
+            const n = rated.length;
+            const avg = n ? rated.reduce((a, m) => a + sc(m), 0) / n : 0;
+
+            const counts = {};
+            rated.forEach(m => { const k = sc(m).toFixed(1); counts[k] = (counts[k] || 0) + 1; });
+            let modeKey = null, modeCount = 0;
+            Object.entries(counts).forEach(([k, c]) => {
+                if (c > modeCount || (c === modeCount && parseFloat(k) > parseFloat(modeKey))) { modeKey = k; modeCount = c; }
+            });
+
+            const hist = new Array(10).fill(0);
+            rated.forEach(m => { hist[Math.min(10, Math.max(1, Math.round(sc(m)))) - 1]++; });
+
+            const top10 = [...rated].sort((a, b) => (sc(b) - sc(a)) || (other(b) - other(a)) || byTitle(a, b)).slice(0, 10);
+            const bottom5 = [...rated].sort((a, b) => (sc(a) - sc(b)) || (other(a) - other(b)) || byTitle(a, b)).slice(0, 5);
+
+            const withImdb = rated.filter(m => m.scImdb > 0).map(m => ({ m, diff: sc(m) - m.scImdb }));
+            const meanDiff = withImdb.length ? withImdb.reduce((a, x) => a + x.diff, 0) / withImdb.length : 0;
+            const above = withImdb.filter(x => x.diff > 0.049).sort((a, b) => b.diff - a.diff || byTitle(a.m, b.m)).slice(0, 5);
+            const below = withImdb.filter(x => x.diff < -0.049).sort((a, b) => a.diff - b.diff || byTitle(a.m, b.m)).slice(0, 5);
+            const corr = pearsonCorr(withImdb.map(x => sc(x.m)), withImdb.map(x => x.m.scImdb));
+
+            const directors = groupExtremes(rated, m => (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director), 2, sc);
+            const genres = groupExtremes(rated, m => (m.genres || '').split(',').map(g => g.trim()).filter(Boolean), 3, sc);
+            const decades = groupExtremes(rated, m => { const y = parseInt(m.year, 10); return y ? ['Anos ' + Math.floor(y / 10) * 10] : []; }, 3, sc);
+
+            return {
+                n, avg, modeKey, modeCount, hist, top10, bottom5,
+                high: rated.filter(m => sc(m) >= 9).length,
+                low: rated.filter(m => sc(m) < 5).length,
+                imdbCount: withImdb.length, meanDiff, above, below, corr,
+                directors, genres, decades
+            };
+        }
+
+        function buildVersusHtml(movies) {
+            const both = movies.filter(m => m.scIsr > 0 && m.scRic > 0);
+            if (!both.length) return '';
+            const isrHigher = both.filter(m => m.scIsr - m.scRic > 0.049).length;
+            const ricHigher = both.filter(m => m.scRic - m.scIsr > 0.049).length;
+            const equal = both.length - isrHigher - ricHigher;
+            const avgIsr = both.reduce((a, m) => a + m.scIsr, 0) / both.length;
+            const avgRic = both.reduce((a, m) => a + m.scRic, 0) / both.length;
+            const d = avgIsr - avgRic;
+            const generous = Math.abs(d) < 0.05 ? 'Empate' : `${d > 0 ? 'Israel' : 'Ricardo'} (+${Math.abs(d).toFixed(2)})`;
+            const r = pearsonCorr(both.map(m => m.scIsr), both.map(m => m.scRic));
+            const card = (val, lbl) => `<div class="stat-card"><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div>`;
+            return [
+                card(`${isrHigher} × ${ricHigher}`, `Nota maior: Israel × Ricardo (${equal} empate${equal !== 1 ? 's' : ''})`),
+                card(generous, 'Mais generoso na média'),
+                card(`${Math.round(equal / both.length * 100)}%`, `Notas idênticas (${both.length} filmes avaliados pelos dois)`),
+                r === null ? '' : card(r.toFixed(2), `Sintonia entre os dois (${corrLabel(r)})`)
+            ].join('');
+        }
+
+        function buildPersonColumnHtml(p, f) {
+            const fmtSigned = v => (v > 0 ? '+' : '') + v.toFixed(1);
+            const head = `
+                <div class="profile-head">
+                    <div class="profile-name">${p.name}</div>
+                    <div class="profile-sub">${f.n} filme${f.n !== 1 ? 's' : ''} com nota</div>
+                </div>`;
+            if (!f.n) return `<div class="profile-col" style="--pc:${p.color}">${head}<div class="chart-panel"><div class="empty-hint">Ainda não há notas de ${p.name}.</div></div></div>`;
+
+            const statCard = (val, lbl) => `<div class="stat-card"><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div>`;
+            const stats = [
+                statCard(f.avg.toFixed(2), 'Nota média'),
+                statCard(`${f.modeKey}<span style="font-size:0.9rem; color:var(--text-muted);"> (${f.modeCount}×)</span>`, 'Nota mais dada'),
+                statCard(`${f.high}<span style="font-size:0.9rem; color:var(--text-muted);"> (${Math.round(f.high / f.n * 100)}%)</span>`, 'Notas 9 ou mais'),
+                statCard(`${f.low}<span style="font-size:0.9rem; color:var(--text-muted);"> (${Math.round(f.low / f.n * 100)}%)</span>`, 'Notas abaixo de 5')
+            ].join('');
+
+            const favCard = (lbl, g, dirClick) => {
+                if (!g) return `<div class="fav-card"><div class="fav-lbl">${lbl}</div><div class="fav-name">—</div><div class="fav-meta">dados insuficientes</div></div>`;
+                const click = dirClick ? ` data-director="${escapeHtml(g.label)}" onclick="app.filterByDirector(this.dataset.director)" title="Ver os filmes no catálogo"` : '';
+                return `<div class="fav-card"${click}><div class="fav-lbl">${lbl}</div><div class="fav-name">${escapeHtml(g.label)}</div><div class="fav-meta">média ${g.avg.toFixed(2)} · ${g.count} filme${g.count !== 1 ? 's' : ''}</div></div>`;
+            };
+            const favs = [
+                favCard('Diretor favorito', f.directors.best, true), favCard('Diretor menos favorito', f.directors.worst, true),
+                favCard('Gênero favorito', f.genres.best), favCard('Gênero menos favorito', f.genres.worst),
+                favCard('Década favorita', f.decades.best), favCard('Década menos favorita', f.decades.worst)
+            ].join('');
+
+            const otherName = p.otherName;
+            const topRow = (m, i) => `
+                <div class="top-item" onclick="app.openModal(${m.id})" title="${escapeHtml(m.title)}">
+                    <span class="top-pos">${i + 1}</span>
+                    <span class="top-title">${escapeHtml(m.title)}${m.year ? ` <span class="rank-item-count">(${escapeHtml(String(m.year))})</span>` : ''}</span>
+                    <span class="top-side">${otherName} ${p.otherScore(m) > 0 ? p.otherScore(m).toFixed(1) : '—'}</span>
+                    <span class="top-score" style="background:${scoreColor(p.score(m))}">${p.score(m).toFixed(1)}</span>
+                </div>`;
+
+            const diffRow = (x, i) => `
+                <div class="top-item" onclick="app.openModal(${x.m.id})" title="${escapeHtml(x.m.title)}">
+                    <span class="top-pos">${i + 1}</span>
+                    <span class="top-title">${escapeHtml(x.m.title)}${x.m.year ? ` <span class="rank-item-count">(${escapeHtml(String(x.m.year))})</span>` : ''}</span>
+                    <span class="top-side">${p.name} ${p.score(x.m).toFixed(1)} · IMDb ${x.m.scImdb.toFixed(1)}</span>
+                    <span class="diff-chip" style="background:${x.diff > 0 ? 'var(--score-high)' : 'var(--score-low)'}">${fmtSigned(x.diff)}</span>
+                </div>`;
+
+            let imdbHtml;
+            if (!f.imdbCount) {
+                imdbHtml = '<div class="empty-hint">Nenhum filme com nota do IMDb ainda. Use o botão ↻ dentro de um filme para buscar.</div>';
+            } else {
+                const tendency = Math.abs(f.meanDiff) < 0.05
+                    ? `${p.name} avalia, em média, igual ao IMDb`
+                    : `${p.name} dá, em média, <b>${Math.abs(f.meanDiff).toFixed(2)}</b> ponto${Math.abs(f.meanDiff) >= 1.005 ? 's' : ''} ${f.meanDiff > 0 ? 'a mais' : 'a menos'} que o IMDb`;
+                const corrTxt = f.corr === null ? '' : ` · correlação ${f.corr.toFixed(2)} (${corrLabel(f.corr)})`;
+                imdbHtml = `
+                    <div style="color:var(--text-muted); font-size:0.82rem; font-weight:600;">${tendency}${corrTxt}. Base: ${f.imdbCount} de ${f.n} filmes com nota do IMDb.</div>
+                    <div class="sub-title">Acima do IMDb — notas mais generosas</div>
+                    <div>${f.above.length ? f.above.map(diffRow).join('') : '<div class="empty-hint">Nenhum filme com nota acima do IMDb.</div>'}</div>
+                    <div class="sub-title">Abaixo do IMDb — notas mais duras</div>
+                    <div>${f.below.length ? f.below.map(diffRow).join('') : '<div class="empty-hint">Nenhum filme com nota abaixo do IMDb.</div>'}</div>`;
+            }
+
+            const maxH = Math.max(...f.hist, 1);
+            const histHtml = `<div class="hist">${f.hist.map((c, i) => `
+                <div class="hist-col" title="${c} filme${c !== 1 ? 's' : ''} com nota próxima de ${i + 1}">
+                    <div class="hist-count">${c || ''}</div>
+                    <div class="hist-barwrap"><div class="hist-bar" style="height:${c ? Math.max(3, c / maxH * 100).toFixed(0) : 0}%; background:${scoreColor(i + 1)};"></div></div>
+                    <div class="hist-lbl">${i + 1}</div>
+                </div>`).join('')}</div>`;
+
+            const panel = (title, note, body) => `
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">${title}${note ? ` <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">${note}</span>` : ''}</span></div>
+                    ${body}
+                </div>`;
+
+            return `
+                <div class="profile-col" style="--pc:${p.color}">
+                    ${head}
+                    <div class="profile-stats">${stats}</div>
+                    ${panel('Gostos', '(diretor: mín. 2 filmes · gênero e década: mín. 3)', `<div class="fav-grid">${favs}</div>`)}
+                    ${panel(`Top 10 de ${p.name}`, `(ao lado, a nota de ${otherName})`, `<div>${f.top10.map(topRow).join('')}</div>`)}
+                    ${panel('Os 5 piores', '', `<div>${f.bottom5.map(topRow).join('')}</div>`)}
+                    ${panel('Distribuição das notas', '(arredondadas para o inteiro mais próximo)', histHtml)}
+                    ${panel(`${p.name} × IMDb`, '', imdbHtml)}
+                </div>`;
+        }
+
         // Paleta categórica sempre distinta entre si (7 cores bem diferentes —
         // nenhuma delas coincide com outra, o que acontecia antes porque
         // "score-low" e "accent" eram exatamente o mesmo vermelho).
@@ -2484,7 +2735,7 @@
             // --- Navegação entre abas ---
             switchTab(tab, opts = {}) {
                 this.currentTab = tab;
-                ['catalogo', 'estatisticas', 'sortear'].forEach(t => {
+                ['catalogo', 'estatisticas', 'perfis', 'sortear'].forEach(t => {
                     const el = document.getElementById('tab-' + t);
                     if (el) {
                         if (t === tab) {
@@ -2502,6 +2753,7 @@
                     if (btn) btn.classList.toggle('btn-primary', t === tab);
                 });
                 if (tab === 'estatisticas') this.renderStats();
+                if (tab === 'perfis') this.renderProfiles();
                 if (tab === 'sortear') this.renderPending();
                 if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -2889,6 +3141,7 @@
                 this.fetchPosters();
                 this.handleFilter();
                 this.renderStats();
+                this.renderProfiles();
             }
 
             formatDuration(mins) {
@@ -4020,6 +4273,19 @@
                     yearlyScores, bestYear, worstYear, mostProductiveYear,
                     decadeScores, weekdayStats, longestMovie, shortestMovie, imdbCorrelation
                 };
+            }
+
+            renderProfiles() {
+                const cols = document.getElementById('profilesCols');
+                const versus = document.getElementById('profilesVersus');
+                if (!cols || !versus) return;
+                if (!this.movies.length) {
+                    versus.innerHTML = '';
+                    cols.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">Nenhum filme no catálogo ainda.</div>';
+                    return;
+                }
+                versus.innerHTML = buildVersusHtml(this.movies);
+                cols.innerHTML = PROFILE_PEOPLE.map(p => buildPersonColumnHtml(p, computePersonProfile(this.movies, p))).join('');
             }
 
             renderStats() {
