@@ -687,6 +687,18 @@
         }
         .retry-poster-btn.show { display: flex; }
 
+        /* Botão "↻ buscar" da nota do IMDb — só aparece se OMDB_API_KEY estiver configurada */
+        .imdb-fetch-btn {
+            display: none; margin-left: 8px; padding: 2px 10px; border-radius: 999px;
+            border: 1px solid var(--border); background: var(--bg-panel); color: var(--accent);
+            font: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0; text-transform: none;
+            cursor: pointer; vertical-align: middle;
+        }
+        .imdb-fetch-btn:hover { border-color: var(--accent); }
+        .imdb-fetch-btn:disabled { opacity: .6; cursor: default; }
+        .omdb-on .imdb-fetch-btn { display: inline-block; }
+        .s-box .imdb-fetch-btn { margin-left: 4px; padding: 0 7px; font-size: 0.8rem; line-height: 1.5; }
+
         .modal-right { width: 60%; padding: 46px; overflow-y: auto; }
 
         .modal-title { font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 2.6rem; font-weight: 400; margin: 0 0 4px 0; line-height: 1.05; color: var(--text-main); letter-spacing: 0.5px;}
@@ -1159,6 +1171,8 @@
                     <option value="avg">Ordenar por: Nossa Média</option>
                     <option value="isr">Ordenar por: Nota do Israel</option>
                     <option value="ric">Ordenar por: Nota do Ricardo</option>
+                    <option value="watchedDesc">Assistido: mais recente primeiro</option>
+                    <option value="watchedAsc">Assistido: mais antigo primeiro</option>
                 </select>
             </div>
         </div>
@@ -1355,7 +1369,7 @@
                             <div class="s-box"><div>Israel</div><div id="sIsrael" style="color:var(--color-israel)">-</div></div>
                             <div class="s-box"><div>Ricardo</div><div id="sRicardo" style="color:var(--color-ricardo)">-</div></div>
                             <div class="s-box"><div>Média</div><div id="sAvg" style="color:var(--accent)">-</div></div>
-                            <div class="s-box"><div>IMDb</div><div id="sImdb">-</div></div>
+                            <div class="s-box"><div>IMDb <button type="button" class="imdb-fetch-btn" id="imdbViewBtn" onclick="app.refreshImdbFromView()" title="Buscar a nota atual deste filme no IMDb e salvar">↻</button></div><div id="sImdb">-</div></div>
                         </div>
 
                         <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 30px; font-weight: 500;">
@@ -1398,7 +1412,7 @@
                             
                             <div><label>Nota Israel</label><input type="number" step="0.1" min="0" max="10" id="eIsrael"></div>
                             <div><label>Nota Ricardo</label><input type="number" step="0.1" min="0" max="10" id="eRicardo"></div>
-                            <div><label>IMDb</label><input type="number" step="0.1" min="0" max="10" id="eImdb"></div>
+                            <div><label>IMDb <button type="button" class="imdb-fetch-btn" id="imdbFetchBtn" onclick="app.fetchImdbRating()" title="Buscar a nota atual no IMDb (via OMDb)">↻ buscar</button></label><input type="number" step="0.1" min="0" max="10" id="eImdb"></div>
                         </div>
 
                         <label>Resenha Israel</label>
@@ -1687,6 +1701,19 @@
         };
 
         const API_KEY = '82706f1a729b416b5b4c1da4ddcbf79b';
+
+        // Chave gratuita do OMDb (https://www.omdbapi.com/apikey.aspx) — é a única forma
+        // prática de ler a nota do IMDb de dentro do navegador. Deixe vazio para
+        // desativar: sem chave, os botões de busca somem e a nota do IMDb fica manual.
+        // A busca NUNCA é automática: só acontece quando você clica em um botão "↻".
+        const OMDB_API_KEY = 'fffafcee';
+        if (OMDB_API_KEY) document.documentElement.classList.add('omdb-on');
+
+        // "AAAA-MM-DD" -> "DD/MM/AAAA"
+        function formatDateBR(iso) {
+            const [y, m, d] = String(iso || '').split('-');
+            return (y && m && d) ? `${d}/${m}/${y}` : '';
+        }
         const CINE_JSON_VERSION = 1; // versão do esquema do export/import em JSON
 
         // Baixa um conteúdo de texto como arquivo, usado por todas as exportações
@@ -1836,6 +1863,30 @@
 
             const bestMatch = pickBestResult(results, hint, year);
             return { bestMatch, hadNetworkError: errorFlag.failed };
+        }
+
+        // Lê a nota do IMDb (0–10) no OMDb a partir do id do IMDb (ex: tt0133093), que o
+        // próprio TMDB informa no detalhe do filme. Devolve null quando o IMDb ainda não
+        // tem nota para o título; lança erro em falha de rede/chave inválida/limite diário.
+        async function fetchImdbRatingById(imdbId) {
+            const url = `https://www.omdbapi.com/?i=${encodeURIComponent(imdbId)}&apikey=${encodeURIComponent(OMDB_API_KEY)}`;
+            const res = await fetch(url);
+            const data = await res.json().catch(() => null);
+            if (!data || data.Response === 'False') throw new Error((data && data.Error) || ('HTTP ' + res.status));
+            const r = parseFloat(data.imdbRating); // "N/A" vira NaN
+            return Number.isFinite(r) && r > 0 ? r : null;
+        }
+
+        // Descobre a nota do IMDb de um filme pelo título/título original/ano:
+        // TMDB (acha o filme e o código do IMDb) -> OMDb (nota). Devolve a nota ou null
+        // (IMDb sem nota); lança Error com mensagem amigável nos demais problemas.
+        async function lookupImdbRating(title, originalTitle, year) {
+            const { bestMatch } = await searchMovieBestMatch(title, originalTitle, year);
+            if (!bestMatch) throw new Error(`não encontrei "${title}" no TMDB`);
+            const dRes = await fetch(`https://api.themoviedb.org/3/movie/${bestMatch.id}?api_key=${API_KEY}`);
+            const dData = await dRes.json();
+            if (!dData.imdb_id) throw new Error('o TMDB não tem o código do IMDb deste filme');
+            return await fetchImdbRatingById(dData.imdb_id);
         }
 
         // Escapa texto livre (títulos, diretores, resenhas, locais...) antes de inserir
@@ -2997,6 +3048,56 @@
                 }
             }
 
+            // Botão "↻ buscar" ao lado do campo IMDb (modo edição): só preenche o campo
+            // com a nota atual — vale quando você clicar em Salvar.
+            async fetchImdbRating() {
+                const title = document.getElementById('eTitle').value.trim();
+                if (!title) { showToast('Preencha o título antes de buscar a nota do IMDb.', 'error'); return; }
+                const btn = document.getElementById('imdbFetchBtn');
+                const label = btn ? btn.textContent : '';
+                if (btn) { btn.disabled = true; btn.textContent = 'buscando…'; }
+                try {
+                    const r = await lookupImdbRating(
+                        title,
+                        document.getElementById('eOriginalTitle').value.trim(),
+                        document.getElementById('eYear').value.trim()
+                    );
+                    if (r === null) { showToast('O IMDb ainda não tem nota para este filme.', 'info'); return; }
+                    document.getElementById('eImdb').value = r.toFixed(1);
+                    showToast(`Nota do IMDb: ${r.toFixed(1)} (clique em Salvar para gravar).`, 'success');
+                } catch (e) {
+                    console.error('Erro ao buscar nota do IMDb', e);
+                    showToast('Não foi possível buscar a nota do IMDb: ' + e.message, 'error');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = label; }
+                }
+            }
+
+            // Botão "↻" ao lado da nota do IMDb (modo visualização do filme): busca a nota
+            // só deste filme e já grava na nuvem, sem precisar entrar em modo edição.
+            async refreshImdbFromView() {
+                const m = this.movies.find(x => x.id === this.editingId);
+                if (!m) return;
+                const btn = document.getElementById('imdbViewBtn');
+                const label = btn ? btn.textContent : '';
+                if (btn) { btn.disabled = true; btn.textContent = '…'; }
+                try {
+                    const r = await lookupImdbRating(m.title, m.originalTitle, m.year);
+                    if (r === null) { showToast(`O IMDb ainda não tem nota para "${m.title}".`, 'info'); return; }
+                    m.scImdb = r;
+                    this.hasUnsavedChanges = true;
+                    this.processData();
+                    document.getElementById('sImdb').innerText = r.toFixed(1);
+                    cloud.upsertMovie(m); // salva na nuvem em segundo plano
+                    showToast(`IMDb de "${m.title}": ${r.toFixed(1)} — salvo.`, 'success');
+                } catch (e) {
+                    console.error('Erro ao buscar nota do IMDb', e);
+                    showToast('Não foi possível buscar a nota do IMDb: ' + e.message, 'error');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = label; }
+                }
+            }
+
             // Reconsulta a capa somando o título (pt-BR) + o título original + o ano
             // informados no modal — usado quando o usuário edita o título original ou o
             // ano manualmente porque a capa buscada automaticamente veio errada (ex:
@@ -3265,10 +3366,24 @@
                 }
 
                 // Ordena pela métrica escolhida (padrão: nossa média)
+                // Ordenação por data assistida: dir = 1 (crescente) ou -1 (decrescente). Filmes sem
+                // data vão sempre para o fim da lista,
+                // independente do sentido. Empates são desfeitos pela nossa média.
+                const byDate = (valueFn, dir) => (a, b) => {
+                    const va = valueFn(a), vb = valueFn(b);
+                    const ea = va === '' || va == null || Number.isNaN(va);
+                    const eb = vb === '' || vb == null || Number.isNaN(vb);
+                    if (ea !== eb) return ea ? 1 : -1;
+                    if (!ea && va !== vb) return va < vb ? -dir : dir;
+                    return (b.avg - a.avg) || (b.scImdb - a.scImdb);
+                };
+                const watchedKey = m => m.date || '';                       // 'AAAA-MM-DD' compara bem como texto
                 const comparators = {
                     avg: (a, b) => (b.avg - a.avg) || (b.scImdb - a.scImdb),
                     isr: (a, b) => (b.scIsr - a.scIsr) || (b.avg - a.avg),
                     ric: (a, b) => (b.scRic - a.scRic) || (b.avg - a.avg),
+                    watchedDesc: byDate(watchedKey, -1),
+                    watchedAsc: byDate(watchedKey, 1),
                 };
                 list.sort(comparators[this.sortBy] || comparators.avg);
 
@@ -3414,6 +3529,8 @@
                     // a nova tentativa passa a ser manual, então a imagem fica estática.
                     const stillLoading = !m.poster && !m.posterFailed;
                     const directorTxt = (m.director || '').trim();
+                    const showWatched = this.sortBy === 'watchedDesc' || this.sortBy === 'watchedAsc';
+                    const watchedTxt = showWatched && m.date ? formatDateBR(m.date) : '';
                     return `
                         <div class="movie-card" onclick="app.openModal(${m.id})" title="${safeTitle}">
                             <div class="rank-badge">#${m[rankKey]}</div>
@@ -3423,6 +3540,7 @@
                             <div class="card-title-overlay">
                                 ${safeTitle}${m.year ? ` <span style="opacity:.7;font-weight:600;">(${escapeHtml(m.year)})</span>` : ''}
                                 ${directorTxt ? `<div class="card-director-overlay">${escapeHtml(directorTxt)}</div>` : ''}
+                                ${watchedTxt ? `<div class="card-director-overlay">Assistido em ${watchedTxt}</div>` : ''}
                             </div>
                         </div>
                     `;
