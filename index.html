@@ -1672,18 +1672,10 @@
 
             <div class="stats-overview-grid" id="sStatsOverview"></div>
 
-            <div class="chart-panel">
-                <div class="chart-header">
-                    <span class="chart-title">Atividade Mensal <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(episódios marcados)</span></span>
-                    <select id="sChartYear" onchange="sapp.handleChartYear(this.value)" style="display:none;"></select>
-                </div>
-                <div class="chart-viz" id="sChartViz"></div>
-            </div>
-
             <div class="stats-row">
                 <div class="chart-panel">
                     <div class="chart-header"><span class="chart-title">Situação do Catálogo</span></div>
-                    <div class="chart-viz" id="sStatusDonut"></div>
+                    <div class="rank-list" id="sStatusDonut"></div>
                 </div>
                 <div class="chart-panel">
                     <div class="chart-header"><span class="chart-title">Maior Divergência de Opinião <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(top 5)</span></span></div>
@@ -6183,7 +6175,7 @@
                 this.dirty = new Set();     // séries com gravação pendente (ignora o "eco" do realtime)
                 this.timers = {};
                 this.ver = {};
-                this.chartYear = null;
+
                 this._posterBusy = new Set();
                 this.lastDrawnId = null;
                 this.drawRequestId = 0;
@@ -7228,55 +7220,13 @@
                     imdbCorrelation = pearsonCorr(pts.map(s => s.avg), pts.map(s => s.scImdb));
                 }
 
-                // Episódios por mês (só os marcados um a um, que carregam data)
-                const years = new Set();
-                all.forEach(s => s.seasons.forEach(se => se.episodes.forEach(e => { if (e.watched && e.watchedDate) years.add(e.watchedDate.split('-')[0]); })));
-                const yearList = [...years].sort().reverse();
-
                 return {
                     total: all.length, startedN: started.length, doneN: done.length, ratedN: rated.length,
                     epsWatched, minsWatched, seasonsDone, remainingMin, queueMin,
                     avgIsr, avgRic, avgNossa, avgImdb, imdbN: withImdb.length,
                     creatorsCount, creatorsAvg, genresCount, genresAvg, divergences, agreement, decades, status,
-                    best, worst, longest, shortest, mostSeasons, imdbCorrelation, yearList, rated
+                    best, worst, longest, shortest, mostSeasons, imdbCorrelation, rated
                 };
-            }
-
-            monthlyData(year) {
-                const counts = new Array(12).fill(0);
-                this.series.forEach(s => s.seasons.forEach(se => se.episodes.forEach(e => {
-                    if (e.watched && e.watchedDate && e.watchedDate.startsWith(year + '-')) {
-                        const mi = parseInt(e.watchedDate.split('-')[1], 10) - 1;
-                        if (mi >= 0 && mi < 12) counts[mi]++;
-                    }
-                })));
-                return counts;
-            }
-
-            handleChartYear(v) { this.chartYear = v; this.renderMonthly(this._stats); }
-
-            renderMonthly(st) {
-                const viz = document.getElementById('sChartViz');
-                const sel = document.getElementById('sChartYear');
-                if (!viz || !st) return;
-                if (!st.yearList.length) {
-                    if (sel) sel.style.display = 'none';
-                    viz.style.height = 'auto';
-                    viz.innerHTML = '<div class="empty-hint" style="width:100%;">Marque episódios um a um (com o toque no episódio) para ver a atividade mensal. Marcações “até aqui” e “série inteira” não têm data.</div>';
-                    return;
-                }
-                viz.style.height = '';
-                if (!this.chartYear || !st.yearList.includes(this.chartYear)) this.chartYear = st.yearList[0];
-                if (sel) {
-                    sel.style.display = '';
-                    sel.innerHTML = st.yearList.map(y => `<option value="${y}" ${y === this.chartYear ? 'selected' : ''}>${y}</option>`).join('');
-                }
-                const labels = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-                const data = this.monthlyData(this.chartYear);
-                viz.innerHTML = buildAreaChart(data.map((v, i) => ({ label: labels[i], value: v })), {
-                    height: 170, zeroBase: true, containerWidth: viz.clientWidth, wideThreshold: 999,
-                    tooltipFmt: d => `${d.label}: ${d.value} episódio${d.value !== 1 ? 's' : ''}`
-                });
             }
 
             renderStats() {
@@ -7284,7 +7234,7 @@
                 if (!overview) return;
                 const s = this.computeStats();
                 this._stats = s;
-                const clearIds = ['sChartViz', 'sStatusDonut', 'sDivergence', 'sRankCreatorsCount', 'sRankCreatorsAvg', 'sRankGenresCount', 'sRankGenresAvg', 'sRankDecades', 'sStatsExtra', 'sHcCorr', 'sHcAgreement'];
+                const clearIds = ['sStatusDonut', 'sDivergence', 'sRankCreatorsCount', 'sRankCreatorsAvg', 'sRankGenresCount', 'sRankGenresAvg', 'sRankDecades', 'sStatsExtra', 'sHcCorr', 'sHcAgreement'];
                 if (!s) {
                     overview.innerHTML = '<div class="empty-hint" style="grid-column:1/-1">Cadastre séries para ver as estatísticas.</div>';
                     clearIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
@@ -7299,8 +7249,6 @@
                     card(s.avgRic.toFixed(2), 'Média Ricardo', '', 'color:var(--color-ricardo)'),
                     card(s.avgNossa.toFixed(2), 'Nossa Média', `<div class="stat-sublabel">${s.ratedN} série${s.ratedN !== 1 ? 's' : ''} avaliada${s.ratedN !== 1 ? 's' : ''}</div>`).replace('class="stat-val"', 'class="stat-val stat-highlight"')
                 ].join('');
-
-                this.renderMonthly(s);
 
                 const size = Math.min(Math.max(Math.round((document.getElementById('sStatusDonut').clientWidth || 300) * 0.62), 210), 300);
                 document.getElementById('sStatusDonut').innerHTML = buildPieChart(s.status, {
