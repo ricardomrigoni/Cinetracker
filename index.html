@@ -1096,9 +1096,197 @@
             /* Botão flutuante "Voltar": não fica colado na borda */
             .back-fab { left: 12px; bottom: 12px; }
         }
+
+        /* ============================================================
+           SÉRIES — extensões de estilo (reaproveitam os tokens do tema Matinê)
+           ============================================================ */
+
+        /* --- Seletor de modo (Filmes / Séries) no cabeçalho --- */
+        .mode-switch {
+            display: inline-flex; gap: 2px; padding: 4px; flex-shrink: 0;
+            background: var(--bg-input); border: 1px solid var(--border); border-radius: 999px;
+        }
+        .mode-btn {
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.1rem; letter-spacing: 1px;
+            padding: 5px 18px 4px 18px; border-radius: 999px; border: none; cursor: pointer;
+            background: transparent; color: var(--text-muted); transition: all 0.18s ease; white-space: nowrap;
+        }
+        .mode-btn:hover { color: var(--text-main); }
+        .mode-btn.active { background: var(--accent); color: #fff8ec; box-shadow: 0 2px 10px rgba(166, 39, 44, 0.3); }
+        [data-theme="dark"] .mode-btn.active { color: #1b1611; box-shadow: 0 2px 10px rgba(224, 169, 59, 0.25); }
+        .nav-group { display: contents; }
+        .controls { margin-left: auto; }
+        @media (max-width: 1240px) {
+            header { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
+        }
+
+        /* --- Grupos do catálogo de séries --- */
+        .series-group { margin-bottom: 42px; }
+        .series-group-head {
+            display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+            margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 1px dashed var(--border);
+        }
+        .series-group-title { font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.7rem; letter-spacing: 0.5px; margin: 0; color: var(--text-main); }
+        .series-group-count {
+            background: var(--gold-soft); color: var(--accent); font-weight: 800; font-size: 0.78rem;
+            padding: 2px 10px; border-radius: 999px;
+        }
+        [data-theme="dark"] .series-group-count { color: var(--gold); }
+        .series-group-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        /* --- Cards de série (usam .movie-card) --- */
+        .series-status-tag {
+            position: absolute; top: 12px; right: 10px; z-index: 2;
+            background: rgba(20, 14, 6, 0.72); color: #f5ead2; border: 1px solid rgba(245,234,210,0.35);
+            font-size: 0.58rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase;
+            padding: 3px 8px; border-radius: 999px; backdrop-filter: blur(6px);
+        }
+        .series-pct-badge {
+            position: absolute; bottom: 14px; right: 10px; z-index: 2;
+            background: var(--gold); color: #2a2016; font-weight: 800; font-size: 0.78rem;
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; letter-spacing: 0.3px;
+            padding: 4px 10px; border-radius: 999px; box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
+        .series-rate-badge { background: var(--accent); color: #fff8ec; font-family: 'Manrope', sans-serif; font-size: 0.66rem; }
+        [data-theme="dark"] .series-rate-badge { color: #1b1611; }
+        .movie-card .score-badge { z-index: 2; }
+        .series-progress-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: rgba(10,6,2,0.6); z-index: 2; }
+        .series-progress-fill { height: 100%; background: var(--gold); }
+
+        /* --- Modal de série --- */
+        .series-left { flex-direction: column; align-items: stretch; justify-content: flex-start; }
+        .series-poster-main { flex: 1 1 auto; min-height: 0; position: relative; overflow: hidden; background: var(--bg-modal-left); }
+        .series-poster-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .season-strip {
+            flex: none; display: flex; gap: 10px; overflow-x: auto; padding: 12px 14px 14px 14px;
+            background: var(--bg-modal-left); border-top: 1px dashed var(--border);
+        }
+        .season-thumb {
+            position: relative; flex: none; width: 56px; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden;
+            border: 2px solid transparent; cursor: pointer; background: var(--bg-input);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .season-thumb:hover { transform: translateY(-2px); }
+        .season-thumb.active { border-color: var(--gold); }
+        .series-left .season-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .season-thumb-noimg {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.3rem; color: var(--text-muted);
+            background: linear-gradient(160deg, var(--bg-input), var(--gold-soft));
+        }
+        .season-thumb-label {
+            position: absolute; left: 0; right: 0; bottom: 0; text-align: center; padding: 10px 0 5px 0;
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 0.85rem; letter-spacing: 0.5px; color: #f5ead2;
+            background: linear-gradient(to top, rgba(10,6,2,0.85), transparent);
+        }
+        .season-thumb-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(10,6,2,0.5); }
+        .season-thumb-bar div { height: 100%; background: var(--gold); }
+        .season-thumb.done::after {
+            content: '✓'; position: absolute; top: 3px; right: 3px; width: 16px; height: 16px; border-radius: 50%;
+            background: var(--score-high); color: #fff; font-size: 0.65rem; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .series-progress-block {
+            display: flex; gap: 20px; align-items: center; margin-bottom: 26px; padding: 18px;
+            background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 14px;
+        }
+        .series-ring { flex-shrink: 0; }
+        .series-progress-info { min-width: 0; flex: 1; }
+        .series-progress-line { font-size: 1rem; color: var(--text-main); font-weight: 600; }
+        .series-progress-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .series-progress-next { font-size: 0.85rem; color: var(--text-main); margin-top: 8px; }
+        .series-progress-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .series-progress-actions .btn { padding: 7px 12px; font-size: 0.76rem; }
+        @media (max-width: 560px) { .series-progress-block { flex-direction: column; text-align: center; } .series-progress-actions { justify-content: center; } }
+
+        .series-section-title {
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.5rem; letter-spacing: 0.5px;
+            margin: 30px 0 12px 0; color: var(--text-main);
+        }
+        .lock-note {
+            background: var(--gold-soft); border: 1px dashed var(--gold); border-radius: 10px;
+            padding: 12px 14px; font-size: 0.83rem; color: var(--text-main); font-weight: 600; line-height: 1.45;
+            margin: -18px 0 22px 0;
+        }
+        .lock-note .btn { margin-top: 10px; padding: 7px 14px; font-size: 0.78rem; }
+        .setup-note { margin: 0 0 22px 0; }
+        .scores-row.locked .s-box div:last-child { opacity: 0.5; font-size: 1.4rem; }
+        .s-box.muted div:last-child { opacity: 0.55; }
+        .series-dates { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+
+        /* Temporadas e episódios */
+        .season-block { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; background: var(--bg-panel); }
+        .season-block.done { border-color: var(--score-high); }
+        .season-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; background: var(--bg-secondary); }
+        .season-head:hover { background: var(--bg-input); }
+        .season-head-poster {
+            width: 34px; height: 51px; border-radius: 4px; object-fit: cover; flex: none; background: var(--bg-input);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', 'Manrope', sans-serif; color: var(--text-muted); font-size: 1rem;
+        }
+        .season-head-main { flex: 1; min-width: 0; }
+        .season-head-title { font-weight: 800; font-size: 0.92rem; color: var(--text-main); }
+        .season-head-meta { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+        .season-mini-bar { height: 4px; background: var(--bg-input); border-radius: 4px; margin-top: 7px; overflow: hidden; }
+        .season-mini-fill { height: 100%; background: var(--gold); border-radius: 4px; }
+        .season-block.done .season-mini-fill { background: var(--score-high); }
+        .season-toggle-btn { padding: 6px 10px; font-size: 0.72rem; flex: none; }
+        .season-chevron { font-size: 1.4rem; color: var(--text-muted); transition: transform 0.2s ease; flex: none; line-height: 1; }
+        .season-block.open .season-chevron { transform: rotate(90deg); }
+        .season-episodes { display: none; }
+        .season-block.open .season-episodes { display: block; }
+        .ep-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-top: 1px dashed var(--border); cursor: pointer; }
+        .ep-row:hover { background: var(--bg-input); }
+        .ep-check {
+            width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex: none;
+            display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: transparent;
+            transition: all 0.15s ease;
+        }
+        .ep-row.watched .ep-check { background: var(--score-high); border-color: var(--score-high); color: #fff; }
+        .ep-num { font-family: 'Bebas Neue', 'Manrope', sans-serif; width: 32px; flex: none; color: var(--text-muted); font-size: 1.05rem; }
+        .ep-title { flex: 1; min-width: 0; font-size: 0.86rem; font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ep-row.watched .ep-title { color: var(--text-muted); }
+        .ep-meta { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
+        .ep-upto {
+            border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer;
+            font-family: inherit; font-size: 0.66rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; flex: none;
+        }
+        .ep-upto:hover { color: var(--accent); border-color: var(--accent); }
+        .ep-row.unreleased { opacity: 0.5; cursor: default; }
+        .ep-row.unreleased:hover { background: transparent; }
+        @media (max-width: 560px) { .ep-meta { display: none; } }
+
+        /* Editor de estrutura (temporadas) no modo de edição */
+        .season-edit-row { display: grid; grid-template-columns: 52px 1fr 78px 82px 78px 40px; gap: 8px; align-items: end; margin-top: 8px; }
+        .season-edit-row label { margin-top: 0 !important; font-size: 0.62rem !important; }
+        .season-edit-row input { margin-top: 4px !important; padding: 9px 10px !important; font-size: 0.88rem !important; }
+        .season-edit-row .btn { padding: 9px 0; justify-content: center; }
+        @media (max-width: 640px) { .season-edit-row { grid-template-columns: 1fr 1fr 1fr; } .season-edit-row > div:nth-child(2) { grid-column: 1 / -1; } }
+        .edit-block-title { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 800; margin: 30px 0 4px 0; padding-top: 18px; border-top: 1px dashed var(--border); }
+        .edit-form input:disabled, .edit-form textarea:disabled { opacity: 0.45; cursor: not-allowed; }
+        .api-status { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .series-left { height: 230px; flex-direction: row; align-items: center; gap: 12px; padding: 12px; }
+            .series-poster-main { flex: none; height: 100%; aspect-ratio: 2 / 3; border-radius: 8px; }
+            .season-strip { flex: 1; min-width: 0; height: 100%; align-items: center; border-top: none; padding: 0 4px; background: transparent; }
+        }
+
+        /* --- Mobile: seletor de modo ocupa a largura toda, abaixo da marca --- */
+        @media (max-width: 640px) {
+            .mode-switch { order: 3; flex: 1 1 100%; }
+            .mode-btn { flex: 1; }
+            .search-box { order: 4; }
+            .series-group-title { font-size: 1.4rem; }
+            .season-thumb { width: 48px; }
+        }
+
+        /* alternância de modo: mostra só a navegação do modo atual */
+        body[data-mode="movies"] #navSeries, body[data-mode="series"] #navMovies { display: none; }
     </style>
 </head>
-<body>
+<body data-mode="movies">
 
     <!-- Tela de login — cobre tudo até existir uma sessão válida no Supabase -->
     <div id="authOverlay" class="confirm-overlay" style="display:flex;">
@@ -1120,6 +1308,10 @@
 
     <header>
         <div class="brand"><span>CINETRACKER</span><small>ISRAEL &amp; RICARDO</small></div>
+        <div class="mode-switch" role="tablist" aria-label="Alternar entre Filmes e Séries">
+            <button type="button" class="mode-btn active" id="modeBtn-movies" onclick="app.switchMode('movies')">🎬 Filmes</button>
+            <button type="button" class="mode-btn" id="modeBtn-series" onclick="app.switchMode('series')">📺 Séries</button>
+        </div>
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Buscar filme, diretor..." onkeyup="app.handleSearch()">
         </div>
@@ -1130,7 +1322,7 @@
             <button class="btn" onclick="app.toggleTheme()" id="themeBtn" title="Alternar Modo Escuro">
                 🌙
             </button>
-            <button class="btn" onclick="app.addMovie()">
+            <button class="btn" onclick="app.addNew()" id="addNewBtn">
                 <span style="color:var(--accent); font-weight:bold; font-size:1.2rem; line-height:1">+</span> Novo
             </button>
             <label class="btn">
@@ -1143,10 +1335,18 @@
 
     <div class="app-body">
     <nav class="tab-nav">
+        <div class="nav-group" id="navMovies">
         <button class="btn btn-primary" id="navBtn-catalogo" onclick="app.switchTab('catalogo')">🎬 Catálogo</button>
         <button class="btn" id="navBtn-estatisticas" onclick="app.switchTab('estatisticas')">📊 Estatísticas</button>
         <button class="btn" id="navBtn-perfis" onclick="app.switchTab('perfis')">🎭 Israel &amp; Ricardo</button>
         <button class="btn" id="navBtn-sortear" onclick="app.switchTab('sortear')">🎟️ Sortear Filme</button>
+        </div>
+        <div class="nav-group" id="navSeries">
+        <button class="btn btn-primary" id="navBtn-s-catalogo" onclick="app.switchTab('s-catalogo')">📺 Catálogo</button>
+        <button class="btn" id="navBtn-s-estatisticas" onclick="app.switchTab('s-estatisticas')">📊 Estatísticas</button>
+        <button class="btn" id="navBtn-s-perfis" onclick="app.switchTab('s-perfis')">🎭 Israel &amp; Ricardo</button>
+        <button class="btn" id="navBtn-s-sortear" onclick="app.switchTab('s-sortear')">🎟️ Sortear Série</button>
+        </div>
         <div class="tab-nav-hint">Sessão contínua desde 2022.<br>Que comecem os créditos.</div>
     </nav>
     <main class="app-main">
@@ -1392,6 +1592,186 @@
     </div>
     <!-- /tab-sortear -->
 
+    <!-- ============================ SÉRIES ============================ -->
+    <div id="tab-s-catalogo" class="tab-page" style="display:none;">
+
+    <div id="sSetupBanner"></div>
+
+    <div class="dashboard-container">
+        <div class="stats-grid" id="sStatsGrid"></div>
+    </div>
+
+    <div class="gallery-container">
+        <div class="filters-bar">
+            <h3>Séries</h3>
+            <div class="filters-controls">
+                <div class="multi-select" id="sFilterWrap-year">
+                    <button type="button" class="btn multi-select-btn" id="sFilterBtn-year" onclick="sapp.toggleMenu('year')">Todos os anos</button>
+                    <div class="multi-select-menu" id="sFilterMenu-year">
+                        <label class="multi-select-option">
+                            <input type="checkbox" id="sFilterAll-year" checked onchange="sapp.toggleAll('year', this.checked)">
+                            <span>Todos os anos</span>
+                        </label>
+                        <div class="multi-select-divider"></div>
+                        <div id="sFilterList-year" class="multi-select-scroll-area"></div>
+                    </div>
+                </div>
+                <div class="multi-select" id="sFilterWrap-creator">
+                    <button type="button" class="btn multi-select-btn" id="sFilterBtn-creator" onclick="sapp.toggleMenu('creator')">Todos os criadores</button>
+                    <div class="multi-select-menu" id="sFilterMenu-creator">
+                        <input type="text" class="multi-select-search" id="sFilterSearch-creator" placeholder="Buscar criador..." oninput="sapp.filterOptions('creator', this.value)">
+                        <label class="multi-select-option">
+                            <input type="checkbox" id="sFilterAll-creator" checked onchange="sapp.toggleAll('creator', this.checked)">
+                            <span>Todos os criadores</span>
+                        </label>
+                        <div class="multi-select-divider"></div>
+                        <div id="sFilterList-creator" class="multi-select-scroll-area"></div>
+                        <div class="multi-select-empty" id="sFilterEmpty-creator" style="display:none;">Nenhum criador encontrado.</div>
+                    </div>
+                </div>
+                <div class="multi-select" id="sFilterWrap-genre">
+                    <button type="button" class="btn multi-select-btn" id="sFilterBtn-genre" onclick="sapp.toggleMenu('genre')">Todos os gêneros</button>
+                    <div class="multi-select-menu" id="sFilterMenu-genre">
+                        <label class="multi-select-option">
+                            <input type="checkbox" id="sFilterAll-genre" checked onchange="sapp.toggleAll('genre', this.checked)">
+                            <span>Todos os gêneros</span>
+                        </label>
+                        <div class="multi-select-divider"></div>
+                        <div id="sFilterList-genre" class="multi-select-scroll-area"></div>
+                    </div>
+                </div>
+                <select id="sGroupFilter" onchange="sapp.handleGroupFilter(this.value)" title="Filtrar por situação">
+                    <option value="all">Situação: todas</option>
+                    <option value="andamento">Em andamento</option>
+                    <option value="finalizadas">Finalizadas</option>
+                    <option value="nao_iniciadas">Não iniciadas</option>
+                    <option value="avaliar">Aguardando nota</option>
+                </select>
+                <select id="sSortFilter" onchange="sapp.handleSort(this.value)" title="Ordenar séries por">
+                    <option value="recent">Ordenar por: Atividade recente</option>
+                    <option value="avg">Ordenar por: Nossa Média</option>
+                    <option value="isr">Ordenar por: Nota do Israel</option>
+                    <option value="ric">Ordenar por: Nota do Ricardo</option>
+                    <option value="progress">Ordenar por: Progresso</option>
+                    <option value="year">Ordenar por: Ano de estreia</option>
+                    <option value="title">Ordenar por: Título (A–Z)</option>
+                </select>
+            </div>
+        </div>
+        <div id="seriesGroups"></div>
+    </div>
+    </div>
+    <!-- /tab-s-catalogo -->
+
+    <div id="tab-s-estatisticas" class="tab-page" style="display:none;">
+        <div class="stats-page-container">
+            <div>
+                <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Estatísticas das Séries</h3>
+                <div style="color:var(--text-muted); font-size:0.9rem;">Progresso, tempo assistido e gostos. Notas e IMDb só entram nas contas depois que a série é concluída. Clique em um criador para ver as séries dele no catálogo.</div>
+            </div>
+
+            <div class="stats-overview-grid" id="sStatsOverview"></div>
+
+            <div class="chart-panel">
+                <div class="chart-header">
+                    <span class="chart-title">Atividade Mensal <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(episódios marcados)</span></span>
+                    <select id="sChartYear" onchange="sapp.handleChartYear(this.value)" style="display:none;"></select>
+                </div>
+                <div class="chart-viz" id="sChartViz"></div>
+            </div>
+
+            <div class="stats-row">
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">Situação do Catálogo</span></div>
+                    <div class="chart-viz" id="sStatusDonut"></div>
+                </div>
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">Maior Divergência de Opinião <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(top 5)</span></span></div>
+                    <div class="rank-list" id="sDivergence"></div>
+                </div>
+            </div>
+
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Criadores Mais Assistidos</span></div>
+                <div class="rank-list rank-list-scroll" id="sRankCreatorsCount"></div>
+            </div>
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Gêneros Mais Assistidos</span></div>
+                <div class="rank-list rank-list-scroll" id="sRankGenresCount"></div>
+            </div>
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Criadores Mais Bem Avaliados <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(mín. 2 séries)</span></span></div>
+                <div class="rank-list rank-list-scroll" id="sRankCreatorsAvg"></div>
+            </div>
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Gêneros Mais Bem Avaliados <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">(mín. 2 séries)</span></span></div>
+                <div class="rank-list rank-list-scroll" id="sRankGenresAvg"></div>
+            </div>
+
+            <div class="chart-panel">
+                <div class="chart-header"><span class="chart-title">Notas por Década de Estreia</span></div>
+                <div class="rank-list" id="sRankDecades"></div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <h4 style="margin:0 0 6px 0; font-weight:700; color:var(--text-main); font-size:1.15rem;">Curiosidades</h4>
+                <div style="color:var(--text-muted); font-size:0.85rem;">Mais alguns números do histórico de séries.</div>
+            </div>
+            <div class="stats-overview-grid" id="sStatsExtra"></div>
+
+            <div class="stats-row">
+                <div class="stat-card highlight-card" id="sHcCorr" style="text-align:center; align-items:center;"></div>
+                <div class="stat-card highlight-card" id="sHcAgreement" style="text-align:center; align-items:center;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- /tab-s-estatisticas -->
+
+    <div id="tab-s-perfis" class="tab-page" style="display:none;">
+        <div class="stats-page-container">
+            <div>
+                <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Israel &amp; Ricardo — Séries</h3>
+                <div style="color:var(--text-muted); font-size:0.9rem;">Gostos de cada um nas séries concluídas e avaliadas: melhores e piores criadores, gêneros e décadas. Clique em uma série para abri-la.</div>
+            </div>
+            <div class="profiles-versus" id="sProfilesVersus"></div>
+            <div class="profiles-cols" id="sProfilesCols"></div>
+        </div>
+    </div>
+    <!-- /tab-s-perfis -->
+
+    <div id="tab-s-sortear" class="tab-page" style="display:none;">
+        <div class="sortear-container">
+            <div>
+                <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Sortear Série</h3>
+                <div style="color:var(--text-muted); font-size:0.9rem;">A fila é formada automaticamente pelas séries ainda não iniciadas do catálogo. Ao começar a assistir (marcando um episódio), a série sai da fila.</div>
+            </div>
+            <div class="sortear-grid">
+                <div class="sortear-col-left">
+                    <div class="draw-panel">
+                        <button class="btn btn-primary" id="sDrawBtn" style="padding:13px 34px; font-size:0.95rem;" onclick="sapp.drawRandom()">🎲 Sortear Série</button>
+                        <div class="draw-result" id="sDrawResult">
+                            <img class="draw-poster" id="sDrawPoster" alt="Capa da sorteada">
+                            <div class="draw-text">
+                                <div class="draw-eyebrow">A sorteada é...</div>
+                                <div class="draw-title">-</div>
+                            </div>
+                        </div>
+                        <div class="draw-actions" id="sDrawActions">
+                            <button class="btn btn-primary" onclick="sapp.openDrawn()">Abrir série</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="sortear-col-right">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="margin:0; font-weight:700; color:var(--text-main);">Fila de espera (<span id="sPendingCount">0</span>)</h4>
+                    </div>
+                    <div class="pending-list-panel" id="sPendingList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /tab-s-sortear -->
+
     </main>
     </div>
     <!-- /app-body -->
@@ -1474,6 +1854,84 @@
                             <button class="btn btn-primary" style="flex:1; justify-content:center; padding: 12px;" onclick="app.saveEdits()">Salvar</button>
                             <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="app.toggleEdit(false)">Cancelar</button>
                             <button class="btn btn-danger" style="flex:1; justify-content:center; padding: 12px;" onclick="app.deleteMovie()">Excluir</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal de série -->
+    <div class="modal-overlay" id="sModalOverlay" onclick="sapp.handleOverlayClick(event)">
+        <div class="modal-window" id="sModalWindow">
+            <div class="modal-close" onclick="sapp.closeModal()">×</div>
+            <div class="modal-content">
+                <div class="modal-left series-left">
+                    <img id="sPosterImg" src="" alt="Capa">
+                    <div class="season-strip" id="sSeasonStrip"></div>
+                </div>
+                <div class="modal-right" id="sModalRight">
+
+                    <div id="sViewMode"></div>
+
+                    <div id="sEditMode" class="edit-form" style="display:none;">
+                        <h2 style="color:var(--text-main); margin-top:0; font-weight:700">Editar Série</h2>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                            <div style="grid-column: 1 / -1"><label>Título (Digite e saia do campo para buscar)</label><input type="text" id="sfTitle" onblur="sapp.fetchMetadata()" style="font-weight:600"></div>
+                            <div style="grid-column: 1 / -1"><label>Título Original</label><input type="text" id="sfOriginal"></div>
+
+                            <div><label>Ano de estreia</label><input type="number" id="sfYearStart" min="1900" max="2100"></div>
+                            <div><label>Ano de encerramento <span style="font-weight:400; text-transform:none; letter-spacing:0;">— vazio se em exibição</span></label><input type="number" id="sfYearEnd" min="1900" max="2100"></div>
+
+                            <div style="grid-column: 1 / -1"><label>Criador(es) <span style="font-weight:400; text-transform:none; letter-spacing:0;">— separe vários com vírgula</span></label><input type="text" id="sfCreators" placeholder="Ex: Fulano, Beltrana"></div>
+                            <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="sfGenres"></div>
+
+                            <div><label>Situação da produção</label>
+                                <select id="sfStatus">
+                                    <option value="em_producao">Em produção / em exibição</option>
+                                    <option value="finalizada">Finalizada (produção encerrada)</option>
+                                </select>
+                            </div>
+                            <div><label>&nbsp;</label>
+                                <button type="button" class="btn" id="sfApiBtn" onclick="sapp.fetchMetadata(true)" style="width:100%; justify-content:center;">🔎 Buscar dados na API</button>
+                            </div>
+                            <div id="sfApiStatus" style="grid-column: 1 / -1; font-size:0.8rem; color:var(--text-muted); margin-top:-10px;"></div>
+
+                            <div><label>Começou a assistir <span style="font-weight:400; text-transform:none; letter-spacing:0;">— data completa ou só o ano</span></label><input type="text" id="sfStarted" placeholder="AAAA-MM-DD, DD-MM-AAAA ou só AAAA" onblur="sapp.normalizeDateField('sfStarted')"></div>
+                            <div><label>Terminou de assistir <span style="font-weight:400; text-transform:none; letter-spacing:0;">— data completa ou só o ano</span></label><input type="text" id="sfFinished" placeholder="AAAA-MM-DD, DD-MM-AAAA ou só AAAA" onblur="sapp.normalizeDateField('sfFinished')"></div>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin:26px 0 8px 0; gap:10px; flex-wrap:wrap;">
+                            <label style="margin:0;">Temporadas</label>
+                            <button type="button" class="btn" style="font-size:0.8rem; padding:6px 12px;" onclick="sapp.addSeasonRow()">+ Temporada</button>
+                        </div>
+                        <div id="sfSeasonsWrap"></div>
+
+                        <div id="sfRatingBlock" style="margin-top:26px;">
+                            <div class="lock-note" id="sfLockNote" style="display:none;">🔒 Notas e resenhas ficam bloqueadas até a série ser 100% assistida.</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+                                <div><label>Nota Israel</label><input type="number" step="0.1" min="0" max="10" id="sfIsrael"></div>
+                                <div><label>Nota Ricardo</label><input type="number" step="0.1" min="0" max="10" id="sfRicardo"></div>
+                                <div><label>IMDb <button type="button" class="imdb-fetch-btn" id="sfImdbBtn" onclick="sapp.fetchImdbRating()" title="Buscar a nota atual no IMDb (via OMDb)">↻ buscar</button></label><input type="number" step="0.1" min="0" max="10" id="sfImdb"></div>
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">A nota do IMDb pode ser preenchida a qualquer momento, mas só conta nas estatísticas quando a série estiver 100% assistida.</div>
+
+                            <label style="margin-top:18px;">Resenha Israel</label>
+                            <textarea id="sfRevIsrael" maxlength="200" oninput="sapp.updateCount('Israel')"></textarea>
+                            <div id="sfCntIsrael" class="char-count">0/200</div>
+
+                            <label>Resenha Ricardo</label>
+                            <textarea id="sfRevRicardo" maxlength="200" oninput="sapp.updateCount('Ricardo')"></textarea>
+                            <div id="sfCntRicardo" class="char-count">0/200</div>
+                        </div>
+
+                        <div style="display:flex; gap:15px; margin-top:30px;">
+                            <button class="btn btn-primary" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.saveEdits()">Salvar</button>
+                            <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.toggleEdit(false)">Cancelar</button>
+                            <button class="btn btn-danger" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.deleteSeries()">Excluir</button>
                         </div>
                     </div>
 
@@ -1723,6 +2181,134 @@
                     .subscribe();
             },
 
+            // ============================================================
+            // SÉRIES — conversores e operações na nuvem
+            // Tabela "series" (ver cinetracker_series_schema.sql). Temporadas e
+            // episódios ficam dentro da própria linha, na coluna jsonb "seasons".
+            // ============================================================
+            seriesToDb(s) {
+                return {
+                    id: s.id,
+                    title: s.title,
+                    original_title: s.originalTitle || null,
+                    creators: s.creators || [],
+                    creator: s.creator || null,
+                    year_start: s.yearStart ? parseInt(s.yearStart, 10) || null : null,
+                    year_end: s.yearEnd ? parseInt(s.yearEnd, 10) || null : null,
+                    production_status: s.productionStatus === 'finalizada' ? 'finalizada' : 'em_producao',
+                    genres: s.genres || null,
+                    tmdb_id: s.tmdbId || null,
+                    imdb_id: s.imdbId || null,
+                    poster_url: s.poster || null,
+                    poster_failed: !!s.posterFailed,
+                    seasons: s.seasons || [],
+                    sc_isr: s.scIsr || 0,
+                    sc_ric: s.scRic || 0,
+                    sc_imdb: s.scImdb || 0,
+                    review_isr: s.revIsr || null,
+                    review_ric: s.revRic || null,
+                    started_date: s.startedDate || null,
+                    finished_date: s.finishedDate || null
+                };
+            },
+            seriesFromDb(row) {
+                return deriveSeries(normalizeSeriesObj({
+                    id: row.id,
+                    title: row.title,
+                    originalTitle: row.original_title,
+                    creators: row.creators,
+                    creator: row.creator,
+                    yearStart: row.year_start,
+                    yearEnd: row.year_end,
+                    productionStatus: row.production_status,
+                    genres: row.genres,
+                    tmdbId: row.tmdb_id,
+                    imdbId: row.imdb_id,
+                    poster: row.poster_url,
+                    posterFailed: row.poster_failed,
+                    seasons: row.seasons,
+                    scIsr: row.sc_isr,
+                    scRic: row.sc_ric,
+                    scImdb: row.sc_imdb,
+                    revIsr: row.review_isr,
+                    revRic: row.review_ric,
+                    startedDate: row.started_date,
+                    finishedDate: row.finished_date
+                }));
+            },
+
+            // Carrega as séries. Se a tabela ainda não existir, os filmes continuam
+            // funcionando normalmente e a aba de séries mostra o passo a passo para criar a tabela.
+            async loadSeries() {
+                const res = await supabaseClient.from('series').select('*').order('id', { ascending: true });
+                if (res.error) {
+                    sapp.available = false;
+                    sapp.loadError = res.error.message || String(res.error);
+                    sapp.series = [];
+                    console.warn('Séries indisponíveis:', res.error);
+                } else {
+                    sapp.available = true;
+                    sapp.loadError = '';
+                    sapp.series = (res.data || []).map(row => this.seriesFromDb(row));
+                }
+                sapp.processData();
+            },
+            async upsertSeries(s) {
+                const payload = this.seriesToDb(s);
+                delete payload.id;
+                const { error } = await supabaseClient.from('series').update(payload).eq('id', s.id);
+                if (error) showToast('Não foi possível salvar a série na nuvem: ' + error.message, 'error');
+                return !error;
+            },
+            async insertSeries(s) {
+                const payload = this.seriesToDb(s);
+                delete payload.id;
+                const { data, error } = await supabaseClient.from('series').insert(payload).select().single();
+                if (error) { showToast('Não foi possível criar a série na nuvem: ' + error.message, 'error'); return null; }
+                return this.seriesFromDb(data);
+            },
+            async deleteSeriesRow(id) {
+                const { error } = await supabaseClient.from('series').delete().eq('id', id);
+                if (error) showToast('Não foi possível excluir a série na nuvem: ' + error.message, 'error');
+            },
+            async replaceAllSeries(list) {
+                const del = await supabaseClient.from('series').delete().gt('id', 0);
+                if (del.error) { showToast('Não foi possível limpar as séries antigas na nuvem: ' + del.error.message, 'error'); return null; }
+                if (!list.length) return [];
+                const rows = list.map(s => { const r = this.seriesToDb(s); delete r.id; return r; });
+                const { data, error } = await supabaseClient.from('series').insert(rows).select();
+                if (error) { showToast('Não foi possível enviar as séries para a nuvem: ' + error.message, 'error'); return null; }
+                return data.map(row => this.seriesFromDb(row));
+            },
+
+            // Tempo real das séries — em um canal SEPARADO do canal dos filmes, para que
+            // um problema com a tabela de séries nunca afete a sincronização dos filmes.
+            seriesChannel: null,
+            subscribeSeriesRealtime() {
+                if (this.seriesChannel || !sapp.available) return;
+                this.seriesChannel = supabaseClient
+                    .channel('cinetracker-series-sync')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'series' }, (payload) => {
+                        if (payload.eventType === 'DELETE') {
+                            sapp.series = sapp.series.filter(s => s.id !== payload.old.id);
+                            sapp.processData();
+                            return;
+                        }
+                        const row = payload.new;
+                        // Enquanto há gravação local pendente desta série, ignoramos o "eco"
+                        // do servidor — senão um estado antigo sobrescreveria marcações recentes.
+                        if (sapp.dirty.has(row.id)) return;
+                        const idx = sapp.series.findIndex(s => s.id === row.id);
+                        // Colunas grandes e inalteradas podem não vir no evento: preserva as temporadas locais
+                        if (row.seasons === undefined && idx >= 0) row.seasons = sapp.series[idx].seasons;
+                        const incoming = this.seriesFromDb(row);
+                        if (idx >= 0) sapp.series[idx] = incoming; else sapp.series.push(incoming);
+                        sapp.processData();
+                        sapp.refreshOpenModal(incoming.id);
+                    })
+                    .subscribe();
+            },
+
             // --- Ponto de entrada, chamado uma vez ao carregar a página ---
             async init() {
                 const { data: { session } } = await supabaseClient.auth.getSession();
@@ -1731,6 +2317,8 @@
                     this.showAuthGate(false);
                     await this.loadAll();
                     this.subscribeRealtime();
+                    await this.loadSeries();
+                    this.subscribeSeriesRealtime();
                 } else {
                     this.showAuthGate(true);
                 }
@@ -1740,6 +2328,8 @@
                         this.showAuthGate(false);
                         await this.loadAll();
                         this.subscribeRealtime();
+                        await this.loadSeries();
+                        this.subscribeSeriesRealtime();
                     } else {
                         this.showAuthGate(true);
                     }
@@ -2663,6 +3253,564 @@
             });
         }
 
+        // ============================================================
+        // SÉRIES — FUNÇÕES AUXILIARES
+        // (API do TMDB para séries, métricas de progresso, normalização)
+        // ============================================================
+
+        // Data de hoje no fuso local, "AAAA-MM-DD" (toISOString puro usaria UTC e
+        // marcaria o dia seguinte para quem assiste à noite no Brasil).
+        function todayLocalISO() {
+            const d = new Date();
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().split('T')[0];
+        }
+
+        // "Começou a assistir" / "Terminou de assistir" aceitam três formatos:
+        // data completa em AAAA-MM-DD ou DD-MM-AAAA (formato brasileiro), ou só o ano (AAAA),
+        // para quando não dá pra lembrar o dia exato. Sempre guardado como AAAA-MM-DD (ou
+        // só o ano) internamente, para manter a ordenação por data funcionando; '' se inválido/vazio.
+        function normalizeSeriesDate(v) {
+            v = (v || '').trim();
+            if (!v) return '';
+            if (/^\d{4}$/.test(v)) {
+                const y = parseInt(v, 10);
+                return (y >= 1900 && y <= 2100) ? v : '';
+            }
+            const iso = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            const br = v.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+            let y, mo, d;
+            if (iso) { [, y, mo, d] = iso; } else if (br) { [, d, mo, y] = br; } else { return ''; }
+            const iso_v = `${y}-${mo}-${d}`;
+            const date = new Date(iso_v + 'T00:00:00');
+            const valid = !isNaN(date) && date.getUTCFullYear() == y && (date.getUTCMonth() + 1) == +mo && date.getUTCDate() == +d;
+            return valid ? iso_v : '';
+        }
+        // Mostra "2020" para um ano só, ou "DD/MM/AAAA" para data completa
+        function seriesDateLabel(v) {
+            v = (v || '').trim();
+            if (!v) return '';
+            return /^\d{4}$/.test(v) ? v : formatDateBR(v);
+        }
+
+        function genresOf(s) {
+            return (s.genres || '').split(',').map(g => g.trim()).filter(Boolean);
+        }
+
+        // Capa "de mentirinha" em SVG (sem depender de serviço externo) para séries sem capa.
+        function placeholderPoster(title) {
+            const esc = String(title || 'Sem capa').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const lines = []; let cur = '';
+            esc.split(/\s+/).forEach(w => {
+                if (cur && (cur + ' ' + w).length > 14) { lines.push(cur); cur = w; }
+                else cur = (cur ? cur + ' ' : '') + w;
+            });
+            if (cur) lines.push(cur);
+            const shown = lines.slice(0, 5);
+            const y = 225 - (shown.length - 1) * 17;
+            const tspans = shown.map((l, i) => `<tspan x="150" dy="${i === 0 ? 0 : 34}">${l}</tspan>`).join('');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect width="300" height="450" fill="#2b2013"/><rect x="14" y="14" width="272" height="422" fill="none" stroke="#e0a93b" stroke-opacity=".35" stroke-dasharray="6 6"/><text x="150" y="${y}" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="30" fill="#e0a93b">${tspans}</text></svg>`;
+            return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        }
+
+        // Gêneros de TV do TMDB vêm às vezes "compostos" (ex: "Action & Adventure").
+        // Separamos em gêneros simples para casar com o vocabulário usado nos filmes.
+        const TV_GENRE_MAP = {
+            'Action & Adventure': 'Ação, Aventura',
+            'Ação & Aventura': 'Ação, Aventura',
+            'Sci-Fi & Fantasy': 'Ficção científica, Fantasia',
+            'War & Politics': 'Guerra, Política',
+            'Guerra & Política': 'Guerra, Política',
+            'Kids': 'Infantil',
+            'News': 'Notícias',
+            'Soap': 'Novela',
+            'Talk': 'Talk show'
+        };
+        function tvGenresToText(genres) {
+            const out = [];
+            (genres || []).forEach(g => {
+                const n = (g && g.name || '').trim();
+                if (!n) return;
+                (TV_GENRE_MAP[n] ? TV_GENRE_MAP[n].split(', ') : [n]).forEach(x => { if (!out.includes(x)) out.push(x); });
+            });
+            return out.join(', ');
+        }
+
+        // ---------- Normalização ----------
+        function normalizeSeasons(raw) {
+            if (!Array.isArray(raw)) return [];
+            return raw.map((se, i) => ({
+                number: Number.isFinite(Number(se.number)) ? Number(se.number) : i + 1,
+                name: se.name || '',
+                year: se.year ? String(se.year) : '',
+                poster: se.poster || null,
+                episodes: (Array.isArray(se.episodes) ? se.episodes : []).map((ep, j) => ({
+                    number: Number.isFinite(Number(ep.number)) ? Number(ep.number) : j + 1,
+                    title: ep.title || '',
+                    runtime: Number(ep.runtime) || 0,
+                    airDate: ep.airDate || '',
+                    watched: !!ep.watched,
+                    watchedDate: ep.watchedDate || ''
+                })).sort((a, b) => a.number - b.number)
+            })).sort((a, b) => a.number - b.number);
+        }
+
+        function normalizeSeriesObj(m) {
+            const creators = (Array.isArray(m.creators) && m.creators.length)
+                ? m.creators.map(c => String(c).trim()).filter(Boolean)
+                : splitDirectors(m.creator || '');
+            return {
+                id: m.id,
+                title: m.title || '',
+                originalTitle: m.originalTitle || '',
+                creators,
+                creator: creators.join(', '),
+                yearStart: m.yearStart ? String(m.yearStart) : '',
+                yearEnd: m.yearEnd ? String(m.yearEnd) : '',
+                productionStatus: m.productionStatus === 'finalizada' ? 'finalizada' : 'em_producao',
+                genres: m.genres || '',
+                tmdbId: m.tmdbId || null,
+                imdbId: m.imdbId || '',
+                poster: m.poster || null,
+                posterFailed: !!m.posterFailed,
+                seasons: normalizeSeasons(m.seasons),
+                scIsr: Number(m.scIsr) || 0,
+                scRic: Number(m.scRic) || 0,
+                scImdb: Number(m.scImdb) || 0,
+                revIsr: m.revIsr || '',
+                revRic: m.revRic || '',
+                startedDate: m.startedDate || '',
+                finishedDate: m.finishedDate || ''
+            };
+        }
+
+        // ---------- Métricas de progresso ----------
+        // Um episódio "conta" para o total se já foi lançado (ou não tem data) — ou se
+        // já foi marcado como assistido. Episódios com data futura ficam como "por lançar"
+        // e não impedem a série de chegar a 100%.
+        function isEpReleased(ep, today) { return !ep.airDate || ep.airDate <= today; }
+
+        function seasonMetrics(se, today) {
+            today = today || todayLocalISO();
+            let total = 0, watched = 0, totalMin = 0, watchedMin = 0, upcoming = 0;
+            se.episodes.forEach(ep => {
+                if (!(isEpReleased(ep, today) || ep.watched)) { upcoming++; return; }
+                total++; totalMin += ep.runtime || 0;
+                if (ep.watched) { watched++; watchedMin += ep.runtime || 0; }
+            });
+            return { total, watched, totalMin, watchedMin, upcoming, pct: total ? watched / total * 100 : 0, done: total > 0 && watched >= total };
+        }
+
+        function seriesMetrics(s) {
+            const today = todayLocalISO();
+            let total = 0, watched = 0, totalMin = 0, watchedMin = 0, upcoming = 0, next = null;
+            let lastActivity = s.startedDate || '';
+            (s.seasons || []).forEach(se => {
+                se.episodes.forEach(ep => {
+                    if (!(isEpReleased(ep, today) || ep.watched)) { upcoming++; return; }
+                    total++; totalMin += ep.runtime || 0;
+                    if (ep.watched) {
+                        watched++; watchedMin += ep.runtime || 0;
+                        if (ep.watchedDate && ep.watchedDate > lastActivity) lastActivity = ep.watchedDate;
+                    } else if (!next) {
+                        next = { season: se.number, episode: ep.number, title: ep.title };
+                    }
+                });
+            });
+            if (s.finishedDate && s.finishedDate > lastActivity) lastActivity = s.finishedDate;
+            const complete = total > 0 && watched >= total;
+            const started = watched > 0;
+            // Grupos do catálogo. "Finalizadas" exige os dois sentidos: a série encerrou
+            // (produção) E vimos até o último episódio (exibição). Em dia com uma série que
+            // ainda está no ar continua "em andamento". "Não iniciadas" só olha se já começamos.
+            let group;
+            if (complete && s.productionStatus === 'finalizada' && upcoming === 0) group = 'finalizadas';
+            else if (started) group = 'andamento';
+            else group = 'nao_iniciadas';
+            return { total, watched, totalMin, watchedMin, upcoming, next, complete, started, group, lastActivity,
+                     pct: total ? watched / total * 100 : 0 };
+        }
+
+        // Nota da série: média dos dois quando ambos avaliaram; se só um avaliou, vale a dele.
+        function seriesAvg(s) {
+            const a = s.scIsr, b = s.scRic;
+            if (a > 0 && b > 0) return (a + b) / 2;
+            return a > 0 ? a : (b > 0 ? b : 0);
+        }
+
+        function deriveSeries(s) {
+            s._m = seriesMetrics(s);
+            s.avg = seriesAvg(s);
+            // Só entra nas estatísticas de nota quem está 100% assistida
+            s.rated = s._m.complete && s.avg > 0;
+            s.needsRating = s._m.complete && !(s.scIsr > 0 && s.scRic > 0);
+            return s;
+        }
+
+        function seriesYearsLabel(s, longForm) {
+            if (!s.yearStart) return '';
+            if (s.productionStatus !== 'finalizada') return longForm ? `${s.yearStart}–presente` : s.yearStart;
+            return (s.yearEnd && s.yearEnd !== s.yearStart) ? `${s.yearStart}–${s.yearEnd}` : s.yearStart;
+        }
+
+        function countEpisodes(seasons) { return (seasons || []).reduce((a, se) => a + se.episodes.length, 0); }
+
+        // Junta as temporadas vindas da API com o progresso já registrado (por nº da
+        // temporada + nº do episódio), para atualizar a série sem perder o que já foi marcado.
+        function mergeSeasons(oldSeasons, apiSeasons) {
+            const watchedMap = new Map();
+            (oldSeasons || []).forEach(se => se.episodes.forEach(ep => {
+                if (ep.watched) watchedMap.set(se.number + ':' + ep.number, ep.watchedDate || '');
+            }));
+            return apiSeasons.map(se => ({
+                ...se,
+                episodes: se.episodes.map(ep => {
+                    const k = se.number + ':' + ep.number;
+                    return watchedMap.has(k) ? { ...ep, watched: true, watchedDate: watchedMap.get(k) } : { ...ep };
+                })
+            }));
+        }
+        function countWatchedLost(oldSeasons, mergedSeasons) {
+            const keep = new Set();
+            mergedSeasons.forEach(se => se.episodes.forEach(ep => { if (ep.watched) keep.add(se.number + ':' + ep.number); }));
+            let lost = 0;
+            (oldSeasons || []).forEach(se => se.episodes.forEach(ep => { if (ep.watched && !keep.has(se.number + ':' + ep.number)) lost++; }));
+            return lost;
+        }
+
+        // ---------- TMDB (séries) ----------
+        async function searchTMDBTvTerm(query, year, errorFlag, page) {
+            const q = (query || '').trim();
+            if (!q) return [];
+            try {
+                let url = `https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`;
+                if (page && page > 1) url += `&page=${page}`;
+                if (year) url += `&first_air_date_year=${encodeURIComponent(year)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                return data.results || [];
+            } catch (e) {
+                errorFlag.failed = true;
+                return [];
+            }
+        }
+
+        // Escolhe o melhor resultado priorizando o título IDÊNTICO (sem acento/maiúsculas):
+        //   1º título original == título original informado (campo "Título Original")
+        //   2º título original == título digitado (é o caso de "Paradise": o original é "Paradise")
+        //   3º título em português == título digitado ou original informado
+        //   4º qualquer outro (só se não houver nenhum idêntico)
+        // Dentro de cada faixa, desempata por ano de estreia e, depois, por popularidade —
+        // assim "Paradise Hotel" nunca vence uma série chamada exatamente "Paradise".
+        function pickBestTvResult(results, originalHint, year, titlePt) {
+            if (!results || !results.length) return null;
+            const hint = normalizeKey(originalHint || '');
+            const typed = normalizeKey(titlePt || '');
+            const yearStr = year ? String(year).trim() : '';
+            const tier = r => {
+                const orig = normalizeKey(r.original_name || '');
+                const pt = normalizeKey(r.name || '');
+                if (hint && orig === hint) return 0;
+                if (typed && orig === typed) return 1;
+                if ((typed && pt === typed) || (hint && pt === hint)) return 2;
+                return 3;
+            };
+            const yearOk = r => (yearStr && (r.first_air_date || '').startsWith(yearStr)) ? 0 : 1;
+            const ranked = results.map((r, i) => ({ r, i, t: tier(r), y: yearOk(r) }));
+            ranked.sort((a, b) =>
+                (a.t - b.t) || (a.y - b.y) ||
+                ((b.r.popularity || 0) - (a.r.popularity || 0)) || (a.i - b.i));
+            return ranked[0].r;
+        }
+
+        // Mesma estratégia dos filmes: soma a busca pelo título em português com a busca
+        // pelo título original e tenta primeiro com o ano de estreia (para separar remakes).
+        async function searchSeriesBestMatch(titlePt, originalHint, year) {
+            const errorFlag = { failed: false };
+            const hint = (originalHint || '').trim();
+            const hasDistinctHint = hint && normalizeKey(hint) !== normalizeKey(titlePt || '');
+            async function collect(useYear) {
+                const y = useYear ? year : null;
+                const [a, b] = await Promise.all([
+                    searchTMDBTvTerm(titlePt, y, errorFlag),
+                    hasDistinctHint ? searchTMDBTvTerm(hint, y, errorFlag) : Promise.resolve([])
+                ]);
+                const seen = new Set(), out = [];
+                const add = list => list.forEach(r => { if (!seen.has(r.id)) { seen.add(r.id); out.push(r); } });
+                add(a); add(b);
+                // Títulos curtos e genéricos ("Paradise") têm muitos resultados parecidos:
+                // se nenhum é idêntico na 1ª página, olha também a 2ª.
+                const isExact = r => [normalizeKey(r.original_name || ''), normalizeKey(r.name || '')]
+                    .some(n => n && (n === normalizeKey(titlePt || '') || (hint && n === normalizeKey(hint))));
+                if (!out.some(isExact) && (a.length >= 20 || b.length >= 20)) {
+                    const [a2, b2] = await Promise.all([
+                        searchTMDBTvTerm(titlePt, y, errorFlag, 2),
+                        hasDistinctHint ? searchTMDBTvTerm(hint, y, errorFlag, 2) : Promise.resolve([])
+                    ]);
+                    add(a2); add(b2);
+                }
+                return out;
+            }
+            let results = await collect(true);
+            if (!results.length && year) results = await collect(false);
+            return { bestMatch: pickBestTvResult(results, hint, year, titlePt), hadNetworkError: errorFlag.failed };
+        }
+
+        // Busca TUDO de uma série: dados gerais + criadores + capas das temporadas + episódios
+        // (título, duração, data de exibição) de cada temporada. Devolve já no formato do app.
+        async function fetchSeriesData(tmdbId) {
+            const dRes = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${API_KEY}&language=pt-BR&append_to_response=external_ids`);
+            if (!dRes.ok) throw new Error('HTTP ' + dRes.status);
+            const d = await dRes.json();
+
+            const listed = (d.seasons || []).filter(x => x.season_number > 0); // ignora "Especiais" (temporada 0)
+            const seasonJson = {};
+            for (let i = 0; i < listed.length; i += 6) {
+                await Promise.all(listed.slice(i, i + 6).map(async x => {
+                    try {
+                        const r = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${x.season_number}?api_key=${API_KEY}&language=pt-BR`);
+                        if (r.ok) seasonJson[x.season_number] = await r.json();
+                    } catch (e) { /* uma temporada com falha não derruba as outras */ }
+                }));
+            }
+
+            const ended = d.status === 'Ended' || d.status === 'Canceled';
+            const knownRuntimes = [];
+            Object.values(seasonJson).forEach(sj => (sj.episodes || []).forEach(e => { if (e.runtime > 0) knownRuntimes.push(e.runtime); }));
+            knownRuntimes.sort((a, b) => a - b);
+            const fallbackRuntime = knownRuntimes.length
+                ? knownRuntimes[Math.floor(knownRuntimes.length / 2)]
+                : ((d.episode_run_time && d.episode_run_time[0]) || (d.last_episode_to_air && d.last_episode_to_air.runtime) || 0);
+
+            const seasons = [];
+            listed.forEach(x => {
+                const sj = seasonJson[x.season_number];
+                const eps = (sj && sj.episodes) || [];
+                if (!eps.length) return; // temporada anunciada, ainda sem episódios
+                if (!ended && !x.air_date && eps.every(e => !e.air_date)) return; // temporada sem nenhuma data: ainda não confirmada
+                const poster = x.poster_path || (sj && sj.poster_path) || null;
+                const y = (x.air_date || (sj && sj.air_date) || eps[0].air_date || '').split('-')[0];
+                seasons.push({
+                    number: x.season_number,
+                    name: x.name || `Temporada ${x.season_number}`,
+                    year: y || '',
+                    poster: poster ? `https://image.tmdb.org/t/p/w342${poster}` : null,
+                    episodes: eps.map(e => ({
+                        number: e.episode_number,
+                        title: e.name || '',
+                        runtime: e.runtime || fallbackRuntime || 0,
+                        airDate: e.air_date || '',
+                        watched: false,
+                        watchedDate: ''
+                    }))
+                });
+            });
+
+            return {
+                tmdbId: d.id,
+                title: d.name || '',
+                originalTitle: d.original_name || '',
+                yearStart: (d.first_air_date || '').split('-')[0] || '',
+                yearEnd: ended ? ((d.last_air_date || '').split('-')[0] || '') : '',
+                productionStatus: ended ? 'finalizada' : 'em_producao',
+                creators: (d.created_by || []).map(c => c.name).filter(Boolean),
+                genres: tvGenresToText(d.genres),
+                imdbId: (d.external_ids && d.external_ids.imdb_id) || '',
+                poster: d.poster_path ? `https://image.tmdb.org/t/p/w342${d.poster_path}` : null,
+                seasons: normalizeSeasons(seasons)
+            };
+        }
+
+        // Nota do IMDb de uma série: usa o código já conhecido; se não houver, descobre
+        // via TMDB. Como nos filmes, NUNCA roda sozinho — só quando se clica em "↻".
+        async function lookupSeriesImdb(info) {
+            let { imdbId, tmdbId } = info;
+            if (!imdbId) {
+                if (!tmdbId) {
+                    const { bestMatch } = await searchSeriesBestMatch(info.title, info.originalTitle, info.yearStart);
+                    if (!bestMatch) throw new Error(`não encontrei "${info.title}" no TMDB`);
+                    tmdbId = bestMatch.id;
+                }
+                const r = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/external_ids?api_key=${API_KEY}`);
+                const j = await r.json();
+                if (!j.imdb_id) throw new Error('o TMDB não tem o código do IMDb desta série');
+                imdbId = j.imdb_id;
+            }
+            const rating = await fetchImdbRatingById(imdbId);
+            return { rating, imdbId, tmdbId };
+        }
+
+        // ---------- Agrupamento para estatísticas ----------
+        function buildGroupStats(list, extractFn, withAvg) {
+            const groups = {};
+            list.forEach(s => {
+                const seen = new Set();
+                extractFn(s).forEach(raw => {
+                    const v = (raw || '').trim();
+                    if (!v) return;
+                    const key = normalizeKey(v);
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    if (!groups[key]) groups[key] = { count: 0, sum: 0, labelCounts: {} };
+                    groups[key].count++;
+                    if (withAvg) groups[key].sum += s.avg;
+                    groups[key].labelCounts[v] = (groups[key].labelCounts[v] || 0) + 1;
+                });
+            });
+            return Object.values(groups).map(g => ({
+                name: pickMostCommonLabel(g.labelCounts), count: g.count, avg: withAvg ? g.sum / g.count : undefined
+            }));
+        }
+
+        // ---------- Aba "Israel & Ricardo" (séries) ----------
+        function computeSeriesProfile(list, p) {
+            const sc = p.score, other = p.otherScore;
+            const byTitle = (a, b) => (a.title || '').localeCompare(b.title || '', 'pt-BR', { sensitivity: 'base' });
+            const rated = list.filter(s => sc(s) > 0);
+            const n = rated.length;
+            const avg = n ? rated.reduce((a, s) => a + sc(s), 0) / n : 0;
+
+            const counts = {};
+            rated.forEach(s => { const k = sc(s).toFixed(1); counts[k] = (counts[k] || 0) + 1; });
+            let modeKey = null, modeCount = 0;
+            Object.entries(counts).forEach(([k, c]) => {
+                if (c > modeCount || (c === modeCount && parseFloat(k) > parseFloat(modeKey))) { modeKey = k; modeCount = c; }
+            });
+
+            const hist = new Array(10).fill(0);
+            rated.forEach(s => { hist[Math.min(10, Math.max(1, Math.round(sc(s)))) - 1]++; });
+
+            const top10 = [...rated].sort((a, b) => (sc(b) - sc(a)) || (other(b) - other(a)) || byTitle(a, b)).slice(0, 10);
+            const bottom5 = [...rated].sort((a, b) => (sc(a) - sc(b)) || (other(a) - other(b)) || byTitle(a, b)).slice(0, 5);
+
+            const withImdb = rated.filter(s => s.scImdb > 0).map(s => ({ m: s, diff: sc(s) - s.scImdb }));
+            const meanDiff = withImdb.length ? withImdb.reduce((a, x) => a + x.diff, 0) / withImdb.length : 0;
+            const above = withImdb.filter(x => x.diff > 0.049).sort((a, b) => b.diff - a.diff || byTitle(a.m, b.m)).slice(0, 5);
+            const below = withImdb.filter(x => x.diff < -0.049).sort((a, b) => a.diff - b.diff || byTitle(a.m, b.m)).slice(0, 5);
+            const corr = pearsonCorr(withImdb.map(x => sc(x.m)), withImdb.map(x => x.m.scImdb));
+
+            // Mínimos menores que nos filmes: há bem menos séries do que filmes no histórico
+            const creators = groupExtremes(rated, s => s.creators, 2, sc);
+            const genres = groupExtremes(rated, s => genresOf(s), 2, sc);
+            const decades = groupExtremes(rated, s => { const y = parseInt(s.yearStart, 10); return y ? ['Anos ' + Math.floor(y / 10) * 10] : []; }, 2, sc);
+
+            return {
+                n, avg, modeKey, modeCount, hist, top10, bottom5,
+                high: rated.filter(s => sc(s) >= 9).length,
+                low: rated.filter(s => sc(s) < 5).length,
+                imdbCount: withImdb.length, meanDiff, above, below, corr,
+                creators, genres, decades
+            };
+        }
+
+        function buildSeriesVersusHtml(list) {
+            const both = list.filter(s => s.scIsr > 0 && s.scRic > 0);
+            if (!both.length) return '';
+            const isrHigher = both.filter(s => s.scIsr - s.scRic > 0.049).length;
+            const ricHigher = both.filter(s => s.scRic - s.scIsr > 0.049).length;
+            const equal = both.length - isrHigher - ricHigher;
+            const avgIsr = both.reduce((a, s) => a + s.scIsr, 0) / both.length;
+            const avgRic = both.reduce((a, s) => a + s.scRic, 0) / both.length;
+            const d = avgIsr - avgRic;
+            const generous = Math.abs(d) < 0.05 ? 'Empate' : `${d > 0 ? 'Israel' : 'Ricardo'} (+${Math.abs(d).toFixed(2)})`;
+            const r = pearsonCorr(both.map(s => s.scIsr), both.map(s => s.scRic));
+            const card = (val, lbl) => `<div class="stat-card"><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div>`;
+            return [
+                card(`${isrHigher} × ${ricHigher}`, `Nota maior: Israel × Ricardo (${equal} empate${equal !== 1 ? 's' : ''})`),
+                card(generous, 'Mais generoso na média'),
+                card(`${Math.round(equal / both.length * 100)}%`, `Notas idênticas (${both.length} série${both.length !== 1 ? 's' : ''} avaliada${both.length !== 1 ? 's' : ''} pelos dois)`),
+                r === null ? '' : card(r.toFixed(2), `Sintonia entre os dois (${corrLabel(r)})`)
+            ].join('');
+        }
+
+        function buildSeriesPersonColumnHtml(p, f) {
+            const fmtSigned = v => (v > 0 ? '+' : '') + v.toFixed(1);
+            const plural = (n, one, many) => n === 1 ? one : many;
+            const head = `
+                <div class="profile-head">
+                    <div class="profile-name">${p.name}</div>
+                    <div class="profile-sub">${f.n} ${plural(f.n, 'série avaliada', 'séries avaliadas')}</div>
+                </div>`;
+            if (!f.n) return `<div class="profile-col" style="--pc:${p.color}">${head}<div class="chart-panel"><div class="empty-hint">Ainda não há notas de ${p.name} em séries concluídas.</div></div></div>`;
+
+            const statCard = (val, lbl) => `<div class="stat-card"><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div>`;
+            const stats = [
+                statCard(f.avg.toFixed(2), 'Nota média'),
+                statCard(`${f.modeKey}<span style="font-size:0.9rem; color:var(--text-muted);"> (${f.modeCount}×)</span>`, 'Nota mais dada'),
+                statCard(`${f.high}<span style="font-size:0.9rem; color:var(--text-muted);"> (${Math.round(f.high / f.n * 100)}%)</span>`, 'Notas 9 ou mais'),
+                statCard(`${f.low}<span style="font-size:0.9rem; color:var(--text-muted);"> (${Math.round(f.low / f.n * 100)}%)</span>`, 'Notas abaixo de 5')
+            ].join('');
+
+            const favCard = (lbl, g, creatorClick) => {
+                if (!g) return `<div class="fav-card"><div class="fav-lbl">${lbl}</div><div class="fav-name">—</div><div class="fav-meta">dados insuficientes</div></div>`;
+                const click = creatorClick ? ` data-creator="${escapeHtml(g.label)}" onclick="sapp.filterByCreator(this.dataset.creator)" title="Ver as séries no catálogo"` : '';
+                return `<div class="fav-card"${click}><div class="fav-lbl">${lbl}</div><div class="fav-name">${escapeHtml(g.label)}</div><div class="fav-meta">média ${g.avg.toFixed(2)} · ${g.count} ${plural(g.count, 'série', 'séries')}</div></div>`;
+            };
+            const favs = [
+                favCard('Criador favorito', f.creators.best, true), favCard('Criador menos favorito', f.creators.worst, true),
+                favCard('Gênero favorito', f.genres.best), favCard('Gênero menos favorito', f.genres.worst),
+                favCard('Década favorita', f.decades.best), favCard('Década menos favorita', f.decades.worst)
+            ].join('');
+
+            const otherName = p.otherName;
+            const topRow = (s, i) => `
+                <div class="top-item" onclick="sapp.openModal(${s.id})" title="${escapeHtml(s.title)}">
+                    <span class="top-pos">${i + 1}</span>
+                    <span class="top-title">${escapeHtml(s.title)}${s.yearStart ? ` <span class="rank-item-count">(${escapeHtml(s.yearStart)})</span>` : ''}</span>
+                    <span class="top-side">${otherName} ${p.otherScore(s) > 0 ? p.otherScore(s).toFixed(1) : '—'}</span>
+                    <span class="top-score" style="background:${scoreColor(p.score(s))}">${p.score(s).toFixed(1)}</span>
+                </div>`;
+            const diffRow = (x, i) => `
+                <div class="top-item" onclick="sapp.openModal(${x.m.id})" title="${escapeHtml(x.m.title)}">
+                    <span class="top-pos">${i + 1}</span>
+                    <span class="top-title">${escapeHtml(x.m.title)}${x.m.yearStart ? ` <span class="rank-item-count">(${escapeHtml(x.m.yearStart)})</span>` : ''}</span>
+                    <span class="top-side">${p.name} ${p.score(x.m).toFixed(1)} · IMDb ${x.m.scImdb.toFixed(1)}</span>
+                    <span class="diff-chip" style="background:${x.diff > 0 ? 'var(--score-high)' : 'var(--score-low)'}">${fmtSigned(x.diff)}</span>
+                </div>`;
+
+            let imdbHtml;
+            if (!f.imdbCount) {
+                imdbHtml = '<div class="empty-hint">Nenhuma série concluída com nota do IMDb ainda. Use o botão ↻ dentro de uma série para buscar.</div>';
+            } else {
+                const tendency = Math.abs(f.meanDiff) < 0.05
+                    ? `${p.name} avalia, em média, igual ao IMDb`
+                    : `${p.name} dá, em média, <b>${Math.abs(f.meanDiff).toFixed(2)}</b> ponto${Math.abs(f.meanDiff) >= 1.005 ? 's' : ''} ${f.meanDiff > 0 ? 'a mais' : 'a menos'} que o IMDb`;
+                const corrTxt = f.corr === null ? '' : ` · correlação ${f.corr.toFixed(2)} (${corrLabel(f.corr)})`;
+                imdbHtml = `
+                    <div style="color:var(--text-muted); font-size:0.82rem; font-weight:600;">${tendency}${corrTxt}. Base: ${f.imdbCount} de ${f.n} séries com nota do IMDb.</div>
+                    <div class="sub-title">Acima do IMDb — notas mais generosas</div>
+                    <div>${f.above.length ? f.above.map(diffRow).join('') : '<div class="empty-hint">Nenhuma série com nota acima do IMDb.</div>'}</div>
+                    <div class="sub-title">Abaixo do IMDb — notas mais duras</div>
+                    <div>${f.below.length ? f.below.map(diffRow).join('') : '<div class="empty-hint">Nenhuma série com nota abaixo do IMDb.</div>'}</div>`;
+            }
+
+            const maxH = Math.max(...f.hist, 1);
+            const histHtml = `<div class="hist">${f.hist.map((c, i) => `
+                <div class="hist-col" title="${c} ${plural(c, 'série', 'séries')} com nota próxima de ${i + 1}">
+                    <div class="hist-count">${c || ''}</div>
+                    <div class="hist-barwrap"><div class="hist-bar" style="height:${c ? Math.max(3, c / maxH * 100).toFixed(0) : 0}%; background:${scoreColor(i + 1)};"></div></div>
+                    <div class="hist-lbl">${i + 1}</div>
+                </div>`).join('')}</div>`;
+
+            const panel = (title, note, body) => `
+                <div class="chart-panel">
+                    <div class="chart-header"><span class="chart-title">${title}${note ? ` <span style="font-weight:400; color:var(--text-muted); font-size:0.7rem;">${note}</span>` : ''}</span></div>
+                    ${body}
+                </div>`;
+
+            return `
+                <div class="profile-col" style="--pc:${p.color}">
+                    ${head}
+                    <div class="profile-stats">${stats}</div>
+                    ${panel('Gostos', '(mín. 2 séries por grupo)', `<div class="fav-grid">${favs}</div>`)}
+                    ${panel(`Top 10 de ${p.name}`, `(ao lado, a nota de ${otherName})`, `<div>${f.top10.map(topRow).join('')}</div>`)}
+                    ${panel('As 5 piores', '', `<div>${f.bottom5.map(topRow).join('')}</div>`)}
+                    ${panel('Distribuição das notas', '(arredondadas para o inteiro mais próximo)', histHtml)}
+                    ${panel(`${p.name} × IMDb`, '', imdbHtml)}
+                </div>`;
+        }
+
         class CineApp {
             constructor() {
                 this.movies = [];
@@ -2670,6 +3818,8 @@
                 this.editingId = null;
                 this.hasUnsavedChanges = false; // Controle de alterações
                 this.currentTab = 'catalogo';
+                this.mode = 'movies'; // 'movies' | 'series'
+                this.lastTab = { movies: 'catalogo', series: 's-catalogo' };
                 this.pending = []; // Lista "Sortear Filme"
                 this.lastDrawnId = null;
                 this.drawRequestId = 0; // Evita condição de corrida ao buscar capa do sorteado
@@ -2725,7 +3875,7 @@
 
                 // Listener para avisar antes de fechar se houver mudanças não salvas
                 window.addEventListener('beforeunload', (e) => {
-                    if (this.hasUnsavedChanges) {
+                    if (this.hasUnsavedChanges || (typeof sapp !== 'undefined' && sapp.hasPending())) {
                         e.preventDefault();
                         e.returnValue = ''; // Necessário para Chrome
                     }
@@ -2734,8 +3884,13 @@
 
             // --- Navegação entre abas ---
             switchTab(tab, opts = {}) {
+                // Uma aba de séries sempre pertence ao modo "series" (e vice-versa)
+                const tabMode = tab.startsWith('s-') ? 'series' : 'movies';
+                if (tabMode !== this.mode) this.setMode(tabMode);
                 this.currentTab = tab;
-                ['catalogo', 'estatisticas', 'perfis', 'sortear'].forEach(t => {
+                this.lastTab[tabMode] = tab;
+                ['catalogo', 'estatisticas', 'perfis', 'sortear',
+                 's-catalogo', 's-estatisticas', 's-perfis', 's-sortear'].forEach(t => {
                     const el = document.getElementById('tab-' + t);
                     if (el) {
                         if (t === tab) {
@@ -2755,7 +3910,47 @@
                 if (tab === 'estatisticas') this.renderStats();
                 if (tab === 'perfis') this.renderProfiles();
                 if (tab === 'sortear') this.renderPending();
+                if (tab === 's-estatisticas') sapp.renderStats();
+                if (tab === 's-perfis') sapp.renderProfiles();
+                if (tab === 's-sortear') sapp.renderSortear();
                 if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // --- Modo: Filmes / Séries ---
+            // Só ajusta a "casca" (botões, navegação, busca). Quem mostra a aba é o switchTab.
+            setMode(mode) {
+                if (mode === this.mode) return;
+                this.mode = mode;
+                document.body.setAttribute('data-mode', mode);
+                document.getElementById('modeBtn-movies').classList.toggle('active', mode === 'movies');
+                document.getElementById('modeBtn-series').classList.toggle('active', mode === 'series');
+                const search = document.getElementById('searchInput');
+                search.placeholder = mode === 'series' ? 'Buscar série, criador...' : 'Buscar filme, diretor...';
+                // A busca é compartilhada: ao trocar de modo ela é limpa, para não
+                // deixar um filtro "invisível" valendo do outro lado.
+                if (search.value) {
+                    search.value = '';
+                    this.handleFilter();
+                    sapp.handleFilter();
+                }
+                try { localStorage.setItem('cinetracker_mode', mode); } catch (e) {}
+            }
+            switchMode(mode) {
+                if (mode === this.mode) return;
+                this.switchTab(this.lastTab[mode] || (mode === 'series' ? 's-catalogo' : 'catalogo'));
+            }
+
+            // Busca do cabeçalho: vale para o modo atual
+            handleSearch() {
+                if (this.mode === 'series') sapp.handleSearch();
+                else {
+                    clearTimeout(this._searchDebounce);
+                    this._searchDebounce = setTimeout(() => this.handleFilter(), 200);
+                }
+            }
+            // Botão "Novo" do cabeçalho
+            addNew() {
+                if (this.mode === 'series') sapp.addSeries(); else this.addMovie();
             }
 
             // --- Botão "Voltar" ---
@@ -2867,8 +4062,9 @@
                 if (data.version && data.version > CINE_JSON_VERSION) {
                     showToast('Este arquivo foi exportado por uma versão mais nova do CineTracker. Alguns dados podem não aparecer corretamente.', 'info');
                 }
+                const hasSeries = Array.isArray(data.series);
                 const ok = await showConfirm(
-                    `Isso substitui TODO o catálogo salvo na nuvem (visível também no outro aparelho) pelos ${data.movies.length} filmes deste arquivo. Essa ação não pode ser desfeita.`,
+                    `Isso substitui TODO o catálogo salvo na nuvem (visível também no outro aparelho) pelos ${data.movies.length} filmes${hasSeries ? ` e ${data.series.length} séries` : ''} deste arquivo. Essa ação não pode ser desfeita.`,
                     { title: 'Importar e substituir tudo?', okLabel: 'Substituir', danger: true }
                 );
                 if (!ok) return;
@@ -2879,6 +4075,9 @@
                 if (savedMovies) this.movies = savedMovies;
                 const savedPending = await cloud.replaceAllPending(this.pending);
                 if (savedPending) this.pending = savedPending;
+
+                // Arquivos antigos (sem o campo "series") não mexem nas séries já cadastradas
+                if (hasSeries) await sapp.importSeries(data.series);
 
                 this.processData();
                 this.renderPending();
@@ -3645,12 +4844,6 @@
                 this.updateDashboard(list);
             }
             
-            handleSearch() {
-                // Pequeno atraso para não recalcular filtro/grid a cada tecla digitada —
-                // só dispara depois que a pessoa para de digitar por 200ms.
-                clearTimeout(this._searchDebounce);
-                this._searchDebounce = setTimeout(() => this.handleFilter(), 200);
-            }
 
             updateDashboard(list) {
                 const dash = document.getElementById('statsGrid');
@@ -3887,9 +5080,9 @@
 
             // Mantém o foco (Tab/Shift+Tab) circulando dentro do modal enquanto ele
             // estiver aberto, em vez de vazar para elementos escondidos atrás dele.
-            setupFocusTrap() {
+            setupFocusTrap(selector) {
                 this.teardownFocusTrap();
-                const modal = document.querySelector('.modal-window');
+                const modal = document.querySelector(selector || '#modalOverlay .modal-window');
                 if (!modal) return;
                 this._trapFocusHandler = (e) => {
                     if (e.key !== 'Tab') return;
@@ -4084,7 +5277,8 @@
                         poster: m.poster || null,
                         posterFailed: !!m.posterFailed
                     })),
-                    pending: this.pending
+                    pending: this.pending,
+                    series: sapp.exportSeries()
                 };
             }
 
@@ -4967,7 +6161,1309 @@
         }
         syncHeaderHeight(); // roda já na primeira renderização, não só depois do "load"
 
+        // ============================================================
+        // SÉRIES — APLICAÇÃO (catálogo, modal, episódios, estatísticas)
+        // ============================================================
+        class SeriesApp {
+            constructor() {
+                this.series = [];
+                this.filtered = [];
+                this.available = true;      // false quando a tabela "series" não existe no Supabase
+                this.loadError = '';
+                this.editingId = null;
+                this.isEditing = false;
+                this.sel = { year: new Set(), creator: new Set(), genre: new Set() };
+                this.opts = { year: [], creator: [], genre: [] };
+                this.groupFilter = 'all';   // all | andamento | finalizadas | nao_iniciadas | avaliar
+                this.sortBy = 'recent';
+                this.openSeasons = new Set();
+                this.previewSeason = null;  // null = capa da série; número = capa da temporada
+                this.editSeasons = [];      // cópia de trabalho das temporadas durante a edição
+                this.pendingApi = null;     // dados buscados na API, gravados ao clicar em Salvar
+                this.dirty = new Set();     // séries com gravação pendente (ignora o "eco" do realtime)
+                this.timers = {};
+                this.ver = {};
+                this.chartYear = null;
+                this._posterBusy = new Set();
+                this.lastDrawnId = null;
+                this.drawRequestId = 0;
+
+                // Fecha os menus de filtro ao clicar fora
+                document.addEventListener('click', (e) => {
+                    ['year', 'creator', 'genre'].forEach(k => {
+                        const w = document.getElementById('sFilterWrap-' + k);
+                        if (w && !w.contains(e.target)) this.closeMenu(k);
+                    });
+                });
+            }
+
+            cur() { return this.series.find(s => s.id === this.editingId) || null; }
+            dur(mins) { return app.formatDuration(Math.round(mins || 0)); }
+            hasPending() { return Object.values(this.timers).some(t => !!t); }
+
+            // ---------------- DADOS ----------------
+            processData(opts = {}) {
+                this.series.forEach(deriveSeries);
+                const rated = this.series.filter(s => s.rated).sort((a, b) => (b.avg - a.avg) || (b.scImdb - a.scImdb));
+                rated.forEach((s, i) => s.rankAvg = i + 1);
+                this.series.forEach(s => { if (!s.rated) s.rankAvg = null; });
+
+                if (opts.rebuildFilters !== false) this.buildFilterOptions();
+                this.handleFilter();
+                this.renderSetupBanner();
+                this.renderVisibleTabs();
+                if (opts.fetchPosters !== false) this.fetchPosters();
+            }
+
+            renderVisibleTabs() {
+                const t = app.currentTab;
+                if (t === 's-estatisticas') this.renderStats();
+                if (t === 's-perfis') this.renderProfiles();
+                if (t === 's-sortear') this.renderSortear();
+            }
+
+            renderSetupBanner() {
+                const el = document.getElementById('sSetupBanner');
+                if (!el) return;
+                if (this.available) { el.innerHTML = ''; return; }
+                el.innerHTML = `
+                    <div class="gallery-container" style="padding-bottom:0;">
+                        <div class="lock-note setup-note" style="margin:0;">
+                            ⚠️ A tabela <b>series</b> ainda não existe no Supabase, então as séries não podem ser salvas.<br>
+                            Abra o <b>SQL Editor</b> do projeto, cole o conteúdo do arquivo <b>cinetracker_series_schema.sql</b>, execute e recarregue esta página.
+                            <div style="font-weight:500; margin-top:6px; font-size:0.75rem; color:var(--text-muted);">Detalhe técnico: ${escapeHtml(this.loadError)}</div>
+                        </div>
+                    </div>`;
+            }
+
+            // Busca a capa (só a capa) de séries cadastradas sem imagem — nunca troca capas existentes.
+            async fetchPosters() {
+                const targets = this.series.filter(s => !s.poster && !s.posterFailed && s.title && !this._posterBusy.has(s.id));
+                for (const s of targets) {
+                    this._posterBusy.add(s.id);
+                    try {
+                        const { bestMatch } = await searchSeriesBestMatch(s.title, s.originalTitle, s.yearStart);
+                        if (bestMatch && bestMatch.poster_path) {
+                            s.poster = `https://image.tmdb.org/t/p/w342${bestMatch.poster_path}`;
+                            if (this.available) cloud.upsertSeries(s);
+                        } else {
+                            s.posterFailed = true;
+                        }
+                    } catch (e) { /* segue sem capa */ }
+                }
+                if (targets.length) this.handleFilter();
+            }
+
+            // ---------------- FILTROS ----------------
+            buildFilterOptions() {
+                const yearMap = {}, creatorGroups = {}, genreGroups = {};
+                // conta cada grafia dentro do grupo normalizado (sem acento/maiúsculas)
+                const bump = (groups, label) => {
+                    const v = (label || '').trim(); if (!v) return;
+                    const k = normalizeKey(v);
+                    if (!groups[k]) groups[k] = {};
+                    groups[k][v] = (groups[k][v] || 0) + 1;
+                };
+                this.series.forEach(s => {
+                    if (s.yearStart) yearMap[s.yearStart] = (yearMap[s.yearStart] || 0) + 1;
+                    s.creators.forEach(c => bump(creatorGroups, c));
+                    genresOf(s).forEach(g => bump(genreGroups, g));
+                });
+                const cmp = (a, b) => a.label.localeCompare(b.label, 'pt-BR', { sensitivity: 'base' });
+                this.opts.year = Object.keys(yearMap).sort().reverse().map(y => ({ key: y, label: y, count: yearMap[y] }));
+                this.opts.creator = Object.entries(creatorGroups).map(([key, lc]) => ({
+                    key, label: pickMostCommonLabel(lc), count: Object.values(lc).reduce((a, b) => a + b, 0)
+                })).sort((a, b) => b.count - a.count || cmp(a, b));
+                this.opts.genre = Object.entries(genreGroups).map(([key, lc]) => ({ key, label: pickMostCommonLabel(lc) })).sort(cmp);
+
+                ['year', 'creator', 'genre'].forEach(kind => {
+                    this.sel[kind] = new Set([...this.sel[kind]].filter(k => this.opts[kind].some(o => o.key === k)));
+                    const list = document.getElementById('sFilterList-' + kind);
+                    if (list) {
+                        list.innerHTML = this.opts[kind].map(o => `
+                            <label class="multi-select-option">
+                                <input type="checkbox" value="${escapeHtml(o.key)}" ${this.sel[kind].has(o.key) ? 'checked' : ''} onchange="sapp.toggleOption('${kind}', '${escapeJsString(o.key)}', this.checked)">
+                                <span>${escapeHtml(o.label)}${o.count ? ` <span class="rank-item-count">(${o.count})</span>` : ''}</span>
+                            </label>`).join('');
+                    }
+                    const all = document.getElementById('sFilterAll-' + kind);
+                    if (all) all.checked = this.sel[kind].size === 0;
+                    this.updateFilterLabel(kind);
+                });
+            }
+            toggleMenu(kind) {
+                const menu = document.getElementById('sFilterMenu-' + kind);
+                if (!menu) return;
+                const opening = !menu.classList.contains('open');
+                ['year', 'creator', 'genre'].forEach(k => { if (k !== kind) this.closeMenu(k); });
+                menu.classList.toggle('open');
+                if (opening && kind === 'creator') {
+                    const search = document.getElementById('sFilterSearch-creator');
+                    if (search) { search.value = ''; this.filterOptions('creator', ''); setTimeout(() => search.focus(), 0); }
+                }
+            }
+            closeMenu(kind) { const m = document.getElementById('sFilterMenu-' + kind); if (m) m.classList.remove('open'); }
+            filterOptions(kind, query) {
+                const q = normalizeKey(query);
+                let any = false;
+                document.querySelectorAll(`#sFilterList-${kind} .multi-select-option`).forEach(opt => {
+                    const match = !q || normalizeKey(opt.querySelector('span')?.textContent || '').includes(q);
+                    opt.style.display = match ? '' : 'none';
+                    if (match) any = true;
+                });
+                const empty = document.getElementById('sFilterEmpty-' + kind);
+                if (empty) empty.style.display = (q && !any) ? 'block' : 'none';
+            }
+            updateFilterLabel(kind) {
+                const btn = document.getElementById('sFilterBtn-' + kind);
+                if (!btn) return;
+                const labels = { year: ['Todos os anos', n => `${n} anos selecionados`], creator: ['Todos os criadores', n => `${n} criadores selecionados`], genre: ['Todos os gêneros', n => `${n} gêneros selecionados`] };
+                const n = this.sel[kind].size;
+                if (n === 0) { btn.textContent = labels[kind][0]; return; }
+                if (n === 1) {
+                    const key = [...this.sel[kind]][0];
+                    const o = this.opts[kind].find(x => x.key === key);
+                    btn.textContent = o ? o.label : '1 selecionado';
+                    return;
+                }
+                btn.textContent = labels[kind][1](n);
+            }
+            toggleAll(kind, checked) {
+                if (checked) {
+                    this.sel[kind].clear();
+                    document.querySelectorAll(`#sFilterList-${kind} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+                }
+                this.updateFilterLabel(kind);
+                this.handleFilter();
+            }
+            toggleOption(kind, key, checked) {
+                if (checked) this.sel[kind].add(key); else this.sel[kind].delete(key);
+                const all = document.getElementById('sFilterAll-' + kind);
+                if (all) all.checked = this.sel[kind].size === 0;
+                this.updateFilterLabel(kind);
+                this.handleFilter();
+            }
+            handleGroupFilter(v) { this.groupFilter = v; this.handleFilter(); }
+            handleSort(v) { this.sortBy = v; this.handleFilter(); }
+            handleSearch() {
+                clearTimeout(this._searchDebounce);
+                this._searchDebounce = setTimeout(() => this.handleFilter(), 200);
+            }
+
+            // Atalho vindo das Estatísticas / Perfis: filtra o catálogo por criador
+            filterByCreator(name) {
+                app.pushNavState();
+                app.switchTab('s-catalogo');
+                this.sel.creator = new Set([normalizeKey(name)]);
+                this.sel.year.clear(); this.sel.genre.clear();
+                this.groupFilter = 'all';
+                const gf = document.getElementById('sGroupFilter'); if (gf) gf.value = 'all';
+                document.getElementById('searchInput').value = '';
+                this.buildFilterOptions();
+                this.closeMenu('creator');
+                this.handleFilter();
+            }
+
+            handleFilter() {
+                const q = app.mode === 'series' ? normalizeKey(document.getElementById('searchInput').value) : '';
+                let list = this.series.slice();
+                if (this.sel.year.size) list = list.filter(s => this.sel.year.has(s.yearStart));
+                if (this.sel.creator.size) list = list.filter(s => s.creators.some(c => this.sel.creator.has(normalizeKey(c))));
+                if (this.sel.genre.size) list = list.filter(s => genresOf(s).some(g => this.sel.genre.has(normalizeKey(g))));
+                if (q) list = list.filter(s => normalizeKey(s.title).includes(q) || normalizeKey(s.originalTitle).includes(q) || normalizeKey(s.creator).includes(q));
+                this.filtered = list;
+                this.renderCatalog();
+                this.renderDashboard(list);
+            }
+
+            // ---------------- CATÁLOGO ----------------
+            comparator() {
+                const recent = (a, b) => (b._m.lastActivity || '').localeCompare(a._m.lastActivity || '') || (b.id - a.id);
+                return {
+                    recent,
+                    avg: (a, b) => (b.avg - a.avg) || (b.scImdb - a.scImdb) || recent(a, b),
+                    isr: (a, b) => (b.scIsr - a.scIsr) || (b.avg - a.avg) || recent(a, b),
+                    ric: (a, b) => (b.scRic - a.scRic) || (b.avg - a.avg) || recent(a, b),
+                    progress: (a, b) => (b._m.pct - a._m.pct) || recent(a, b),
+                    year: (a, b) => (parseInt(b.yearStart, 10) || 0) - (parseInt(a.yearStart, 10) || 0) || recent(a, b),
+                    title: (a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' })
+                }[this.sortBy] || recent;
+            }
+
+            renderCatalog() {
+                const host = document.getElementById('seriesGroups');
+                if (!host) return;
+                if (!this.series.length) {
+                    host.innerHTML = `
+                        <div class="catalog-empty-state">
+                            <div class="catalog-empty-icon">📺</div>
+                            <div class="catalog-empty-title">Nenhuma série cadastrada</div>
+                            <div class="catalog-empty-text">Clique em "Novo" no topo, digite o título e saia do campo: temporadas, episódios e capas são buscados automaticamente.</div>
+                        </div>`;
+                    return;
+                }
+                let list = this.filtered;
+                if (this.groupFilter === 'avaliar') list = list.filter(s => s.needsRating);
+                if (!list.length) {
+                    host.innerHTML = `
+                        <div class="catalog-empty-state">
+                            <div class="catalog-empty-icon">🔍</div>
+                            <div class="catalog-empty-title">Nenhuma série encontrada</div>
+                            <div class="catalog-empty-text">Nenhuma série corresponde aos filtros ou à busca atual.</div>
+                        </div>`;
+                    return;
+                }
+                const groups = [
+                    { id: 'andamento', icon: '▶️', title: 'Em andamento', sub: 'Sendo assistidas agora ou ainda em exibição' },
+                    { id: 'finalizadas', icon: '🏁', title: 'Finalizadas', sub: 'Encerradas e assistidas até o último episódio' },
+                    { id: 'nao_iniciadas', icon: '🕓', title: 'Não iniciadas', sub: 'Ainda não começamos a assistir' }
+                ];
+                const cmp = this.comparator();
+                const show = groups.filter(g => ['all', 'avaliar'].includes(this.groupFilter) || this.groupFilter === g.id);
+                const html = show.map(g => {
+                    const items = list.filter(s => s._m.group === g.id).sort(cmp);
+                    if (!items.length) return '';
+                    return `
+                        <section class="series-group">
+                            <div class="series-group-head">
+                                <h4 class="series-group-title">${g.icon} ${g.title}</h4>
+                                <span class="series-group-count">${items.length}</span>
+                                <span class="series-group-sub">${g.sub}</span>
+                            </div>
+                            <div class="movies-grid">${items.map(s => this.cardHtml(s)).join('')}</div>
+                        </section>`;
+                }).join('');
+                host.innerHTML = html || `<div class="catalog-empty-state"><div class="catalog-empty-icon">🔍</div><div class="catalog-empty-title">Nenhuma série neste grupo</div><div class="catalog-empty-text">Tente outro filtro de situação.</div></div>`;
+            }
+
+            cardHtml(s) {
+                const m = s._m;
+                const safeTitle = escapeHtml(s.title);
+                const img = s.poster || placeholderPoster(s.title);
+                const mainGenre = genresOf(s)[0];
+                let badge = '';
+                if (s.rated) badge = `<div class="score-badge" style="background:${scoreColor(s.avg)}">${s.avg.toFixed(1)}</div>`;
+                else if (m.complete) badge = `<div class="series-pct-badge series-rate-badge">⭐ Avaliar</div>`;
+                else if (m.started) badge = `<div class="series-pct-badge">${Math.floor(m.pct)}%</div>`;
+                const rank = s.rated ? `<div class="rank-badge">#${s.rankAvg}</div>` : '';
+                const airing = m.group === 'andamento' && s.productionStatus !== 'finalizada';
+                const bar = (m.started && !m.complete) ? `<div class="series-progress-bar"><div class="series-progress-fill" style="width:${m.pct.toFixed(1)}%"></div></div>` : '';
+                const seasonsN = s.seasons.length;
+                const nextTxt = (m.started && !m.complete && m.next) ? `<div class="card-director-overlay">A seguir: T${m.next.season} · E${m.next.episode}</div>` : '';
+                const infoTxt = `${seasonsN} temporada${seasonsN !== 1 ? 's' : ''}`;
+                return `
+                    <div class="movie-card" onclick="sapp.openModal(${s.id})" title="${safeTitle}">
+                        ${rank}
+                        ${airing ? `<div class="series-status-tag">Em exibição</div>` : ''}
+                        ${mainGenre ? `<div class="card-genre-tag">${escapeHtml(mainGenre)}</div>` : ''}
+                        ${badge}
+                        <img src="${img}" loading="lazy" alt="${safeTitle}">
+                        <div class="card-title-overlay">
+                            ${safeTitle}${s.yearStart ? ` <span style="opacity:.7;font-weight:600;">(${escapeHtml(s.yearStart)})</span>` : ''}
+                            ${s.creator ? `<div class="card-director-overlay">${escapeHtml(s.creator)}</div>` : ''}
+                            ${seasonsN ? `<div class="card-director-overlay">${infoTxt}${m.total ? ` · ${m.total} ep.` : ''}</div>` : ''}
+                            ${nextTxt}
+                        </div>
+                        ${bar}
+                    </div>`;
+            }
+
+            renderDashboard(list) {
+                const dash = document.getElementById('sStatsGrid');
+                if (!dash) return;
+                const by = g => list.filter(s => s._m.group === g).length;
+                const waiting = list.filter(s => s.needsRating).length;
+                const mins = list.reduce((a, s) => a + s._m.watchedMin, 0);
+                const rated = list.filter(s => s.rated);
+                const avg = rated.length ? rated.reduce((a, s) => a + s.avg, 0) / rated.length : 0;
+                dash.innerHTML = `
+                    <div class="stat-card"><div class="stat-val stat-highlight">${list.length}</div><div class="stat-lbl">Séries no catálogo</div></div>
+                    <div class="stat-card"><div class="stat-val">${by('andamento')}</div><div class="stat-lbl">Em andamento</div></div>
+                    <div class="stat-card"><div class="stat-val">${by('finalizadas')}</div><div class="stat-lbl">Finalizadas</div>${waiting ? `<div class="stat-sublabel">${waiting} aguardando nota</div>` : ''}</div>
+                    <div class="stat-card"><div class="stat-val">${by('nao_iniciadas')}</div><div class="stat-lbl">Não iniciadas</div></div>
+                    <div class="stat-card"><div class="stat-val">${this.dur(mins)}</div><div class="stat-lbl">Tempo assistido</div></div>
+                    <div class="stat-card"><div class="stat-val stat-highlight">${avg.toFixed(2)}</div><div class="stat-lbl">Nossa média</div></div>`;
+            }
+
+            // ---------------- MODAL ----------------
+            openModal(id, opts = {}) {
+                const s = this.series.find(x => x.id === id);
+                if (!s) return;
+                this.editingId = id;
+                this.isEditing = false;
+                this.previewSeason = null;
+                this.pendingApi = null;
+                const m = s._m;
+                this.openSeasons = new Set();
+                const focus = m.next ? m.next.season : (s.seasons.length ? s.seasons[s.seasons.length - 1].number : null);
+                if (focus != null) this.openSeasons.add(focus);
+                this.renderModal();
+                this.toggleEdit(false);
+                document.getElementById('sModalOverlay').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                app.setupFocusTrap('#sModalWindow');
+                document.querySelector('#sModalRight').scrollTop = 0;
+            }
+
+            isOpen() { return document.getElementById('sModalOverlay').style.display === 'flex'; }
+
+            closeModal() {
+                if (!this.isOpen()) return;
+                const s = this.cur();
+                if (s) {
+                    if (!s.title.trim()) {
+                        // Série nova fechada sem preencher nada: remove o registro fantasma
+                        this.series = this.series.filter(x => x.id !== s.id);
+                        cloud.deleteSeriesRow(s.id);
+                        this.processData({ fetchPosters: false });
+                    } else if (this.timers[s.id]) {
+                        this.flushSave(s.id);
+                    }
+                }
+                app.teardownFocusTrap();
+                document.getElementById('sModalOverlay').style.display = 'none';
+                document.body.style.overflow = 'auto';
+                this.editingId = null;
+                this.isEditing = false;
+            }
+
+            handleOverlayClick(e) {
+                if (e.target && e.target.id === 'sModalOverlay') this.closeModal();
+            }
+
+            // Redesenha o modal aberto quando a série muda por outro aparelho (realtime)
+            refreshOpenModal(id) {
+                if (!this.isOpen() || this.editingId !== id || this.isEditing) return;
+                this.renderModal(true);
+            }
+
+            renderModal(keepScroll) {
+                const s = this.cur();
+                if (!s) return;
+                const box = document.getElementById('sModalRight');
+                const top = box ? box.scrollTop : 0;
+                this.updatePoster();
+                this.renderSeasonStrip();
+                document.getElementById('sViewMode').innerHTML = this.viewHtml(s);
+                if (keepScroll && box) box.scrollTop = top;
+            }
+
+            updatePoster() {
+                const s = this.cur();
+                if (!s) return;
+                const img = document.getElementById('sPosterImg');
+                let src = s.poster;
+                if (this.previewSeason != null) {
+                    const se = s.seasons.find(x => x.number === this.previewSeason);
+                    if (se && se.poster) src = se.poster;
+                }
+                img.src = src || placeholderPoster(s.title || 'Sem capa');
+            }
+
+            renderSeasonStrip() {
+                const s = this.cur();
+                const strip = document.getElementById('sSeasonStrip');
+                if (!s || !strip) return;
+                if (!s.seasons.length) { strip.style.display = 'none'; strip.innerHTML = ''; return; }
+                strip.style.display = '';
+                const tiles = [`
+                    <div class="season-thumb ${this.previewSeason == null ? 'active' : ''}" onclick="sapp.selectSeason(null)" title="Capa da série">
+                        <img src="${s.poster || placeholderPoster(s.title)}" alt="Capa da série">
+                        <div class="season-thumb-label">Série</div>
+                    </div>`];
+                s.seasons.forEach(se => {
+                    const sm = seasonMetrics(se);
+                    tiles.push(`
+                        <div class="season-thumb ${this.previewSeason === se.number ? 'active' : ''} ${sm.done ? 'done' : ''}" onclick="sapp.selectSeason(${se.number})" title="${escapeHtml(se.name || 'Temporada ' + se.number)}${se.year ? ' (' + escapeHtml(se.year) + ')' : ''}">
+                            ${se.poster ? `<img src="${se.poster}" loading="lazy" alt="Temporada ${se.number}">` : `<div class="season-thumb-noimg">T${se.number}</div>`}
+                            <div class="season-thumb-label">T${se.number}</div>
+                            <div class="season-thumb-bar"><div style="width:${sm.pct.toFixed(0)}%"></div></div>
+                        </div>`);
+                });
+                strip.innerHTML = tiles.join('');
+            }
+
+            selectSeason(sn) {
+                this.previewSeason = sn;
+                this.updatePoster();
+                this.renderSeasonStrip();
+                if (sn != null) {
+                    this.openSeasons.add(sn);
+                    const el = document.getElementById('season-' + sn);
+                    if (el) { el.classList.add('open'); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+                }
+            }
+
+            viewHtml(s) {
+                const m = s._m;
+                const locked = !m.complete;
+                const pad2 = n => String(n).padStart(2, '0');
+                const yearsTxt = seriesYearsLabel(s, true);
+                const airing = s.productionStatus !== 'finalizada';
+                const watchState = m.complete ? (airing ? 'Em dia' : 'Concluída') : (m.started ? 'Assistindo' : 'Não iniciada');
+                const pills = [
+                    `<span class="genre-pill" style="border-color:var(--gold); color:var(--accent);">${airing ? '📡 Em exibição' : '🏁 Encerrada'}</span>`,
+                    `<span class="genre-pill" style="border-color:var(--gold); color:var(--accent);">${m.complete ? '✔' : (m.started ? '▶' : '🕓')} ${watchState}</span>`,
+                    ...genresOf(s).map(g => `<span class="genre-pill">${escapeHtml(g)}</span>`)
+                ].join('');
+                const hasOriginal = s.originalTitle && normalizeKey(s.originalTitle) !== normalizeKey(s.title);
+                const nSeasons = s.seasons.length;
+
+                const ring = buildRingSingle(m.pct, { size: 98, stroke: 10, color: m.complete ? 'var(--score-high)' : 'var(--gold)' });
+                const nextTxt = m.next
+                    ? `A seguir: <b>T${m.next.season} · E${pad2(m.next.episode)}</b>${m.next.title ? ' — ' + escapeHtml(m.next.title) : ''}`
+                    : (m.complete ? '✔ Todos os episódios lançados foram assistidos' : '');
+                const progress = `
+                    <div class="series-progress-block">
+                        <div class="series-ring">${ring}</div>
+                        <div class="series-progress-info">
+                            <div class="series-progress-line"><b>${m.watched}</b> de <b>${m.total}</b> episódios${m.upcoming ? ` <span class="rank-item-count">(+${m.upcoming} por lançar)</span>` : ''}</div>
+                            <div class="series-progress-sub">${this.dur(m.watchedMin)} assistidos de ${this.dur(m.totalMin)}${nSeasons ? ` · ${nSeasons} temporada${nSeasons !== 1 ? 's' : ''}` : ''}</div>
+                            ${nextTxt ? `<div class="series-progress-next">${nextTxt}</div>` : ''}
+                            <div class="series-progress-actions">
+                                ${!m.complete && m.total ? `<button class="btn" onclick="sapp.markAll(true)">✓ Marcar série inteira</button>` : ''}
+                                ${m.watched > 0 ? `<button class="btn" onclick="sapp.markAll(false)">↺ Desmarcar tudo</button>` : ''}
+                                <button class="btn" id="sRefreshApiBtn" onclick="sapp.refreshFromApi()" title="Busca novas temporadas/episódios na API sem perder o que já foi marcado">↻ Atualizar da API</button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                const scoreBox = (label, val, color) => `<div class="s-box"><div>${label}</div><div style="color:${color}">${locked ? '🔒' : (val > 0 ? val.toFixed(1) : '-')}</div></div>`;
+                const imdbBox = `<div class="s-box ${locked ? 'muted' : ''}"><div>IMDb <button type="button" class="imdb-fetch-btn" onclick="sapp.refreshImdbFromView()" title="Buscar a nota atual desta série no IMDb e salvar">↻</button></div><div>${s.scImdb > 0 ? s.scImdb.toFixed(1) : '-'}</div></div>`;
+                const scores = `
+                    <div class="scores-row ${locked ? 'locked' : ''}">
+                        ${scoreBox('Israel', s.scIsr, 'var(--color-israel)')}
+                        ${scoreBox('Ricardo', s.scRic, 'var(--color-ricardo)')}
+                        ${scoreBox('Média', s.avg, 'var(--accent)')}
+                        ${imdbBox}
+                    </div>`;
+
+                let note = '';
+                if (locked) {
+                    const left = Math.max(0, m.total - m.watched);
+                    note = `<div class="lock-note">🔒 Notas e resenha são liberadas quando a série estiver 100% assistida${m.total ? ` (faltam ${left} episódio${left !== 1 ? 's' : ''})` : ''}. ${s.scIsr > 0 || s.scRic > 0 ? 'As notas anteriores continuam guardadas.' : ''} A nota do IMDb pode ser preenchida a qualquer momento, mas só entra nas estatísticas quando a série for concluída.</div>`;
+                } else if (s.needsRating) {
+                    note = `<div class="lock-note">⭐ ${airing ? 'Vocês estão em dia com a série (ela ainda está em exibição).' : 'Série concluída!'} Falta registrar as notas e a resenha.<br><button class="btn btn-primary" onclick="sapp.startRating()">Avaliar agora</button></div>`;
+                }
+
+                const dates = [
+                    s.startedDate ? `Iniciada em ${seriesDateLabel(s.startedDate)}` : '',
+                    s.finishedDate ? `Concluída em ${seriesDateLabel(s.finishedDate)}` : ''
+                ].filter(Boolean).join(' &nbsp;•&nbsp; ');
+
+                const seasonsHtml = nSeasons
+                    ? s.seasons.map(se => this.seasonHtml(se)).join('')
+                    : `<div class="empty-hint">Nenhuma temporada registrada ainda. Use “Editar informações” para buscar os dados na API ou adicionar temporadas manualmente.</div>`;
+
+                const reviewText = (txt) => txt ? escapeHtml(txt) : (locked ? '🔒 Disponível quando a série for concluída.' : 'Nenhuma resenha.');
+
+                return `
+                    <h1 class="modal-title">${escapeHtml(s.title) || 'Sem Título'}</h1>
+                    ${hasOriginal ? `<div class="modal-original-title">Título original: ${escapeHtml(s.originalTitle)}</div>` : ''}
+                    <div class="modal-subtitle">${escapeHtml(yearsTxt) || '-'} • ${s.creator ? 'Criada por ' + escapeHtml(s.creator) : 'Criador não informado'}</div>
+                    <div class="genre-pills">${pills}</div>
+                    ${progress}
+                    ${scores}
+                    ${note}
+                    ${dates ? `<div class="series-dates">${dates}</div>` : ''}
+                    <div class="series-section-title">Temporadas e episódios</div>
+                    ${seasonsHtml}
+                    <div class="reviews-container">
+                        <div class="review-card">
+                            <h4 style="color:var(--color-israel)">Resenha Israel</h4>
+                            <div class="review-text">${reviewText(s.revIsr)}</div>
+                        </div>
+                        <div class="review-card">
+                            <h4 style="color:var(--color-ricardo)">Resenha Ricardo</h4>
+                            <div class="review-text">${reviewText(s.revRic)}</div>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%; margin-top:30px; justify-content:center; background: var(--bg-input);" onclick="sapp.toggleEdit(true)">Editar Informações</button>`;
+            }
+
+            seasonHtml(se) {
+                const sm = seasonMetrics(se);
+                const open = this.openSeasons.has(se.number);
+                const today = todayLocalISO();
+                const pad2 = n => String(n).padStart(2, '0');
+                const name = se.name || `Temporada ${se.number}`;
+                const eps = se.episodes.map(ep => {
+                    const released = isEpReleased(ep, today) || ep.watched;
+                    const meta = [ep.runtime ? `${ep.runtime}m` : '', ep.airDate ? (released ? formatDateBR(ep.airDate) : `estreia ${formatDateBR(ep.airDate)}`) : ''].filter(Boolean).join(' · ');
+                    return `
+                        <div class="ep-row ${ep.watched ? 'watched' : ''} ${released ? '' : 'unreleased'}" ${released ? `onclick="sapp.toggleEpisode(${se.number}, ${ep.number})"` : ''}>
+                            <span class="ep-check">✓</span>
+                            <span class="ep-num">E${pad2(ep.number)}</span>
+                            <span class="ep-title">${escapeHtml(ep.title || 'Episódio ' + ep.number)}</span>
+                            <span class="ep-meta">${escapeHtml(meta)}</span>
+                            ${released ? `<button type="button" class="ep-upto" onclick="event.stopPropagation(); sapp.markUpTo(${se.number}, ${ep.number})" title="Marcar todos os episódios até este como assistidos">até aqui</button>` : ''}
+                        </div>`;
+                }).join('');
+                return `
+                    <div class="season-block ${open ? 'open' : ''} ${sm.done ? 'done' : ''}" id="season-${se.number}">
+                        <div class="season-head" onclick="sapp.toggleSeasonOpen(${se.number})">
+                            ${se.poster ? `<img class="season-head-poster" src="${se.poster}" loading="lazy" alt="">` : `<div class="season-head-poster">T${se.number}</div>`}
+                            <div class="season-head-main">
+                                <div class="season-head-title">${escapeHtml(name)}${se.year ? ` <span class="rank-item-count">(${escapeHtml(se.year)})</span>` : ''}</div>
+                                <div class="season-head-meta">${sm.watched}/${sm.total} episódios · ${Math.floor(sm.pct)}% · ${this.dur(sm.totalMin)}${sm.upcoming ? ` · +${sm.upcoming} por lançar` : ''}</div>
+                                <div class="season-mini-bar"><div class="season-mini-fill" style="width:${sm.pct.toFixed(1)}%"></div></div>
+                            </div>
+                            ${sm.total ? `<button type="button" class="btn season-toggle-btn" onclick="event.stopPropagation(); sapp.toggleSeason(${se.number})">${sm.done ? '↺ Desmarcar' : '✓ Temporada'}</button>` : ''}
+                            <span class="season-chevron">›</span>
+                        </div>
+                        <div class="season-episodes">${eps || '<div class="empty-hint">Sem episódios.</div>'}</div>
+                    </div>`;
+            }
+
+            toggleSeasonOpen(sn) {
+                const el = document.getElementById('season-' + sn);
+                if (!el) return;
+                const open = el.classList.toggle('open');
+                if (open) this.openSeasons.add(sn); else this.openSeasons.delete(sn);
+            }
+
+            // ---------------- REGISTRO DE EPISÓDIOS ----------------
+            findEp(s, sn, en) {
+                const se = s.seasons.find(x => x.number === sn);
+                return se ? se.episodes.find(e => e.number === en) : null;
+            }
+
+            // Toda alteração de progresso passa por aqui: recalcula, ajusta datas de início/fim,
+            // redesenha e agenda a gravação. Se a série acabou de chegar a 100%, "solicita" a nota.
+            afterProgressChange(s, wasComplete) {
+                deriveSeries(s);
+                const m = s._m;
+                if (m.started && !s.startedDate) {
+                    const ds = s.seasons.flatMap(se => se.episodes).filter(e => e.watched && e.watchedDate).map(e => e.watchedDate).sort();
+                    s.startedDate = ds[0] || todayLocalISO();
+                }
+                if (m.complete && !s.finishedDate) s.finishedDate = todayLocalISO();
+                if (!m.complete) s.finishedDate = '';
+                if (!m.started) s.startedDate = '';
+                this.processData({ rebuildFilters: false, fetchPosters: false });
+                this.renderModal(true);
+                this.scheduleSave(s.id);
+                if (!wasComplete && s._m.complete && s.needsRating) this.promptRating(s);
+            }
+
+            async promptRating(s) {
+                const airing = s.productionStatus !== 'finalizada';
+                const ok = await showConfirm(
+                    airing
+                        ? `Vocês estão em dia com "${s.title}" (a série ainda está em exibição). Querem registrar as notas e a resenha agora? Dá para rever depois.`
+                        : `Vocês terminaram "${s.title}"! Querem registrar as notas e a resenha agora?`,
+                    { title: airing ? 'Em dia com a série 📡' : 'Série concluída! 🎉', okLabel: 'Avaliar agora', cancelLabel: 'Depois', danger: false }
+                );
+                if (ok && this.editingId === s.id) this.startRating();
+            }
+
+            toggleEpisode(sn, en) {
+                const s = this.cur();
+                const ep = s && this.findEp(s, sn, en);
+                if (!ep) return;
+                const was = s._m.complete;
+                ep.watched = !ep.watched;
+                ep.watchedDate = ep.watched ? todayLocalISO() : '';
+                this.afterProgressChange(s, was);
+            }
+
+            // Marca todos os episódios lançados até este (inclusive) — útil para dizer "estamos aqui".
+            // Marcações em bloco não recebem data (não distorcem a atividade mensal).
+            markUpTo(sn, en) {
+                const s = this.cur();
+                if (!s) return;
+                const was = s._m.complete;
+                const today = todayLocalISO();
+                let reached = false;
+                for (const se of s.seasons) {
+                    for (const ep of se.episodes) {
+                        if (!ep.watched && isEpReleased(ep, today)) { ep.watched = true; ep.watchedDate = ''; }
+                        if (se.number === sn && ep.number === en) { reached = true; break; }
+                    }
+                    if (reached) break;
+                }
+                this.afterProgressChange(s, was);
+            }
+
+            toggleSeason(sn) {
+                const s = this.cur();
+                const se = s && s.seasons.find(x => x.number === sn);
+                if (!se) return;
+                const was = s._m.complete;
+                const today = todayLocalISO();
+                const released = se.episodes.filter(e => isEpReleased(e, today) || e.watched);
+                const allDone = released.length > 0 && released.every(e => e.watched);
+                released.forEach(e => { e.watched = !allDone; if (allDone) e.watchedDate = ''; });
+                this.afterProgressChange(s, was);
+            }
+
+            async markAll(flag) {
+                const s = this.cur();
+                if (!s) return;
+                if (!flag) {
+                    const ok = await showConfirm(`Isso desmarca todos os episódios já assistidos de "${s.title}" e apaga as datas de exibição registradas.`, { title: 'Desmarcar tudo?', okLabel: 'Desmarcar', danger: true });
+                    if (!ok) return;
+                }
+                const was = s._m.complete;
+                const today = todayLocalISO();
+                s.seasons.forEach(se => se.episodes.forEach(e => {
+                    if (flag) { if (!e.watched && isEpReleased(e, today)) { e.watched = true; e.watchedDate = ''; } }
+                    else { e.watched = false; e.watchedDate = ''; }
+                }));
+                this.afterProgressChange(s, was);
+            }
+
+            // ---------------- GRAVAÇÃO ----------------
+            scheduleSave(id) {
+                this.dirty.add(id);
+                this.ver[id] = (this.ver[id] || 0) + 1;
+                clearTimeout(this.timers[id]);
+                this.timers[id] = setTimeout(() => this.flushSave(id), 600);
+            }
+            async flushSave(id) {
+                clearTimeout(this.timers[id]);
+                this.timers[id] = null;
+                const v = this.ver[id];
+                const s = this.series.find(x => x.id === id);
+                if (s) await cloud.upsertSeries(s);
+                // Mantém "sujo" por mais um instante para ignorar o eco do realtime desta gravação
+                setTimeout(() => { if (this.ver[id] === v && !this.timers[id]) this.dirty.delete(id); }, 1500);
+            }
+
+            // ---------------- CRIAR / EXCLUIR ----------------
+            async addSeries() {
+                if (!this.available) { showToast('Crie a tabela "series" no Supabase primeiro (arquivo cinetracker_series_schema.sql).', 'error', 8000); return; }
+                const draft = normalizeSeriesObj({ title: '', creators: [], seasons: [] });
+                const saved = await cloud.insertSeries(draft);
+                if (!saved) return;
+                this.series.push(saved);
+                this.processData({ fetchPosters: false });
+                this.openModal(saved.id);
+                this.toggleEdit(true);
+            }
+
+            async deleteSeries() {
+                const s = this.cur();
+                if (!s) return;
+                const ok = await showConfirm(`Isso remove ${s.title ? `"${s.title}"` : 'esta série'} permanentemente, com todo o progresso de episódios. Essa ação não pode ser desfeita.`, { title: 'Excluir série?', okLabel: 'Excluir', danger: true });
+                if (!ok) return;
+                const id = s.id;
+                clearTimeout(this.timers[id]); this.timers[id] = null; this.dirty.delete(id);
+                this.series = this.series.filter(x => x.id !== id);
+                this.editingId = null; // evita que closeModal tente remover de novo
+                app.teardownFocusTrap();
+                document.getElementById('sModalOverlay').style.display = 'none';
+                document.body.style.overflow = 'auto';
+                this.isEditing = false;
+                this.processData({ fetchPosters: false });
+                cloud.deleteSeriesRow(id);
+                showToast('Série excluída.', 'success');
+            }
+
+            // ---------------- EDIÇÃO ----------------
+            toggleEdit(on) {
+                const view = document.getElementById('sViewMode');
+                const edit = document.getElementById('sEditMode');
+                if (!on) {
+                    this.isEditing = false;
+                    this.pendingApi = null;
+                    view.style.display = 'block';
+                    edit.style.display = 'none';
+                    if (this.cur()) this.renderModal(true);
+                    return;
+                }
+                const s = this.cur();
+                if (!s) return;
+                this.isEditing = true;
+                this.pendingApi = null;
+                this.editSeasons = JSON.parse(JSON.stringify(s.seasons));
+                const set = (id, v) => { document.getElementById(id).value = v == null ? '' : v; };
+                set('sfTitle', s.title); set('sfOriginal', s.originalTitle);
+                set('sfYearStart', s.yearStart); set('sfYearEnd', s.yearEnd);
+                set('sfCreators', s.creators.join(', ')); set('sfGenres', s.genres);
+                set('sfStatus', s.productionStatus);
+                set('sfImdb', s.scImdb || '');
+                set('sfStarted', s.startedDate); set('sfFinished', s.finishedDate);
+                set('sfIsrael', s.scIsr || ''); set('sfRicardo', s.scRic || '');
+                set('sfRevIsrael', s.revIsr); set('sfRevRicardo', s.revRic);
+                const locked = !s._m.complete;
+                ['sfIsrael', 'sfRicardo', 'sfRevIsrael', 'sfRevRicardo'].forEach(id => document.getElementById(id).disabled = locked);
+                document.getElementById('sfLockNote').style.display = locked ? 'block' : 'none';
+                this.updateCount('Israel'); this.updateCount('Ricardo');
+                document.getElementById('sfApiStatus').textContent = s.tmdbId ? `Vinculada ao TMDB (#${s.tmdbId}).` : '';
+                this.renderSeasonEditor();
+                view.style.display = 'none';
+                edit.style.display = 'block';
+                document.getElementById('sModalRight').scrollTop = 0;
+                document.getElementById('sfTitle').focus();
+            }
+
+            startRating() {
+                this.toggleEdit(true);
+                const box = document.getElementById('sfRatingBlock');
+                if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => { const el = document.getElementById('sfIsrael'); if (el && !el.disabled) el.focus(); }, 350);
+            }
+
+            // Valida/normaliza ao sair do campo de data (aceita AAAA-MM-DD ou só AAAA);
+            // se o texto digitado não bater em nenhum dos dois formatos, limpa o campo.
+            normalizeDateField(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const v = normalizeSeriesDate(el.value);
+                if (el.value.trim() && !v) showToast('Data inválida. Use AAAA-MM-DD, DD-MM-AAAA ou apenas o ano (AAAA).', 'error');
+                el.value = v;
+            }
+
+            updateCount(person) {
+                const el = document.getElementById('sfRev' + person);
+                const disp = document.getElementById('sfCnt' + person);
+                if (el && disp) disp.innerText = `${el.value.length}/200`;
+            }
+
+            renderSeasonEditor() {
+                const wrap = document.getElementById('sfSeasonsWrap');
+                if (!wrap) return;
+                wrap.innerHTML = this.editSeasons.length
+                    ? this.editSeasons.map(se => this.seasonEditRow(se)).join('')
+                    : '<div class="empty-hint" style="padding:12px 0;">Nenhuma temporada. Busque na API ou adicione manualmente.</div>';
+            }
+            seasonEditRow(se, isNew) {
+                const avg = se.episodes.length ? Math.round(se.episodes.reduce((a, e) => a + (e.runtime || 0), 0) / se.episodes.length) : 0;
+                return `
+                    <div class="season-edit-row" data-season="${se.number}" data-orig-avg="${avg}">
+                        <div><label>Temp.</label><input type="text" value="${se.number}" disabled></div>
+                        <div><label>Nome</label><input type="text" class="sf-s-name" value="${escapeHtml(se.name)}" placeholder="Temporada ${se.number}"></div>
+                        <div><label>Ano</label><input type="number" class="sf-s-year" value="${escapeHtml(se.year)}"></div>
+                        <div><label>Episódios</label><input type="number" min="0" class="sf-s-count" value="${se.episodes.length}"></div>
+                        <div><label>Min./ep.</label><input type="number" min="0" class="sf-s-rt" value="${avg}"></div>
+                        <button type="button" class="btn btn-danger" onclick="this.closest('.season-edit-row').remove()" title="Remover temporada">🗑</button>
+                    </div>`;
+            }
+            addSeasonRow() {
+                const wrap = document.getElementById('sfSeasonsWrap');
+                const nums = [...wrap.querySelectorAll('.season-edit-row')].map(r => parseInt(r.dataset.season, 10));
+                const next = (nums.length ? Math.max(...nums) : 0) + 1;
+                const hint = wrap.querySelector('.empty-hint'); if (hint) hint.remove();
+                wrap.insertAdjacentHTML('beforeend', this.seasonEditRow({ number: next, name: '', year: '', episodes: [] }, true));
+            }
+            // Lê as linhas do editor e reconstrói as temporadas (preserva episódios já marcados)
+            collectSeasonsFromEditor() {
+                const old = new Map(this.editSeasons.map(se => [se.number, se]));
+                const rows = [...document.querySelectorAll('#sfSeasonsWrap .season-edit-row')];
+                const out = rows.map(r => {
+                    const n = parseInt(r.dataset.season, 10);
+                    const prev = old.get(n) || { number: n, name: '', year: '', poster: null, episodes: [] };
+                    const count = Math.max(0, parseInt(r.querySelector('.sf-s-count').value, 10) || 0);
+                    const rt = Math.max(0, parseInt(r.querySelector('.sf-s-rt').value, 10) || 0);
+                    const origAvg = parseInt(r.dataset.origAvg, 10) || 0;
+                    const se = { ...prev, name: r.querySelector('.sf-s-name').value.trim(), year: r.querySelector('.sf-s-year').value.trim(), episodes: prev.episodes.map(e => ({ ...e })) };
+                    if (rt !== origAvg) se.episodes.forEach(e => e.runtime = rt);
+                    while (se.episodes.length > count) se.episodes.pop();
+                    while (se.episodes.length < count) se.episodes.push({ number: se.episodes.length + 1, title: '', runtime: rt || origAvg || 0, airDate: '', watched: false, watchedDate: '' });
+                    return se;
+                });
+                return normalizeSeasons(out);
+            }
+
+            // Busca dados da série na API e preenche o formulário (só grava ao clicar em Salvar).
+            // Sem "force", só roda para séries ainda não vinculadas à API (ao sair do campo Título).
+            async fetchMetadata(force) {
+                const s = this.cur();
+                if (!s || !this.isEditing) return;
+                const title = document.getElementById('sfTitle').value.trim();
+                if (!title) return;
+                if (!force && (s.tmdbId || (this.pendingApi && this.pendingApi.tmdbId) || this.editSeasons.length)) return;
+                const status = document.getElementById('sfApiStatus');
+                const btn = document.getElementById('sfApiBtn');
+                if (btn) btn.disabled = true;
+                status.textContent = 'Buscando na API…';
+                try {
+                    const { bestMatch, hadNetworkError } = await searchSeriesBestMatch(title, document.getElementById('sfOriginal').value.trim(), document.getElementById('sfYearStart').value.trim());
+                    if (!bestMatch) {
+                        status.textContent = hadNetworkError ? 'Não foi possível consultar a API. Verifique a conexão.' : `Não encontrei "${title}" na API. Preencha manualmente.`;
+                        return;
+                    }
+                    status.textContent = 'Carregando temporadas e episódios…';
+                    const data = await fetchSeriesData(bestMatch.id);
+                    const lost = countWatchedLost(this.editSeasons, mergeSeasons(this.editSeasons, data.seasons));
+                    if (lost > 0) {
+                        const ok = await showConfirm(`A API não tem ${lost} episódio${lost !== 1 ? 's' : ''} que já estão marcados como assistidos aqui. Continuar mesmo assim faz essas marcações se perderem ao salvar.`, { title: 'Substituir temporadas?', okLabel: 'Continuar', danger: true });
+                        if (!ok) { status.textContent = ''; return; }
+                    }
+                    this.applyApiToForm(data);
+                } catch (e) {
+                    console.error('Erro ao buscar série', e);
+                    status.textContent = 'Erro ao buscar na API.';
+                    showToast('Não foi possível buscar os dados da série. Verifique sua conexão.', 'error');
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            }
+
+            applyApiToForm(data) {
+                const s = this.cur();
+                const set = (id, v) => { document.getElementById(id).value = v == null ? '' : v; };
+                set('sfOriginal', data.originalTitle);
+                set('sfYearStart', data.yearStart); set('sfYearEnd', data.yearEnd);
+                if (data.creators.length) set('sfCreators', data.creators.join(', '));
+                // Como nos filmes, gêneros digitados à mão nunca são sobrescritos
+                if (!document.getElementById('sfGenres').value.trim() && data.genres) set('sfGenres', data.genres);
+                set('sfStatus', data.productionStatus);
+                this.pendingApi = { tmdbId: data.tmdbId, imdbId: data.imdbId, poster: data.poster };
+                this.editSeasons = mergeSeasons(this.editSeasons, data.seasons);
+                this.renderSeasonEditor();
+                if (data.poster) document.getElementById('sPosterImg').src = data.poster;
+                const eps = countEpisodes(this.editSeasons);
+                document.getElementById('sfApiStatus').textContent = `✔ ${this.editSeasons.length} temporada${this.editSeasons.length !== 1 ? 's' : ''} e ${eps} episódio${eps !== 1 ? 's' : ''} carregados da API (gravados ao clicar em Salvar).`;
+            }
+
+            // ↻ ao lado do IMDb no formulário: só preenche o campo (vale ao salvar)
+            async fetchImdbRating() {
+                const s = this.cur();
+                if (!s) return;
+                const title = document.getElementById('sfTitle').value.trim();
+                if (!title) { showToast('Preencha o título antes de buscar a nota do IMDb.', 'error'); return; }
+                const btn = document.getElementById('sfImdbBtn');
+                const label = btn ? btn.textContent : '';
+                if (btn) { btn.disabled = true; btn.textContent = 'buscando…'; }
+                try {
+                    const known = this.pendingApi || {};
+                    const r = await lookupSeriesImdb({
+                        imdbId: known.imdbId || s.imdbId, tmdbId: known.tmdbId || s.tmdbId,
+                        title, originalTitle: document.getElementById('sfOriginal').value.trim(), yearStart: document.getElementById('sfYearStart').value.trim()
+                    });
+                    this.pendingApi = Object.assign({}, this.pendingApi, { imdbId: r.imdbId, tmdbId: r.tmdbId || (known.tmdbId || s.tmdbId) });
+                    if (r.rating === null) { showToast('O IMDb ainda não tem nota para esta série.', 'info'); return; }
+                    document.getElementById('sfImdb').value = r.rating.toFixed(1);
+                    showToast(`Nota do IMDb: ${r.rating.toFixed(1)} (clique em Salvar para gravar).`, 'success');
+                } catch (e) {
+                    console.error('Erro ao buscar nota do IMDb', e);
+                    showToast('Não foi possível buscar a nota do IMDb: ' + e.message, 'error');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = label; }
+                }
+            }
+
+            // ↻ ao lado do IMDb na visualização: busca e já grava
+            async refreshImdbFromView() {
+                const s = this.cur();
+                if (!s) return;
+                const btn = document.querySelector('#sViewMode .imdb-fetch-btn');
+                if (btn) { btn.disabled = true; btn.textContent = '…'; }
+                try {
+                    const r = await lookupSeriesImdb(s);
+                    if (r.imdbId) s.imdbId = r.imdbId;
+                    if (r.tmdbId) s.tmdbId = s.tmdbId || r.tmdbId;
+                    if (r.rating === null) { showToast(`O IMDb ainda não tem nota para "${s.title}".`, 'info'); return; }
+                    s.scImdb = r.rating;
+                    this.processData({ rebuildFilters: false, fetchPosters: false });
+                    this.renderModal(true);
+                    this.scheduleSave(s.id);
+                    showToast(`IMDb de "${s.title}": ${r.rating.toFixed(1)} — salvo.`, 'success');
+                } catch (e) {
+                    console.error('Erro ao buscar nota do IMDb', e);
+                    showToast('Não foi possível buscar a nota do IMDb: ' + e.message, 'error');
+                } finally {
+                    const b2 = document.querySelector('#sViewMode .imdb-fetch-btn');
+                    if (b2) { b2.disabled = false; b2.textContent = '↻'; }
+                }
+            }
+
+            // Botão "↻ Atualizar da API" (visualização): traz temporadas/episódios novos,
+            // mantendo tudo o que já foi marcado. Útil para séries ainda em exibição.
+            async refreshFromApi() {
+                const s = this.cur();
+                if (!s) return;
+                const btn = document.getElementById('sRefreshApiBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'Atualizando…'; }
+                try {
+                    let tmdbId = s.tmdbId;
+                    if (!tmdbId) {
+                        const { bestMatch } = await searchSeriesBestMatch(s.title, s.originalTitle, s.yearStart);
+                        if (!bestMatch) { showToast(`Não encontrei "${s.title}" na API.`, 'error'); return; }
+                        tmdbId = bestMatch.id;
+                    }
+                    const data = await fetchSeriesData(tmdbId);
+                    const merged = mergeSeasons(s.seasons, data.seasons);
+                    const lost = countWatchedLost(s.seasons, merged);
+                    if (lost > 0) {
+                        const ok = await showConfirm(`A API não tem ${lost} episódio${lost !== 1 ? 's' : ''} que já estão marcados como assistidos aqui. Continuar faz essas marcações se perderem.`, { title: 'Atualizar da API?', okLabel: 'Continuar', danger: true });
+                        if (!ok) return;
+                    }
+                    const before = countEpisodes(s.seasons), was = s._m.complete;
+                    s.seasons = merged;
+                    s.tmdbId = data.tmdbId;
+                    s.imdbId = s.imdbId || data.imdbId;
+                    s.productionStatus = data.productionStatus;
+                    s.yearEnd = data.yearEnd;
+                    if (!s.yearStart) s.yearStart = data.yearStart;
+                    if (!s.poster && data.poster) s.poster = data.poster;
+                    if (!s.creators.length && data.creators.length) { s.creators = data.creators; s.creator = data.creators.join(', '); }
+                    const diff = countEpisodes(merged) - before;
+                    this.afterProgressChange(s, was);
+                    this.buildFilterOptions();
+                    showToast(diff > 0 ? `Atualizado: ${diff} episódio${diff !== 1 ? 's' : ''} novo${diff !== 1 ? 's' : ''}.` : 'Atualizado: nenhum episódio novo.', 'success');
+                } catch (e) {
+                    console.error('Erro ao atualizar série', e);
+                    showToast('Não foi possível atualizar da API. Verifique sua conexão.', 'error');
+                } finally {
+                    const b2 = document.getElementById('sRefreshApiBtn');
+                    if (b2) { b2.disabled = false; b2.textContent = '↻ Atualizar da API'; }
+                }
+            }
+
+            saveEdits() {
+                const s = this.cur();
+                if (!s) return;
+                const val = id => document.getElementById(id).value;
+                const clamp = v => Math.min(10, Math.max(0, isNaN(v) ? 0 : v));
+                const wasComplete = s._m.complete;
+                const wasLocked = !wasComplete;
+
+                s.title = val('sfTitle').trim() || 'Sem Título';
+                s.originalTitle = val('sfOriginal').trim();
+                s.yearStart = val('sfYearStart').trim();
+                s.yearEnd = val('sfYearEnd').trim();
+                s.creators = splitDirectors(val('sfCreators'));
+                s.creator = s.creators.join(', ');
+                s.genres = val('sfGenres').trim();
+                s.productionStatus = val('sfStatus') === 'finalizada' ? 'finalizada' : 'em_producao';
+                s.scImdb = clamp(parseFloat(val('sfImdb')));
+                s.startedDate = normalizeSeriesDate(val('sfStarted'));
+                s.finishedDate = normalizeSeriesDate(val('sfFinished'));
+
+                if (this.pendingApi) {
+                    if (this.pendingApi.tmdbId) s.tmdbId = this.pendingApi.tmdbId;
+                    if (this.pendingApi.imdbId) s.imdbId = this.pendingApi.imdbId;
+                    if (this.pendingApi.poster) { s.poster = this.pendingApi.poster; s.posterFailed = false; }
+                }
+                s.seasons = this.collectSeasonsFromEditor();
+
+                // Notas e resenhas só são gravadas se a série estava 100% assistida ao abrir a edição
+                if (!wasLocked) {
+                    const cleanText = t => t.replace(/(\r\n|\n|\r)/gm, ' ').replace(/\t/g, ' ').substring(0, 200);
+                    s.scIsr = clamp(parseFloat(val('sfIsrael')));
+                    s.scRic = clamp(parseFloat(val('sfRicardo')));
+                    s.revIsr = cleanText(val('sfRevIsrael'));
+                    s.revRic = cleanText(val('sfRevRicardo'));
+                }
+
+                this.isEditing = false;
+                this.pendingApi = null;
+                this.processData({ fetchPosters: true });
+                // Reabre a visualização (reposiciona a temporada em foco caso a estrutura tenha mudado)
+                this.openSeasons = new Set([...this.openSeasons].filter(n => s.seasons.some(se => se.number === n)));
+                this.toggleEdit(false);
+                this.scheduleSave(s.id);
+                this.flushSave(s.id);
+            }
+
+            // ---------------- ESTATÍSTICAS (versão enxuta) ----------------
+            computeStats() {
+                const all = this.series;
+                if (!all.length) return null;
+                const sum = arr => arr.reduce((a, b) => a + b, 0);
+                const started = all.filter(s => s._m.started);
+                const done = all.filter(s => s._m.complete);
+                const rated = all.filter(s => s.rated);
+                const avgOf = (arr, fn) => arr.length ? sum(arr.map(fn)) / arr.length : 0;
+
+                const epsWatched = sum(all.map(s => s._m.watched));
+                const minsWatched = sum(all.map(s => s._m.watchedMin));
+                const seasonsDone = sum(all.map(s => s.seasons.filter(se => seasonMetrics(se).done).length));
+                const remainingMin = sum(all.filter(s => s._m.started && !s._m.complete).map(s => s._m.totalMin - s._m.watchedMin));
+                const queueMin = sum(all.filter(s => s._m.group === 'nao_iniciadas').map(s => s._m.totalMin));
+
+                const withIsr = rated.filter(s => s.scIsr > 0), withRic = rated.filter(s => s.scRic > 0);
+                const avgIsr = avgOf(withIsr, s => s.scIsr), avgRic = avgOf(withRic, s => s.scRic);
+                const avgNossa = avgOf(rated, s => s.avg);
+                const withImdb = done.filter(s => s.scImdb > 0);
+                const avgImdb = avgOf(withImdb, s => s.scImdb);
+
+                // Criadores e gêneros: "mais vistos" considera séries que já começamos; "melhor avaliados" só as concluídas com nota
+                const creatorsCount = buildGroupStats(started, s => s.creators, false).sort((a, b) => b.count - a.count);
+                const creatorsAvg = buildGroupStats(rated, s => s.creators, true).filter(x => x.count >= 2).sort((a, b) => b.avg - a.avg);
+                const genresCount = buildGroupStats(started, s => genresOf(s), false).sort((a, b) => b.count - a.count);
+                const genresAvg = buildGroupStats(rated, s => genresOf(s), true).filter(x => x.count >= 2).sort((a, b) => b.avg - a.avg);
+
+                const divergences = rated.filter(s => s.scIsr > 0 && s.scRic > 0)
+                    .map(s => ({ title: s.title, scIsr: s.scIsr, scRic: s.scRic, diff: Math.abs(s.scIsr - s.scRic) }))
+                    .sort((a, b) => b.diff - a.diff).slice(0, 5);
+
+                let agreement = null;
+                const both = rated.filter(s => s.scIsr > 0 && s.scRic > 0);
+                if (both.length) {
+                    const diffs = both.map(s => Math.abs(s.scIsr - s.scRic));
+                    agreement = { avgDiff: sum(diffs) / both.length, closePct: diffs.filter(d => d <= 1).length / both.length * 100 };
+                }
+
+                const decSum = {}, decCount = {};
+                rated.forEach(s => {
+                    const y = parseInt(s.yearStart, 10); if (!y) return;
+                    const d = Math.floor(y / 10) * 10;
+                    decSum[d] = (decSum[d] || 0) + s.avg; decCount[d] = (decCount[d] || 0) + 1;
+                });
+                const decades = Object.keys(decSum).map(Number).sort((a, b) => a - b).map(d => ({ name: `Anos ${d}`, avg: decSum[d] / decCount[d], count: decCount[d] }));
+
+                const status = [
+                    { name: 'Em andamento', count: all.filter(s => s._m.group === 'andamento').length },
+                    { name: 'Finalizadas', count: all.filter(s => s._m.group === 'finalizadas').length },
+                    { name: 'Não iniciadas', count: all.filter(s => s._m.group === 'nao_iniciadas').length }
+                ].filter(x => x.count > 0);
+
+                let best = null, worst = null;
+                rated.forEach(s => { if (!best || s.avg > best.avg) best = s; if (!worst || s.avg < worst.avg) worst = s; });
+                const sized = all.filter(s => s._m.totalMin > 0);
+                let longest = null, shortest = null, mostSeasons = null;
+                sized.forEach(s => {
+                    if (!longest || s._m.totalMin > longest._m.totalMin) longest = s;
+                    if (!shortest || s._m.totalMin < shortest._m.totalMin) shortest = s;
+                });
+                all.forEach(s => { if (s.seasons.length && (!mostSeasons || s.seasons.length > mostSeasons.seasons.length)) mostSeasons = s; });
+
+                let imdbCorrelation = null;
+                if (withImdb.filter(s => s.avg > 0).length >= 3) {
+                    const pts = withImdb.filter(s => s.avg > 0);
+                    imdbCorrelation = pearsonCorr(pts.map(s => s.avg), pts.map(s => s.scImdb));
+                }
+
+                // Episódios por mês (só os marcados um a um, que carregam data)
+                const years = new Set();
+                all.forEach(s => s.seasons.forEach(se => se.episodes.forEach(e => { if (e.watched && e.watchedDate) years.add(e.watchedDate.split('-')[0]); })));
+                const yearList = [...years].sort().reverse();
+
+                return {
+                    total: all.length, startedN: started.length, doneN: done.length, ratedN: rated.length,
+                    epsWatched, minsWatched, seasonsDone, remainingMin, queueMin,
+                    avgIsr, avgRic, avgNossa, avgImdb, imdbN: withImdb.length,
+                    creatorsCount, creatorsAvg, genresCount, genresAvg, divergences, agreement, decades, status,
+                    best, worst, longest, shortest, mostSeasons, imdbCorrelation, yearList, rated
+                };
+            }
+
+            monthlyData(year) {
+                const counts = new Array(12).fill(0);
+                this.series.forEach(s => s.seasons.forEach(se => se.episodes.forEach(e => {
+                    if (e.watched && e.watchedDate && e.watchedDate.startsWith(year + '-')) {
+                        const mi = parseInt(e.watchedDate.split('-')[1], 10) - 1;
+                        if (mi >= 0 && mi < 12) counts[mi]++;
+                    }
+                })));
+                return counts;
+            }
+
+            handleChartYear(v) { this.chartYear = v; this.renderMonthly(this._stats); }
+
+            renderMonthly(st) {
+                const viz = document.getElementById('sChartViz');
+                const sel = document.getElementById('sChartYear');
+                if (!viz || !st) return;
+                if (!st.yearList.length) {
+                    if (sel) sel.style.display = 'none';
+                    viz.style.height = 'auto';
+                    viz.innerHTML = '<div class="empty-hint" style="width:100%;">Marque episódios um a um (com o toque no episódio) para ver a atividade mensal. Marcações “até aqui” e “série inteira” não têm data.</div>';
+                    return;
+                }
+                viz.style.height = '';
+                if (!this.chartYear || !st.yearList.includes(this.chartYear)) this.chartYear = st.yearList[0];
+                if (sel) {
+                    sel.style.display = '';
+                    sel.innerHTML = st.yearList.map(y => `<option value="${y}" ${y === this.chartYear ? 'selected' : ''}>${y}</option>`).join('');
+                }
+                const labels = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+                const data = this.monthlyData(this.chartYear);
+                viz.innerHTML = buildAreaChart(data.map((v, i) => ({ label: labels[i], value: v })), {
+                    height: 170, zeroBase: true, containerWidth: viz.clientWidth, wideThreshold: 999,
+                    tooltipFmt: d => `${d.label}: ${d.value} episódio${d.value !== 1 ? 's' : ''}`
+                });
+            }
+
+            renderStats() {
+                const overview = document.getElementById('sStatsOverview');
+                if (!overview) return;
+                const s = this.computeStats();
+                this._stats = s;
+                const clearIds = ['sChartViz', 'sStatusDonut', 'sDivergence', 'sRankCreatorsCount', 'sRankCreatorsAvg', 'sRankGenresCount', 'sRankGenresAvg', 'sRankDecades', 'sStatsExtra', 'sHcCorr', 'sHcAgreement'];
+                if (!s) {
+                    overview.innerHTML = '<div class="empty-hint" style="grid-column:1/-1">Cadastre séries para ver as estatísticas.</div>';
+                    clearIds.forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
+                    return;
+                }
+                const card = (val, lbl, extra = '', style = '') => `<div class="stat-card"><div class="stat-val" ${style ? `style="${style}"` : ''}>${val}</div><div class="stat-lbl">${lbl}</div>${extra}</div>`;
+                overview.innerHTML = [
+                    card(s.total, 'Séries no catálogo', `<div class="stat-sublabel">${s.doneN} concluída${s.doneN !== 1 ? 's' : ''} · ${s.startedN - s.doneN} em andamento</div>`).replace('class="stat-val"', 'class="stat-val stat-highlight"'),
+                    card(s.epsWatched, 'Episódios assistidos', `<div class="stat-sublabel">${s.seasonsDone} temporada${s.seasonsDone !== 1 ? 's' : ''} completa${s.seasonsDone !== 1 ? 's' : ''}</div>`),
+                    card(this.dur(s.minsWatched), 'Tempo assistido'),
+                    card(s.avgIsr.toFixed(2), 'Média Israel', '', 'color:var(--color-israel)'),
+                    card(s.avgRic.toFixed(2), 'Média Ricardo', '', 'color:var(--color-ricardo)'),
+                    card(s.avgNossa.toFixed(2), 'Nossa Média', `<div class="stat-sublabel">${s.ratedN} série${s.ratedN !== 1 ? 's' : ''} avaliada${s.ratedN !== 1 ? 's' : ''}</div>`).replace('class="stat-val"', 'class="stat-val stat-highlight"')
+                ].join('');
+
+                this.renderMonthly(s);
+
+                const size = Math.min(Math.max(Math.round((document.getElementById('sStatusDonut').clientWidth || 300) * 0.62), 210), 300);
+                document.getElementById('sStatusDonut').innerHTML = buildPieChart(s.status, {
+                    size, hole: 0.56, maxSlices: 6, centerLabel: String(s.total), centerSub: s.total !== 1 ? 'séries' : 'série'
+                });
+                document.getElementById('sDivergence').innerHTML = buildDumbbellList(s.divergences);
+
+                const creatorClick = d => `sapp.filterByCreator('${escapeJsString(d.name)}')`;
+                document.getElementById('sRankCreatorsCount').innerHTML = buildBubbleField(s.creatorsCount, {
+                    valueFn: d => d.count, nameFn: d => d.name, valueLabelFn: d => d.count, clickFn: creatorClick
+                });
+                document.getElementById('sRankCreatorsAvg').innerHTML = buildGaugeGrid(s.creatorsAvg, {
+                    valueFn: d => d.avg, nameFn: d => d.name, clickFn: creatorClick
+                });
+                document.getElementById('sRankGenresCount').innerHTML = buildBubbleField(s.genresCount, {
+                    valueFn: g => g.count, nameFn: g => g.name, valueLabelFn: g => g.count
+                });
+                document.getElementById('sRankGenresAvg').innerHTML = buildGaugeGrid(s.genresAvg, {
+                    valueFn: g => g.avg, nameFn: g => g.name
+                });
+                document.getElementById('sRankDecades').innerHTML = buildLollipopChart(s.decades, {
+                    valueFn: d => d.avg, nameFn: d => d.name, extraFn: d => ` <span class="rank-item-count">(${d.count})</span>`
+                });
+
+                // Curiosidades
+                const sub = (x, extra = '') => x ? `<div class="stat-sublabel" title="${escapeHtml(x.title)}">${escapeHtml(x.title)}${extra}</div>` : '<div class="stat-sublabel">Sem dados</div>';
+                document.getElementById('sStatsExtra').innerHTML = [
+                    card(s.best ? s.best.avg.toFixed(2) : '—', 'Série mais bem avaliada', sub(s.best), 'color:var(--score-high)'),
+                    card(s.worst ? s.worst.avg.toFixed(2) : '—', 'Série pior avaliada', sub(s.worst), 'color:var(--score-low)'),
+                    card(s.longest ? this.dur(s.longest._m.totalMin) : '—', 'Maior maratona', sub(s.longest)),
+                    card(s.shortest ? this.dur(s.shortest._m.totalMin) : '—', 'Menor maratona', sub(s.shortest)),
+                    card(s.mostSeasons ? s.mostSeasons.seasons.length : '—', 'Mais temporadas', sub(s.mostSeasons)),
+                    card(s.imdbN ? s.avgImdb.toFixed(2) : '—', 'Média IMDb (concluídas)', `<div class="stat-sublabel">${s.imdbN} série${s.imdbN !== 1 ? 's' : ''} com nota</div>`),
+                    card(this.dur(s.remainingMin), 'Falta para terminar', '<div class="stat-sublabel">séries em andamento</div>'),
+                    card(this.dur(s.queueMin), 'Tempo da fila', '<div class="stat-sublabel">séries não iniciadas</div>')
+                ].join('');
+
+                // Correlação com o IMDb + concordância
+                const hcCorr = document.getElementById('sHcCorr');
+                if (s.imdbCorrelation === null) {
+                    hcCorr.innerHTML = `<div class="hc-text">Correlação com o IMDb</div><div class="hc-main">Dados insuficientes</div><div class="hc-text">Precisa de pelo menos 3 séries concluídas com nota do IMDb.</div>`;
+                } else {
+                    const r = s.imdbCorrelation;
+                    const pts = s.rated.filter(x => x.scImdb > 0).map(x => ({ x: x.avg, y: x.scImdb, title: x.title }));
+                    const label = corrLabel(r);
+                    hcCorr.innerHTML = `
+                        <div class="highlight-card-flex">
+                            <div class="highlight-visual">${buildScatterChart(pts)}</div>
+                            <div class="highlight-text">
+                                <div class="hc-text">Correlação com o IMDb</div>
+                                <div class="hc-main">${label.charAt(0).toUpperCase() + label.slice(1)} e ${r >= 0 ? 'positiva' : 'negativa'} <span style="font-weight:500; font-size:0.95rem; color:var(--text-muted);">(r = ${r.toFixed(2)})</span></div>
+                                <div class="hc-text">Só entram séries 100% assistidas, para não distorcer a comparação.</div>
+                            </div>
+                        </div>`;
+                }
+                const hcAgr = document.getElementById('sHcAgreement');
+                if (!s.agreement) {
+                    hcAgr.innerHTML = `<div class="hc-text">Nível de Concordância</div><div class="hc-main">Sem dados ainda</div>`;
+                } else {
+                    const { avgDiff, closePct } = s.agreement;
+                    hcAgr.innerHTML = `
+                        <div class="highlight-card-flex">
+                            <div class="highlight-visual">${buildRingSingle(closePct, { color: scoreColor(closePct / 10) })}</div>
+                            <div class="highlight-text">
+                                <div class="hc-text">Nível de Concordância</div>
+                                <div class="hc-main">${closePct.toFixed(0)}% de acordo</div>
+                                <div class="hc-text">Notas parecidas (até 1 ponto de diferença) em ${closePct.toFixed(0)}% das séries; diferença média de ${avgDiff.toFixed(2)} pontos.</div>
+                            </div>
+                        </div>`;
+                }
+            }
+
+            // ---------------- ISRAEL & RICARDO ----------------
+            renderProfiles() {
+                const cols = document.getElementById('sProfilesCols');
+                const versus = document.getElementById('sProfilesVersus');
+                if (!cols || !versus) return;
+                const rated = this.series.filter(s => s.rated);
+                if (!rated.length) {
+                    versus.innerHTML = '';
+                    cols.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">Ainda não há séries concluídas com nota. Quando terminarem uma série, registrem as notas para ver os perfis aqui.</div>';
+                    return;
+                }
+                versus.innerHTML = buildSeriesVersusHtml(rated);
+                cols.innerHTML = PROFILE_PEOPLE.map(p => buildSeriesPersonColumnHtml(p, computeSeriesProfile(rated, p))).join('');
+            }
+
+            // ---------------- SORTEAR SÉRIE ----------------
+            queue() { return this.series.filter(s => s._m.group === 'nao_iniciadas').sort((a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' })); }
+
+            renderSortear() {
+                const wrap = document.getElementById('sPendingList');
+                const cnt = document.getElementById('sPendingCount');
+                if (!wrap) return;
+                const q = this.queue();
+                if (cnt) cnt.innerText = q.length;
+                if (!q.length) { wrap.innerHTML = '<div class="empty-hint">Nenhuma série na fila. Cadastre séries pelo botão “Novo” — as que ainda não foram iniciadas aparecem aqui.</div>'; return; }
+                wrap.innerHTML = q.map(s => `
+                    <div class="pending-item" style="cursor:pointer;" onclick="sapp.openModal(${s.id})">
+                        <div>
+                            <div class="pending-title">${escapeHtml(s.title)}${s.yearStart ? ` <span class="rank-item-count">(${escapeHtml(s.yearStart)})</span>` : ''}</div>
+                            <div class="pending-by">${s.seasons.length ? `${s.seasons.length} temporada${s.seasons.length !== 1 ? 's' : ''} · ${this.dur(s._m.totalMin)}` : 'Sem temporadas registradas'}${s.creator ? ' · ' + escapeHtml(s.creator) : ''}</div>
+                        </div>
+                    </div>`).join('');
+            }
+
+            drawRandom() {
+                const q = this.queue();
+                if (!q.length) { showToast('Não há séries na fila para sortear.', 'info'); return; }
+                const resultEl = document.getElementById('sDrawResult');
+                const actionsEl = document.getElementById('sDrawActions');
+                const posterEl = document.getElementById('sDrawPoster');
+                const btn = document.getElementById('sDrawBtn');
+                const titleEl = resultEl.querySelector('.draw-title');
+                btn.disabled = true;
+                actionsEl.style.display = 'none';
+                resultEl.classList.remove('draw-final');
+                resultEl.style.display = 'flex';
+                posterEl.style.display = 'none'; posterEl.src = '';
+                let ticks = 0;
+                const maxTicks = 16 + Math.floor(Math.random() * 8);
+                const interval = setInterval(() => {
+                    titleEl.innerText = q[Math.floor(Math.random() * q.length)].title;
+                    ticks++;
+                    if (ticks >= maxTicks) {
+                        clearInterval(interval);
+                        const winner = q[Math.floor(Math.random() * q.length)];
+                        this.lastDrawnId = winner.id;
+                        titleEl.innerText = winner.title;
+                        resultEl.classList.add('draw-final');
+                        actionsEl.style.display = 'flex';
+                        btn.disabled = false;
+                        posterEl.src = winner.poster || placeholderPoster(winner.title);
+                        posterEl.style.display = 'block';
+                    }
+                }, 90);
+            }
+            openDrawn() { if (this.lastDrawnId != null) this.openModal(this.lastDrawnId); }
+
+            // ---------------- IMPORTAR / EXPORTAR ----------------
+            exportSeries() {
+                return this.series.map(s => ({
+                    id: s.id, title: s.title, originalTitle: s.originalTitle, creators: s.creators,
+                    yearStart: s.yearStart, yearEnd: s.yearEnd, productionStatus: s.productionStatus,
+                    genres: s.genres, tmdbId: s.tmdbId, imdbId: s.imdbId, poster: s.poster, posterFailed: s.posterFailed,
+                    seasons: s.seasons, scIsr: s.scIsr, scRic: s.scRic, scImdb: s.scImdb,
+                    revIsr: s.revIsr, revRic: s.revRic, startedDate: s.startedDate, finishedDate: s.finishedDate
+                }));
+            }
+            async importSeries(list) {
+                if (!this.available) { showToast('As séries do arquivo não foram importadas: a tabela "series" ainda não existe no Supabase.', 'error', 8000); return; }
+                const local = list.map(m => normalizeSeriesObj(m));
+                const saved = await cloud.replaceAllSeries(local);
+                if (saved) this.series = saved; else this.series = local.map(deriveSeries);
+                this.processData();
+            }
+        }
+
+
         const app = new CineApp();
+        const sapp = new SeriesApp();
+        // Lembra o último modo usado neste aparelho
+        try { if (localStorage.getItem('cinetracker_mode') === 'series') app.switchTab('s-catalogo', { skipScroll: true }); } catch (e) {}
         cloud.init(); // busca sessão salva e, se houver, carrega os dados da nuvem
 
         // Fechar com ESC
@@ -4975,6 +7471,7 @@
             if (e.key !== 'Escape') return;
             const recapOverlay = document.getElementById('recapOverlay');
             if (recapOverlay && recapOverlay.classList.contains('open')) { app.closeRecap(); return; }
+            if (sapp.isOpen()) { sapp.closeModal(); return; }
             app.closeModal();
         });
     </script>
