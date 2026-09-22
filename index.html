@@ -1642,7 +1642,8 @@
                 </div>
                 <select id="sGroupFilter" onchange="sapp.handleGroupFilter(this.value)" title="Filtrar por situação">
                     <option value="all">Situação: todas</option>
-                    <option value="andamento">Em andamento</option>
+                    <option value="assistindo">Assistindo</option>
+                    <option value="em_dia">Em dia</option>
                     <option value="finalizadas">Finalizadas</option>
                     <option value="nao_iniciadas">Não iniciadas</option>
                     <option value="avaliar">Aguardando nota</option>
@@ -3412,12 +3413,17 @@
             if (s.finishedDate && s.finishedDate > lastActivity) lastActivity = s.finishedDate;
             const complete = total > 0 && watched >= total;
             const started = watched > 0;
-            // Grupos do catálogo. "Finalizadas" exige os dois sentidos: a série encerrou
-            // (produção) E vimos até o último episódio (exibição). Em dia com uma série que
-            // ainda está no ar continua "em andamento". "Não iniciadas" só olha se já começamos.
+            // Grupos do catálogo:
+            //  - "finalizadas": a série encerrou (produção) E vimos até o último episódio.
+            //  - "em_dia": ainda em exibição, mas já vimos tudo o que foi lançado até agora
+            //    (só falta esperar o próximo episódio sair).
+            //  - "assistindo": já começamos, ainda não terminamos, e já existem episódios
+            //    lançados que ainda não vimos (dá pra continuar agora).
+            //  - "nao_iniciadas": ainda não começamos.
             let group;
             if (complete && s.productionStatus === 'finalizada' && upcoming === 0) group = 'finalizadas';
-            else if (started) group = 'andamento';
+            else if (complete && started) group = 'em_dia';
+            else if (started) group = 'assistindo';
             else group = 'nao_iniciadas';
             return { total, watched, totalMin, watchedMin, upcoming, next, complete, started, group, lastActivity,
                      pct: total ? watched / total * 100 : 0 };
@@ -6166,7 +6172,7 @@
                 this.isEditing = false;
                 this.sel = { year: new Set(), creator: new Set(), genre: new Set() };
                 this.opts = { year: [], creator: [], genre: [] };
-                this.groupFilter = 'all';   // all | andamento | finalizadas | nao_iniciadas | avaliar
+                this.groupFilter = 'all';   // all | assistindo | em_dia | finalizadas | nao_iniciadas | avaliar
                 this.sortBy = 'recent';
                 this.openSeasons = new Set();
                 this.previewSeason = null;  // null = capa da série; número = capa da temporada
@@ -6406,7 +6412,8 @@
                     return;
                 }
                 const groups = [
-                    { id: 'andamento', icon: '▶️', title: 'Em andamento', sub: 'Sendo assistidas agora ou ainda em exibição' },
+                    { id: 'assistindo', icon: '▶️', title: 'Assistindo', sub: 'Já começamos e há episódios lançados esperando' },
+                    { id: 'em_dia', icon: '✅', title: 'Em dia', sub: 'Em exibição, já vimos tudo o que saiu até agora' },
                     { id: 'finalizadas', icon: '🏁', title: 'Finalizadas', sub: 'Encerradas e assistidas até o último episódio' },
                     { id: 'nao_iniciadas', icon: '🕓', title: 'Não iniciadas', sub: 'Ainda não começamos a assistir' }
                 ];
@@ -6438,7 +6445,7 @@
                 else if (m.complete) badge = `<div class="series-pct-badge series-rate-badge">⭐ Avaliar</div>`;
                 else if (m.started) badge = `<div class="series-pct-badge">${Math.floor(m.pct)}%</div>`;
                 const rank = s.rated ? `<div class="rank-badge">#${s.rankAvg}</div>` : '';
-                const airing = m.group === 'andamento' && s.productionStatus !== 'finalizada';
+                const airing = s.productionStatus !== 'finalizada';
                 const bar = (m.started && !m.complete) ? `<div class="series-progress-bar"><div class="series-progress-fill" style="width:${m.pct.toFixed(1)}%"></div></div>` : '';
                 const seasonsN = s.seasons.length;
                 const nextTxt = (m.started && !m.complete && m.next) ? `<div class="card-director-overlay">A seguir: T${m.next.season} · E${m.next.episode}</div>` : '';
@@ -6470,7 +6477,8 @@
                 const avg = rated.length ? rated.reduce((a, s) => a + s.avg, 0) / rated.length : 0;
                 dash.innerHTML = `
                     <div class="stat-card"><div class="stat-val stat-highlight">${list.length}</div><div class="stat-lbl">Séries no catálogo</div></div>
-                    <div class="stat-card"><div class="stat-val">${by('andamento')}</div><div class="stat-lbl">Em andamento</div></div>
+                    <div class="stat-card"><div class="stat-val">${by('assistindo')}</div><div class="stat-lbl">Assistindo</div></div>
+                    <div class="stat-card"><div class="stat-val">${by('em_dia')}</div><div class="stat-lbl">Em dia</div></div>
                     <div class="stat-card"><div class="stat-val">${by('finalizadas')}</div><div class="stat-lbl">Finalizadas</div>${waiting ? `<div class="stat-sublabel">${waiting} aguardando nota</div>` : ''}</div>
                     <div class="stat-card"><div class="stat-val">${by('nao_iniciadas')}</div><div class="stat-lbl">Não iniciadas</div></div>
                     <div class="stat-card"><div class="stat-val">${this.dur(mins)}</div><div class="stat-lbl">Tempo assistido</div></div>
@@ -7199,7 +7207,8 @@
                 const decades = Object.keys(decSum).map(Number).sort((a, b) => a - b).map(d => ({ name: `Anos ${d}`, avg: decSum[d] / decCount[d], count: decCount[d] }));
 
                 const status = [
-                    { name: 'Em andamento', count: all.filter(s => s._m.group === 'andamento').length },
+                    { name: 'Assistindo', count: all.filter(s => s._m.group === 'assistindo').length },
+                    { name: 'Em dia', count: all.filter(s => s._m.group === 'em_dia').length },
                     { name: 'Finalizadas', count: all.filter(s => s._m.group === 'finalizadas').length },
                     { name: 'Não iniciadas', count: all.filter(s => s._m.group === 'nao_iniciadas').length }
                 ].filter(x => x.count > 0);
