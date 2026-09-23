@@ -4004,6 +4004,25 @@
                 this.handleFilter();
             }
 
+            // Atalho vindo da aba de Estatísticas: filtra o catálogo por gênero
+            filterByGenre(name) {
+                this.pushNavState();
+                this.switchTab('catalogo');
+                const key = normalizeKey(name);
+
+                this.selectedGenres = new Set([key]);
+                document.querySelectorAll('#genreOptionsList input[type="checkbox"]').forEach(cb => {
+                    cb.checked = (cb.value === key);
+                });
+                const genAllOpt = document.getElementById('genreOptAll');
+                if (genAllOpt) genAllOpt.checked = false;
+                this.updateGenreFilterButtonLabel();
+                this.closeGenreMenu();
+
+                document.getElementById('searchInput').value = '';
+                this.handleFilter();
+            }
+
             // --- Gerenciamento de Tema ---
             toggleTheme() {
                 const current = document.body.getAttribute('data-theme');
@@ -5528,7 +5547,8 @@
                     clickFn: d => `app.filterByDirector('${escapeJsString(d.name)}')`
                 });
                 document.getElementById('rankGenresCount').innerHTML = buildBubbleField(s.topGenresByCount, {
-                    valueFn: g => g.count, nameFn: g => g.name, valueLabelFn: g => g.count
+                    valueFn: g => g.count, nameFn: g => g.name, valueLabelFn: g => g.count,
+                    clickFn: g => `app.filterByGenre('${escapeJsString(g.name)}')`
                 });
 
                 // Diretores/Gêneros Mais Bem Avaliados → medalhões (anel = nota/10)
@@ -5537,7 +5557,8 @@
                     clickFn: d => `app.filterByDirector('${escapeJsString(d.name)}')`
                 });
                 document.getElementById('rankGenresAvg').innerHTML = buildGaugeGrid(s.topGenresByAvg, {
-                    valueFn: g => g.avg, nameFn: g => g.name
+                    valueFn: g => g.avg, nameFn: g => g.name,
+                    clickFn: g => `app.filterByGenre('${escapeJsString(g.name)}')`
                 });
 
                 // Locais → rosca com legenda
@@ -6359,6 +6380,20 @@
                 document.getElementById('searchInput').value = '';
                 this.buildFilterOptions();
                 this.closeMenu('creator');
+                this.handleFilter();
+            }
+
+            // Atalho vindo das Estatísticas: filtra o catálogo por gênero
+            filterByGenre(name) {
+                app.pushNavState();
+                app.switchTab('s-catalogo');
+                this.sel.genre = new Set([normalizeKey(name)]);
+                this.sel.year.clear(); this.sel.creator.clear();
+                this.groupFilter = 'all';
+                const gf = document.getElementById('sGroupFilter'); if (gf) gf.value = 'all';
+                document.getElementById('searchInput').value = '';
+                this.buildFilterOptions();
+                this.closeMenu('genre');
                 this.handleFilter();
             }
 
@@ -7273,10 +7308,12 @@
                     valueFn: d => d.avg, nameFn: d => d.name, clickFn: creatorClick
                 });
                 document.getElementById('sRankGenresCount').innerHTML = buildBubbleField(s.genresCount, {
-                    valueFn: g => g.count, nameFn: g => g.name, valueLabelFn: g => g.count
+                    valueFn: g => g.count, nameFn: g => g.name, valueLabelFn: g => g.count,
+                    clickFn: g => `sapp.filterByGenre('${escapeJsString(g.name)}')`
                 });
                 document.getElementById('sRankGenresAvg').innerHTML = buildGaugeGrid(s.genresAvg, {
-                    valueFn: g => g.avg, nameFn: g => g.name
+                    valueFn: g => g.avg, nameFn: g => g.name,
+                    clickFn: g => `sapp.filterByGenre('${escapeJsString(g.name)}')`
                 });
                 document.getElementById('sRankDecades').innerHTML = buildLollipopChart(s.decades, {
                     valueFn: d => d.avg, nameFn: d => d.name, extraFn: d => ` <span class="rank-item-count">(${d.count})</span>`
