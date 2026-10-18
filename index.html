@@ -2,8 +2,17 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineTracker Israel & Ricardo</title>
+    <!-- Ícone e modo "aplicativo" ao adicionar à tela inicial (arquivos ao lado do index.html no GitHub) -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#a6272c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="CineTracker">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <style>
 
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
@@ -193,6 +202,13 @@
         .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); box-shadow: 0 5px 16px rgba(166, 39, 44, 0.35); }
 
         .btn-danger { background: var(--score-low); color: #fff8ec; border-color: var(--score-low); }
+        /* Tema escuro: texto escuro sobre os preenchimentos dourados, verdes e vermelhos.
+           Texto creme sobre o dourado ficava em 2:1 de contraste; escuro fica em 8,5:1. */
+        [data-theme="dark"] .btn-primary, [data-theme="dark"] .btn-primary:hover,
+        [data-theme="dark"] .btn-danger, [data-theme="dark"] .score-badge,
+        [data-theme="dark"] .top-score, [data-theme="dark"] .diff-chip,
+        [data-theme="dark"] .filter-badge, [data-theme="dark"] .series-rate-badge,
+        [data-theme="dark"] .ep-row.watched .ep-check, [data-theme="dark"] .season-thumb.done::after { color: #1b1611; }
 
         input[type="file"] { display: none; }
 
@@ -218,6 +234,8 @@
             width: 280px;
         }
         .search-box input::placeholder { color: var(--text-muted); }
+        .search-box input { -webkit-appearance: none; appearance: none; }
+        .search-box input::-webkit-search-decoration { -webkit-appearance: none; }
 
         /* ============================================================
            LAYOUT: header no topo + corpo em duas colunas (sidebar + main)
@@ -272,6 +290,16 @@
             padding: 32px 36px 8px 36px;
             max-width: 1300px;
         }
+        /* Lembrete de backup no topo dos catálogos */
+        .backup-slot:empty { display: none; }
+        .backup-slot { padding: 22px 36px 0 36px; max-width: 1300px; }
+        .backup-banner {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+            background: var(--bg-panel); border: 1px solid var(--gold); border-radius: 14px;
+            padding: 12px 16px; box-shadow: var(--card-shadow);
+        }
+        .backup-banner p { margin: 0; flex: 1 1 260px; font-size: 0.9rem; color: var(--text-main); line-height: 1.45; }
+        .backup-banner .btn { padding: 9px 14px; font-size: 0.82rem; }
 
         .stats-grid {
             display: grid;
@@ -497,6 +525,33 @@
         }
         @keyframes skeleton-pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+        /* Selo "falta nota": canto superior direito do cartaz, na cor de quem falta */
+        .pending-badge {
+            position: absolute; top: 12px; right: 10px; z-index: 2;
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(20, 14, 6, 0.78); color: #f5ead2;
+            font-size: 0.7rem; font-weight: 800; padding: 4px 9px; border-radius: 999px;
+            border: 1px solid var(--pb, #e0a93b); backdrop-filter: blur(6px);
+            max-width: calc(100% - 70px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pending-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pb, #e0a93b); flex: none; }
+        /* Sessões do filme (assistido mais de uma vez) */
+        .sessions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 28px; }
+        .sessions-list { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: 100%; font-size: 0.86rem; }
+        .sessions-l { font-weight: 700; color: var(--text-main); margin-right: 2px; }
+        .session-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--bg-input); border-radius: 999px; padding: 4px 6px 4px 11px; font-weight: 700; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+        .session-chip:first-of-type { padding-right: 11px; }
+        .session-chip button { border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 1rem; line-height: 1; width: 22px; height: 22px; border-radius: 50%; }
+        .session-chip button:hover { background: rgba(166,39,44,0.14); color: var(--score-low); }
+        .rewatch-btn { font-size: 0.82rem; padding: 8px 14px; }
+        .rewatch-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; }
+        .rewatch-form label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
+        .rewatch-form input { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; color: var(--text-main); font-family: inherit; font-size: 16px; }
+        .pending-note {
+            margin: -14px 0 22px; padding: 10px 14px; border-radius: 10px; font-size: 0.86rem; font-weight: 600;
+            background: var(--gold-soft); border: 1px dashed var(--gold); color: var(--text-main);
+        }
+        .s-box .s-pending { font-size: 0.85rem; font-family: 'Manrope', sans-serif; font-weight: 800; opacity: 0.85; }
         .rank-badge {
             position: absolute; top: 12px; left: 10px;
             background: rgba(20, 14, 6, 0.72);
@@ -611,7 +666,7 @@
         }
         .confirm-title { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
         .confirm-message { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 22px; }
-        .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 
         /* --- Recap do ano: "programa da sessão" impresso ---
            Paleta própria e fixa (igual no tema claro e no escuro): é um impresso,
@@ -898,7 +953,7 @@
             border-color: var(--gold);
             box-shadow: var(--focus-ring);
         }
-        .edit-form textarea { min-height: 100px; resize: vertical; }
+        .edit-form textarea { min-height: 130px; resize: vertical; }
 
         .char-count { font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 6px; font-weight: 500; }
 
@@ -1273,6 +1328,9 @@
             .modal-left { height: 200px; }
             .modal-right { padding: 20px; }
             .edit-form input, .edit-form textarea, .edit-form select { font-size: 16px; } /* evita zoom automático ao focar campo */
+            /* Com o zoom de dois dedos liberado, campos de digitação com letra 16 evitam que a
+               tela "pule" ao tocar neles (comportamento do iPhone) */
+            .search-box input, .dr-add input, .dr-tools input, .multi-select-search, #authEmailInput, #authPasswordInput { font-size: 16px; }
 
             /* Menus suspensos de filtro: nunca ultrapassam a largura da tela */
             .multi-select-menu { min-width: 0; width: max-content; max-width: calc(100vw - 24px); }
@@ -1492,6 +1550,101 @@
             .season-thumb { width: 48px; }
         }
 
+        /* ============================================================
+           CELULAR — cabeçalho compacto + abas fixas embaixo
+           (só vale em telas de até 640px; o computador fica igual)
+           ============================================================ */
+        .m-actions { display: none; }
+        @media (max-width: 640px) {
+            header { flex-wrap: wrap; padding: 8px 10px; gap: 6px; row-gap: 8px; min-height: 0; }
+            .brand { font-size: 1.2rem; letter-spacing: 1px; flex-shrink: 0; }
+            .brand::before { display: none; }
+            .mode-switch { order: 0; flex: 0 1 auto; min-width: 0; padding: 3px; }
+            .mode-btn { flex: 1; padding: 4px 9px 3px; font-size: 0.95rem; letter-spacing: 0.6px; }
+            .mode-ico { display: none; }
+            .m-actions { display: flex; gap: 5px; margin-left: auto; flex-shrink: 0; }
+            .m-icon-btn {
+                width: 36px; height: 36px; border-radius: 50%;
+                display: inline-flex; align-items: center; justify-content: center;
+                background: var(--bg-input); color: var(--text-main);
+                border: 1px solid var(--border); cursor: pointer; padding: 0;
+                -webkit-tap-highlight-color: transparent;
+            }
+            @media (max-width: 370px) {
+                .brand { font-size: 1.05rem; letter-spacing: 0.5px; }
+                .mode-btn { padding: 4px 7px 3px; font-size: 0.88rem; }
+                .m-icon-btn { width: 34px; height: 34px; }
+            }
+            .m-icon-btn.m-add { background: var(--accent); border-color: var(--accent); color: #fff8ec; }
+            [data-theme="dark"] .m-icon-btn.m-add { color: #1b1611; }
+            header.m-search-open #mSearchBtn, header.m-menu-open #mMenuBtn { border-color: var(--gold); background: var(--gold-soft); }
+
+            /* Busca: aparece numa segunda linha ao tocar na lupa (ou se já tiver texto) */
+            .search-box { display: none; order: 5; flex: 1 1 100%; }
+            header.m-search-open .search-box, header.m-has-query .search-box { display: block; }
+
+            /* Tema, Importar, Exportar e Sair: dentro do menu "⋯" */
+            .controls {
+                display: none; position: absolute; top: calc(100% + 6px); right: 10px;
+                flex-direction: column; align-items: stretch; gap: 4px;
+                width: 230px; max-width: calc(100vw - 20px); overflow: visible;
+                background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px;
+                padding: 8px; box-shadow: 0 18px 40px -12px rgba(0,0,0,0.35); z-index: 70;
+            }
+            header.m-menu-open .controls { display: flex; }
+            .controls .btn, .controls .btn.btn-quiet {
+                width: 100%; justify-content: flex-start; padding: 12px 14px; font-size: 0.9rem;
+                opacity: 1; background: transparent; border-color: transparent; box-shadow: none; color: var(--text-main);
+            }
+            .controls .btn:hover { background: var(--bg-input); }
+            .controls .btn.btn-primary { background: var(--gold-soft); color: var(--text-main); }
+            #addNewBtn { display: none; }
+            .controls label.btn::before { content: '📥'; margin-right: 10px; }
+            .pending-badge { font-size: 0.62rem; padding: 3px 7px; gap: 4px; right: 8px; max-width: calc(100% - 56px); }
+            #themeBtn::after { content: 'Alternar tema'; margin-left: 10px; }
+            #signOutBtn::after { content: 'Sair da conta'; margin-left: 10px; }
+            .controls .hide-narrow { display: inline; }
+
+            /* Abas: barra fixa no rodapé, ícone em cima e nome curto embaixo */
+            .tab-nav {
+                position: fixed; top: auto; bottom: 0; left: 0; right: 0; z-index: 90;
+                width: 100%; height: auto; flex-direction: row; gap: 4px;
+                padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+                border-right: none; border-bottom: none; border-top: 1px solid var(--border);
+                background: var(--bg-panel); overflow: visible;
+                box-shadow: 0 -6px 18px -10px rgba(0,0,0,0.25);
+            }
+            .tab-nav .btn {
+                flex: 1 1 0; min-width: 0; flex-direction: column; gap: 2px;
+                padding: 6px 2px; border-radius: 12px; line-height: 1.1; white-space: nowrap;
+            }
+            .nav-ico { font-size: 1.25rem; line-height: 1; }
+            .nav-lbl { font-size: 0.68rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+            .nav-lbl[data-short] { font-size: 0; }
+            .nav-lbl[data-short]::after { content: attr(data-short); font-size: 0.68rem; }
+            .tab-nav-hint, .tab-nav-divider { display: none; }
+            body.kb-open .tab-nav { display: none; }
+
+            /* Espaço para a barra não cobrir o fim da página, o "Voltar" e os avisos */
+            .app-body { padding-bottom: 74px; }
+            body.kb-open .app-body { padding-bottom: 0; }
+            .back-fab { bottom: 84px; }
+            .toast-container { bottom: 84px; right: 12px; }
+            .backup-slot { padding: 14px 14px 0; }
+
+            /* Números do catálogo: uma faixa que desliza de lado, em vez de 3 linhas de cartões */
+            #tab-catalogo .dashboard-container, #tab-s-catalogo .dashboard-container { padding-bottom: 0; }
+            #statsGrid, #sStatsGrid {
+                display: flex; overflow-x: auto; gap: 12px; padding: 4px 10px 16px;
+                margin: 0 -10px; scroll-snap-type: x proximity; scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+            #statsGrid::-webkit-scrollbar, #sStatsGrid::-webkit-scrollbar { display: none; }
+            #statsGrid .stat-card, #sStatsGrid .stat-card { flex: 0 0 auto; min-width: 128px; max-width: 70vw; scroll-snap-align: start; }
+            #statsGrid .stat-val, #sStatsGrid .stat-val { white-space: nowrap; font-size: 1.6rem; }
+            #statsGrid .stat-card:hover, #sStatsGrid .stat-card:hover { transform: none; }
+        }
+
         /* alternância de modo: mostra só a navegação do modo atual */
         body[data-mode="movies"] #navSeries, body[data-mode="series"] #navMovies { display: none; }
     </style>
@@ -1519,11 +1672,23 @@
     <header>
         <div class="brand"><span>CINETRACKER</span><small>ISRAEL &amp; RICARDO</small></div>
         <div class="mode-switch" role="tablist" aria-label="Alternar entre Filmes e Séries">
-            <button type="button" class="mode-btn active" id="modeBtn-movies" onclick="app.switchMode('movies')">🎬 Filmes</button>
-            <button type="button" class="mode-btn" id="modeBtn-series" onclick="app.switchMode('series')">📺 Séries</button>
+            <button type="button" class="mode-btn active" id="modeBtn-movies" onclick="app.switchMode('movies')"><span class="mode-ico">🎬 </span>Filmes</button>
+            <button type="button" class="mode-btn" id="modeBtn-series" onclick="app.switchMode('series')"><span class="mode-ico">📺 </span>Séries</button>
+        </div>
+        <!-- Só no celular: busca, novo e menu com o restante das ações -->
+        <div class="m-actions">
+            <button type="button" class="m-icon-btn" id="mSearchBtn" onclick="toggleMobileSearch()" aria-label="Buscar" aria-expanded="false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button type="button" class="m-icon-btn m-add" onclick="closeMobileMenu(); app.addNew()" aria-label="Novo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button type="button" class="m-icon-btn" id="mMenuBtn" onclick="toggleMobileMenu(event)" aria-label="Mais opções" aria-expanded="false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+            </button>
         </div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar filme, diretor..." onkeyup="app.handleSearch()">
+            <input type="search" id="searchInput" placeholder="Buscar filme, diretor, gênero..." oninput="app.handleSearch()" enterkeyhint="search">
         </div>
         <div class="controls">
             <button class="btn" onclick="app.toggleTheme()" id="themeBtn" title="Alternar Modo Escuro">
@@ -1544,22 +1709,23 @@
     <div class="app-body">
     <nav class="tab-nav">
         <div class="nav-group" id="navMovies">
-        <button class="btn btn-primary" id="navBtn-catalogo" onclick="app.switchTab('catalogo')">🎬 Catálogo</button>
-        <button class="btn" id="navBtn-estatisticas" onclick="app.switchTab('estatisticas')">📊 Estatísticas</button>
-        <button class="btn" id="navBtn-perfis" onclick="app.switchTab('perfis')">🎭 Israel &amp; Ricardo</button>
-        <button class="btn" id="navBtn-sortear" onclick="app.switchTab('sortear')">🎟️ Sortear Filme</button>
+        <button class="btn btn-primary" id="navBtn-catalogo" onclick="app.switchTab('catalogo')"><span class="nav-ico">🎬</span> <span class="nav-lbl">Catálogo</span></button>
+        <button class="btn" id="navBtn-estatisticas" onclick="app.switchTab('estatisticas')"><span class="nav-ico">📊</span> <span class="nav-lbl">Estatísticas</span></button>
+        <button class="btn" id="navBtn-perfis" onclick="app.switchTab('perfis')"><span class="nav-ico">🎭</span> <span class="nav-lbl" data-short="Perfis">Israel &amp; Ricardo</span></button>
+        <button class="btn" id="navBtn-sortear" onclick="app.switchTab('sortear')"><span class="nav-ico">🎟️</span> <span class="nav-lbl" data-short="Sortear">Sortear Filme</span></button>
         </div>
         <div class="nav-group" id="navSeries">
-        <button class="btn btn-primary" id="navBtn-s-catalogo" onclick="app.switchTab('s-catalogo')">📺 Catálogo</button>
-        <button class="btn" id="navBtn-s-estatisticas" onclick="app.switchTab('s-estatisticas')">📊 Estatísticas</button>
-        <button class="btn" id="navBtn-s-perfis" onclick="app.switchTab('s-perfis')">🎭 Israel &amp; Ricardo</button>
-        <button class="btn" id="navBtn-s-sortear" onclick="app.switchTab('s-sortear')">🎟️ Sortear Série</button>
+        <button class="btn btn-primary" id="navBtn-s-catalogo" onclick="app.switchTab('s-catalogo')"><span class="nav-ico">📺</span> <span class="nav-lbl">Catálogo</span></button>
+        <button class="btn" id="navBtn-s-estatisticas" onclick="app.switchTab('s-estatisticas')"><span class="nav-ico">📊</span> <span class="nav-lbl">Estatísticas</span></button>
+        <button class="btn" id="navBtn-s-perfis" onclick="app.switchTab('s-perfis')"><span class="nav-ico">🎭</span> <span class="nav-lbl" data-short="Perfis">Israel &amp; Ricardo</span></button>
+        <button class="btn" id="navBtn-s-sortear" onclick="app.switchTab('s-sortear')"><span class="nav-ico">🎟️</span> <span class="nav-lbl" data-short="Sortear">Sortear Série</span></button>
         </div>
         <div class="tab-nav-hint">Sessão contínua desde 2022.<br>Que comecem os créditos.</div>
     </nav>
     <main class="app-main">
 
     <div id="tab-catalogo" class="tab-page">
+    <div class="backup-slot"></div>
 
     <div class="dashboard-container">
         <div class="stats-grid" id="statsGrid">
@@ -1605,10 +1771,11 @@
                         <div id="genreOptionsList" class="multi-select-scroll-area"></div>
                     </div>
                 </div>
-                <select id="reviewFilter" onchange="app.handleReviewFilterChange(this.value)" title="Filtrar por resenha">
-                    <option value="all">Resenha: todos</option>
-                    <option value="with">Com Resenha</option>
-                    <option value="without">Sem Resenha</option>
+                <select id="reviewFilter" onchange="app.handleReviewFilterChange(this.value)" title="Filtrar por resenha ou nota pendente">
+                    <option value="all">Mostrar: todos</option>
+                    <option value="with">Com resenha</option>
+                    <option value="without">Sem resenha</option>
+                    <option value="pending">Com nota pendente</option>
                 </select>
                 <select id="sortFilter" onchange="app.handleSortChange(this.value)" title="Ordenar catálogo por">
                     <option value="watchedDesc" selected>Assistido: mais recente primeiro</option>
@@ -1781,7 +1948,7 @@
                 </div>
 
                 <div class="dr-add">
-                    <input type="text" id="pendingTitle" placeholder="Adicionar filme à lista…" onkeyup="if(event.key==='Enter') app.addPending()" aria-label="Título do filme">
+                    <input type="text" id="pendingTitle" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Adicionar filme à lista…" onkeyup="if(event.key==='Enter') app.addPending()" aria-label="Título do filme">
                     <select id="pendingBy" aria-label="Quem sugeriu">
                         <option value="Ambos">Sugestão de ambos</option>
                         <option value="Israel">Sugestão de Israel</option>
@@ -1811,6 +1978,7 @@
 
     <!-- ============================ SÉRIES ============================ -->
     <div id="tab-s-catalogo" class="tab-page" style="display:none;">
+    <div class="backup-slot"></div>
 
     <div id="sSetupBanner"></div>
 
@@ -2015,11 +2183,13 @@
                             <div class="s-box"><div>Média</div><div id="sAvg" style="color:var(--accent)">-</div></div>
                             <div class="s-box"><div>IMDb <button type="button" class="imdb-fetch-btn" id="imdbViewBtn" onclick="app.refreshImdbFromView()" title="Buscar a nota atual deste filme no IMDb e salvar">↻</button></div><div id="sImdb">-</div></div>
                         </div>
+                        <div class="pending-note" id="mPendingNote" style="display:none;"></div>
 
-                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 30px; font-weight: 500;">
+                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500;">
                             <span id="mData">Data: -</span> &nbsp;•&nbsp; 
                             <span id="mLocal">Local: -</span>
                         </div>
+                        <div class="sessions" id="mSessions"></div>
 
                         <div class="reviews-container">
                             <div class="review-card">
@@ -2041,18 +2211,18 @@
                         <h2 style="color:var(--text-main); margin-top:0; font-weight:700">Editar Filme</h2>
                         
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                            <div style="grid-column: 1 / -1"><label>Título (Digite e saia do campo para buscar)</label><input type="text" id="eTitle" onblur="app.fetchMetadata()" style="font-weight:600"></div>
+                            <div style="grid-column: 1 / -1"><label>Título (Digite e saia do campo para buscar)</label><input type="text" id="eTitle" spellcheck="true" autocorrect="on" autocapitalize="sentences" onblur="app.fetchMetadata()" style="font-weight:600"></div>
 
-                            <div style="grid-column: 1 / -1"><label>Título Original <span style="font-weight:400; text-transform:none; letter-spacing:0;">— preenchido automaticamente, pode editar caso a capa buscada esteja errada</span></label><input type="text" id="eOriginalTitle" onblur="app.refetchPosterFromModal()" placeholder="Título no idioma original"></div>
+                            <div style="grid-column: 1 / -1"><label>Título Original <span style="font-weight:400; text-transform:none; letter-spacing:0;">— preenchido automaticamente, pode editar caso a capa buscada esteja errada</span></label><input type="text" id="eOriginalTitle" spellcheck="true" autocorrect="on" autocapitalize="sentences" onblur="app.refetchPosterFromModal()" placeholder="Título no idioma original"></div>
                             
                             <div><label>Ano Lançamento</label><input type="number" id="eYear" min="1888" max="2100" onblur="app.refetchPosterFromModal()"></div>
-                            <div><label>Diretor(es) <span style="font-weight:400; text-transform:none; letter-spacing:0;">— separe vários com vírgula</span></label><input type="text" id="eDirector" placeholder="Ex: Fulano, Beltrana"></div>
+                            <div><label>Diretor(es) <span style="font-weight:400; text-transform:none; letter-spacing:0;">— separe vários com vírgula</span></label><input type="text" id="eDirector" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Ex: Fulano, Beltrana"></div>
                             
                             <div><label>Tempo (HH:MM)</label><input type="text" id="eDuration"></div>
-                            <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="eGenres"></div>
+                            <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="eGenres" spellcheck="true" autocorrect="on" autocapitalize="sentences"></div>
                             
                             <div><label>Data (Assistido)</label><input type="date" id="eDate"></div>
-                            <div><label>Local</label><input type="text" id="eLocal" placeholder="Ex: Casa, Cinema..."></div>
+                            <div><label>Local</label><input type="text" id="eLocal" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Ex: Casa, Cinema..."></div>
                             
                             <div><label>Nota Israel</label><input type="number" step="0.1" min="0" max="10" id="eIsrael"></div>
                             <div><label>Nota Ricardo</label><input type="number" step="0.1" min="0" max="10" id="eRicardo"></div>
@@ -2060,16 +2230,16 @@
                         </div>
 
                         <label>Resenha Israel</label>
-                        <textarea id="eReviewIsrael" maxlength="200" oninput="app.updateCount('Israel')"></textarea>
-                        <div id="cntIsrael" class="char-count">0/200</div>
+                        <textarea id="eReviewIsrael" spellcheck="true" autocorrect="on" autocapitalize="sentences" maxlength="500" oninput="app.updateCount('Israel')"></textarea>
+                        <div id="cntIsrael" class="char-count">0/500</div>
                         
                         <label>Resenha Ricardo</label>
-                        <textarea id="eReviewRicardo" maxlength="200" oninput="app.updateCount('Ricardo')"></textarea>
-                        <div id="cntRicardo" class="char-count">0/200</div>
+                        <textarea id="eReviewRicardo" spellcheck="true" autocorrect="on" autocapitalize="sentences" maxlength="500" oninput="app.updateCount('Ricardo')"></textarea>
+                        <div id="cntRicardo" class="char-count">0/500</div>
 
                         <div style="display:flex; gap:15px; margin-top:30px;">
                             <button class="btn btn-primary" style="flex:1; justify-content:center; padding: 12px;" onclick="app.saveEdits()">Salvar</button>
-                            <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="app.toggleEdit(false)">Cancelar</button>
+                            <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="app.cancelEdit()">Cancelar</button>
                             <button class="btn btn-danger" style="flex:1; justify-content:center; padding: 12px;" onclick="app.deleteMovie()">Excluir</button>
                         </div>
                     </div>
@@ -2097,14 +2267,14 @@
                         <h2 style="color:var(--text-main); margin-top:0; font-weight:700">Editar Série</h2>
 
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                            <div style="grid-column: 1 / -1"><label>Título (Digite e saia do campo para buscar)</label><input type="text" id="sfTitle" onblur="sapp.fetchMetadata()" style="font-weight:600"></div>
-                            <div style="grid-column: 1 / -1"><label>Título Original</label><input type="text" id="sfOriginal"></div>
+                            <div style="grid-column: 1 / -1"><label>Título (Digite e saia do campo para buscar)</label><input type="text" id="sfTitle" spellcheck="true" autocorrect="on" autocapitalize="sentences" onblur="sapp.fetchMetadata()" style="font-weight:600"></div>
+                            <div style="grid-column: 1 / -1"><label>Título Original</label><input type="text" id="sfOriginal" spellcheck="true" autocorrect="on" autocapitalize="sentences"></div>
 
                             <div><label>Ano de estreia</label><input type="number" id="sfYearStart" min="1900" max="2100"></div>
                             <div><label>Ano de encerramento <span style="font-weight:400; text-transform:none; letter-spacing:0;">— vazio se em exibição</span></label><input type="number" id="sfYearEnd" min="1900" max="2100"></div>
 
-                            <div style="grid-column: 1 / -1"><label>Criador(es) <span style="font-weight:400; text-transform:none; letter-spacing:0;">— separe vários com vírgula</span></label><input type="text" id="sfCreators" placeholder="Ex: Fulano, Beltrana"></div>
-                            <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="sfGenres"></div>
+                            <div style="grid-column: 1 / -1"><label>Criador(es) <span style="font-weight:400; text-transform:none; letter-spacing:0;">— separe vários com vírgula</span></label><input type="text" id="sfCreators" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Ex: Fulano, Beltrana"></div>
+                            <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="sfGenres" spellcheck="true" autocorrect="on" autocapitalize="sentences"></div>
 
                             <div><label>Situação da produção</label>
                                 <select id="sfStatus">
@@ -2137,17 +2307,17 @@
                             <div style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">A nota do IMDb pode ser preenchida a qualquer momento, mas só conta nas estatísticas quando a série estiver 100% assistida.</div>
 
                             <label style="margin-top:18px;">Resenha Israel</label>
-                            <textarea id="sfRevIsrael" maxlength="200" oninput="sapp.updateCount('Israel')"></textarea>
-                            <div id="sfCntIsrael" class="char-count">0/200</div>
+                            <textarea id="sfRevIsrael" spellcheck="true" autocorrect="on" autocapitalize="sentences" maxlength="500" oninput="sapp.updateCount('Israel')"></textarea>
+                            <div id="sfCntIsrael" class="char-count">0/500</div>
 
                             <label>Resenha Ricardo</label>
-                            <textarea id="sfRevRicardo" maxlength="200" oninput="sapp.updateCount('Ricardo')"></textarea>
-                            <div id="sfCntRicardo" class="char-count">0/200</div>
+                            <textarea id="sfRevRicardo" spellcheck="true" autocorrect="on" autocapitalize="sentences" maxlength="500" oninput="sapp.updateCount('Ricardo')"></textarea>
+                            <div id="sfCntRicardo" class="char-count">0/500</div>
                         </div>
 
                         <div style="display:flex; gap:15px; margin-top:30px;">
                             <button class="btn btn-primary" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.saveEdits()">Salvar</button>
-                            <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.toggleEdit(false)">Cancelar</button>
+                            <button class="btn" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.cancelEdit()">Cancelar</button>
                             <button class="btn btn-danger" style="flex:1; justify-content:center; padding: 12px;" onclick="sapp.deleteSeries()">Excluir</button>
                         </div>
                     </div>
@@ -2172,6 +2342,7 @@
             <div class="confirm-message" id="confirmMessage"></div>
             <div class="confirm-actions">
                 <button class="btn" id="confirmCancelBtn">Cancelar</button>
+                <button class="btn" id="confirmAltBtn" style="display:none;"></button>
                 <button class="btn btn-danger" id="confirmOkBtn">Confirmar</button>
             </div>
         </div>
@@ -2189,9 +2360,8 @@
         </div>
     </div>
 
-    <!-- Bibliotecas usadas só para exportar a aba Estatísticas como imagem/PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- As bibliotecas de imagem (html2canvas) e PDF (jsPDF) agora só são baixadas
+         quando alguém toca em exportar: ver loadScriptOnce() -->
 
     <!-- Cliente do Supabase — é ele quem fala com o banco na nuvem -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -2239,9 +2409,14 @@
                     review_isr: m.revIsr || null,
                     review_ric: m.revRic || null,
                     poster_url: m.poster || null,
-                    poster_failed: !!m.posterFailed
+                    poster_failed: !!m.posterFailed,
+                    // só enviada se a coluna existir no banco (ver hasRewatchCol)
+                    ...(cloud.hasRewatchCol ? { rewatches: normalizeRewatches(m.rewatches) } : {})
                 };
             },
+            // A coluna "rewatches" (novas sessões de um filme) é opcional: sem ela, o app
+            // funciona igual, só não registra "assistimos de novo" até o SQL ser rodado.
+            hasRewatchCol: false,
             movieFromDb(row) {
                 const scIsr = Number(row.sc_isr) || 0;
                 const scRic = Number(row.sc_ric) || 0;
@@ -2263,7 +2438,8 @@
                     poster: row.poster_url || null,
                     posterFailed: !!row.poster_failed,
                     createdAt: row.created_at || '',
-                    avg: (scIsr + scRic) / 2
+                    rewatches: normalizeRewatches(row.rewatches),
+                    avg: movieAvg({ scIsr, scRic })
                 };
             },
             pendingToDb(p) {
@@ -2311,7 +2487,14 @@
                 if (moviesRes.error) { showToast('Erro ao carregar filmes: ' + moviesRes.error.message, 'error'); return; }
                 if (pendingRes.error) { showToast('Erro ao carregar lista de sorteio: ' + pendingRes.error.message, 'error'); }
 
-                app.movies = (moviesRes.data || []).map(this.movieFromDb);
+                // Descobre se a tabela já tem a coluna de novas sessões
+                if ((moviesRes.data || []).length) {
+                    this.hasRewatchCol = Object.prototype.hasOwnProperty.call(moviesRes.data[0], 'rewatches');
+                } else {
+                    const probe = await supabaseClient.from('movies').select('rewatches').limit(1);
+                    this.hasRewatchCol = !probe.error;
+                }
+                app.movies = (moviesRes.data || []).map(row => this.movieFromDb(row));
                 app.pending = (pendingRes.data || []).map(this.pendingFromDb);
                 app.processData();
                 app.renderPending();
@@ -3478,21 +3661,26 @@
         }
 
         // --- Modal de confirmação genérico (substitui o confirm() nativo do navegador) ---
-        function showConfirm(message, { title = 'Tem certeza?', okLabel = 'Confirmar', danger = true } = {}) {
+        // Devolve true (OK), false (Cancelar) ou 'alt' (terceiro botão, só quando altLabel é passado)
+        function showConfirm(message, { title = 'Tem certeza?', okLabel = 'Confirmar', danger = true, altLabel = '', cancelLabel = 'Cancelar' } = {}) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('confirmOverlay');
                 document.getElementById('confirmTitle').textContent = title;
                 document.getElementById('confirmMessage').textContent = message;
                 const okBtn = document.getElementById('confirmOkBtn');
                 const cancelBtn = document.getElementById('confirmCancelBtn');
+                const altBtn = document.getElementById('confirmAltBtn');
                 okBtn.textContent = okLabel;
                 okBtn.className = danger ? 'btn btn-danger' : 'btn btn-primary';
+                cancelBtn.textContent = cancelLabel;
+                if (altBtn) { altBtn.textContent = altLabel; altBtn.style.display = altLabel ? '' : 'none'; altBtn.onclick = () => cleanup('alt'); }
 
                 const escHandler = (e) => { if (e.key === 'Escape') cleanup(false); };
                 function cleanup(result) {
                     overlay.classList.remove('open');
                     okBtn.onclick = null;
                     cancelBtn.onclick = null;
+                    if (altBtn) altBtn.onclick = null;
                     document.removeEventListener('keydown', escHandler);
                     overlay._cleanup = null;
                     resolve(result);
@@ -3561,6 +3749,70 @@
             for (let k = 1; k < V - 1; k++) html += at('9px', pos(V, k)) + at('calc(100% - 9px)', pos(V, k));
             el.innerHTML = html;
         }
+
+        // Média de um filme: só entre quem deu nota (nota 0 = "ainda sem nota").
+        // Antes era sempre (Israel + Ricardo) / 2, e a nota que faltava contava como zero.
+        function movieAvg(m) {
+            const a = Number(m.scIsr) || 0, b = Number(m.scRic) || 0;
+            if (a > 0 && b > 0) return (a + b) / 2;
+            return a > 0 ? a : (b > 0 ? b : 0);
+        }
+        // Quem ainda não deu nota neste filme: [] | ['Israel'] | ['Ricardo'] | ['Israel','Ricardo']
+        function missingScores(m) {
+            const out = [];
+            if (!(Number(m.scIsr) > 0)) out.push('Israel');
+            if (!(Number(m.scRic) > 0)) out.push('Ricardo');
+            return out;
+        }
+
+        // --- Sessões: a primeira vez (data do filme) + cada vez que assistiram de novo ---
+        // rewatches: [{ d: 'AAAA-MM-DD', at: data/hora em que foi registrada }]
+        function normalizeRewatches(raw) {
+            if (!Array.isArray(raw)) return [];
+            return raw.map(r => typeof r === 'string' ? { d: r, at: '' } : { d: (r && r.d) || '', at: (r && r.at) || '' })
+                      .filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.d));
+        }
+        function sessionsOf(m) {
+            const first = m.date ? [{ d: m.date, at: m.createdAt || '', first: true }] : [];
+            return first.concat(normalizeRewatches(m.rewatches));
+        }
+        // Duração de UMA sessão, em minutos ("H:MM")
+        function movieMinutes(m) {
+            if (!m.duration || !String(m.duration).includes(':')) return 0;
+            const [h, mm] = String(m.duration).split(':').map(Number);
+            return (h || 0) * 60 + (mm || 0);
+        }
+        // Sessões dentro de um conjunto de anos (vazio = todas)
+        function sessionsInYears(m, years) {
+            const all = sessionsOf(m);
+            return (!years || !years.size) ? all : all.filter(x => years.has(x.d.slice(0, 4)));
+        }
+        // Última sessão (para "Assistido: mais recente primeiro"); desempate pela hora do registro
+        function lastSession(m) {
+            const all = sessionsOf(m);
+            if (!all.length) return null;
+            return all.reduce((a, b) => (b.d > a.d || (b.d === a.d && (b.at || '') > (a.at || ''))) ? b : a);
+        }
+
+        // Baixa uma biblioteca só na primeira vez que ela for necessária
+        const EXPORT_LIBS = {
+            html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+            jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+        };
+        const _scriptLoads = {};
+        function loadScriptOnce(url) {
+            if (_scriptLoads[url]) return _scriptLoads[url];
+            _scriptLoads[url] = new Promise((resolve, reject) => {
+                const el = document.createElement('script');
+                el.src = url; el.async = true;
+                el.onload = () => resolve();
+                el.onerror = () => { delete _scriptLoads[url]; el.remove(); reject(new Error('não foi possível baixar a biblioteca de exportação (sem internet?)')); };
+                document.head.appendChild(el);
+            });
+            return _scriptLoads[url];
+        }
+        async function ensureHtml2canvas() { if (typeof html2canvas === 'undefined') await loadScriptOnce(EXPORT_LIBS.html2canvas); }
+        async function ensureJsPDF() { if (!window.jspdf) await loadScriptOnce(EXPORT_LIBS.jspdf); }
 
         function compareInsertion(a, b) {
             const ca = a.createdAt || '', cb = b.createdAt || '';
@@ -4238,7 +4490,7 @@
                 document.getElementById('modeBtn-movies').classList.toggle('active', mode === 'movies');
                 document.getElementById('modeBtn-series').classList.toggle('active', mode === 'series');
                 const search = document.getElementById('searchInput');
-                search.placeholder = mode === 'series' ? 'Buscar série, criador...' : 'Buscar filme, diretor...';
+                search.placeholder = mode === 'series' ? 'Buscar série, criador, gênero...' : 'Buscar filme, diretor, gênero...';
                 // A busca é compartilhada: ao trocar de modo ela é limpa, para não
                 // deixar um filtro "invisível" valendo do outro lado.
                 if (search.value) {
@@ -4315,7 +4567,7 @@
                 this.filterDirectorOptions('');
                 this.closeDirectorMenu();
 
-                document.getElementById('searchInput').value = '';
+                document.getElementById('searchInput').value = ''; document.querySelector('header').classList.remove('m-has-query');
                 this.handleFilter();
             }
 
@@ -4334,7 +4586,7 @@
                 this.updateGenreFilterButtonLabel();
                 this.closeGenreMenu();
 
-                document.getElementById('searchInput').value = '';
+                document.getElementById('searchInput').value = ''; document.querySelector('header').classList.remove('m-has-query');
                 this.handleFilter();
             }
 
@@ -4442,7 +4694,8 @@
                         poster: m.poster || null,
                         posterFailed: !!m.posterFailed,
                         createdAt: m.createdAt || '',
-                        avg: (scIsr + scRic) / 2
+                        rewatches: normalizeRewatches(m.rewatches),
+                        avg: movieAvg({ scIsr, scRic })
                     };
                 });
 
@@ -4523,7 +4776,7 @@
                         originalTitle: (c[14] || '').trim(),
                         poster: null
                     };
-                    movie.avg = (movie.scIsr + movie.scRic) / 2;
+                    movie.avg = movieAvg(movie);
                     importedMovies.push(movie);
                 }
 
@@ -4571,7 +4824,7 @@
 
                 // Popular filtro de anos (seleção múltipla) — usado no Catálogo
                 // Nota: Usa a data que assistiu para filtro de histórico, mas mantém ano de lançamento separado
-                const years = [...new Set(this.movies.map(m => m.date.split('-')[0]))].filter(y=>y).sort().reverse();
+                const years = [...new Set(this.movies.flatMap(m => sessionsOf(m).map(x => x.d.slice(0, 4))))].filter(y=>y).sort().reverse();
 
                 // Mantém apenas os anos selecionados que ainda existem nos dados
                 this.selectedYears = new Set([...this.selectedYears].filter(y => years.includes(y)));
@@ -4671,6 +4924,7 @@
                 this.updateGenreFilterButtonLabel();
 
                 this.fetchPosters();
+                this.renderBackupBanner();
                 this.handleFilter();
                 this.renderStats();
                 this.renderProfiles();
@@ -4755,7 +5009,7 @@
                 // Se o modal estiver aberto para um filme que acabou de ser processado aqui,
                 // atualiza o botão de nova tentativa e a capa exibida.
                 if (this.editingId !== null && targets.some(m => m.id === this.editingId)) {
-                    const m = this.movies.find(x => x.id === this.editingId);
+                    const m = this.editingMovie();
                     if (m) {
                         const posterImg = document.getElementById('mPoster');
                         if (posterImg && m.poster) posterImg.src = m.poster;
@@ -4768,7 +5022,7 @@
             // Botão manual "Tentar buscar capa novamente", para filmes cuja busca
             // automática já falhou (título obscuro, sem correspondência no TMDB etc.)
             async retryPosterFetch() {
-                const m = this.movies.find(x => x.id === this.editingId);
+                const m = this.editingMovie();
                 if (!m) return;
                 const retryBtn = document.getElementById('retryPosterBtn');
                 const originalLabel = retryBtn ? retryBtn.textContent : '';
@@ -4820,7 +5074,7 @@
                         }
 
                         // Atualiza a capa em preview no modal já com a dupla verificação aplicada
-                        const m = this.movies.find(x => x.id === this.editingId);
+                        const m = this.editingMovie();
                         if (bestMatch.poster_path) {
                             const posterUrl = `https://image.tmdb.org/t/p/w342${bestMatch.poster_path}`;
                             if (m) { m.poster = posterUrl; m._posterFetchedForTitle = title; }
@@ -4884,8 +5138,8 @@
             // Botão "↻" ao lado da nota do IMDb (modo visualização do filme): busca a nota
             // só deste filme e já grava na nuvem, sem precisar entrar em modo edição.
             async refreshImdbFromView() {
-                const m = this.movies.find(x => x.id === this.editingId);
-                if (!m) return;
+                const m = this.editingMovie();
+                if (!m || this.isDraft(m)) return;
                 const btn = document.getElementById('imdbViewBtn');
                 const label = btn ? btn.textContent : '';
                 if (btn) { btn.disabled = true; btn.textContent = '…'; }
@@ -4920,7 +5174,7 @@
 
                 try {
                     const { bestMatch } = await searchMovieBestMatch(title, hint, year);
-                    const m = this.movies.find(x => x.id === this.editingId);
+                    const m = this.editingMovie();
                     const retryBtn = document.getElementById('retryPosterBtn');
                     if (bestMatch?.poster_path) {
                         const posterUrl = `https://image.tmdb.org/t/p/w342${bestMatch.poster_path}`;
@@ -5134,12 +5388,13 @@
             }
 
             handleFilter() {
-                const s = document.getElementById('searchInput').value.toLowerCase();
+                // Busca sem diferenciar acentos/maiúsculas ("lenin" acha "Lênin")
+                const s = normalizeKey(document.getElementById('searchInput').value);
 
                 // Período: vazio = todo o histórico; senão, filmes cujo ano (de exibição) esteja selecionado
                 let list = this.selectedYears.size === 0
                     ? this.movies.slice()
-                    : this.movies.filter(m => this.selectedYears.has(m.date.split('-')[0]));
+                    : this.movies.filter(m => sessionsInYears(m, this.selectedYears).length > 0);
 
                 // Diretor (comparação normalizada, para casar com qualquer grafia digitada)
                 if (this.selectedDirectors.size > 0) {
@@ -5163,14 +5418,14 @@
                     list = list.filter(m => (m.revIsr || '').trim() && (m.revRic || '').trim());
                 } else if (this.reviewFilter === 'without') {
                     list = list.filter(m => !(m.revIsr || '').trim() || !(m.revRic || '').trim());
+                } else if (this.reviewFilter === 'pending') {
+                    list = list.filter(m => missingScores(m).length > 0);
                 }
 
                 if (s) {
-                    list = list.filter(m =>
-                        m.title.toLowerCase().includes(s) ||
-                        (m.originalTitle || '').toLowerCase().includes(s) ||
-                        m.director.toLowerCase().includes(s)
-                    );
+                    // Procura em título, título original, diretor, gênero, ano de lançamento e local
+                    list = list.filter(m => [m.title, m.originalTitle, m.director, m.genres, m.year, m.local]
+                        .some(v => v && normalizeKey(String(v)).includes(s)));
                 }
 
                 // Ordena pela métrica escolhida (padrão: assistido mais recente primeiro)
@@ -5179,15 +5434,23 @@
                 // no MESMO dia são desempatados pela ordem em que foram incluídos no app
                 // (data/hora de inclusão gravada pelo banco; na falta dela, o id, que também cresce
                 // a cada inclusão) — quem foi incluído depois conta como visto depois.
+                // Para filmes vistos mais de uma vez, vale a sessão mais recente: um filme
+                // revisto ontem sobe para o topo, desempatado pela hora em que a sessão foi registrada.
                 const byDate = (valueFn, dir) => (a, b) => {
                     const va = valueFn(a), vb = valueFn(b);
                     const ea = va === '' || va == null || Number.isNaN(va);
                     const eb = vb === '' || vb == null || Number.isNaN(vb);
                     if (ea !== eb) return ea ? 1 : -1;
                     if (!ea && va !== vb) return va < vb ? -dir : dir;
+                    const la = lastSession(a), lb = lastSession(b);
+                    const ra = la && !la.first ? la.at : '', rb = lb && !lb.first ? lb.at : '';
+                    if (ra || rb) {
+                        const ta = ra || a.createdAt || '', tb = rb || b.createdAt || '';
+                        if (ta && tb && ta !== tb) return (ta < tb ? -1 : 1) * dir;
+                    }
                     return compareInsertion(a, b) * dir;
                 };
-                const watchedKey = m => m.date || '';                       // 'AAAA-MM-DD' compara bem como texto
+                const watchedKey = m => { const l = lastSession(m); return l ? l.d : ''; }; // 'AAAA-MM-DD' compara bem como texto
                 const comparators = {
                     avg: (a, b) => (b.avg - a.avg) || (b.scImdb - a.scImdb),
                     isr: (a, b) => (b.scIsr - a.scIsr) || (b.avg - a.avg),
@@ -5209,18 +5472,15 @@
 
                 // Cálculos (com defaults seguros para não deixar a área vazia sem filmes)
                 const total = list.length;
-                const avgIsr = total ? (list.reduce((a,b)=>a+b.scIsr,0)/total) : 0;
-                const avgRic = total ? (list.reduce((a,b)=>a+b.scRic,0)/total) : 0;
+                // Média de cada um só sobre os filmes que ele avaliou
+                const ratedAvg = key => { const r = list.filter(m => m[key] > 0); return r.length ? r.reduce((a,b)=>a+b[key],0)/r.length : 0; };
+                const avgIsr = ratedAvg('scIsr');
+                const avgRic = ratedAvg('scRic');
                 const avgImdb = total ? (list.reduce((a,b)=>a+b.scImdb,0)/total) : 0;
                 
-                // Tempo
+                // Tempo: cada sessão conta (quem assistiu de novo soma a duração outra vez)
                 let mins = 0;
-                list.forEach(m => {
-                    if(m.duration && m.duration.includes(':')) {
-                        const [h, mm] = m.duration.split(':').map(Number);
-                        mins += (h*60) + mm;
-                    }
-                });
+                list.forEach(m => { mins += movieMinutes(m) * sessionsInYears(m, this.selectedYears).length; });
                 
                 const timeDisplay = this.formatDuration(mins);
 
@@ -5269,7 +5529,7 @@
                 `;
             }
 
-            renderChart(list) {
+            renderChart(list, years) {
                 const ctx = document.getElementById('chartViz');
                 if (!ctx) return;
 
@@ -5278,8 +5538,10 @@
                 const labels = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
 
                 list.forEach(m => {
-                    const monthIdx = parseInt(m.date.split('-')[1]) - 1;
-                    if (!isNaN(monthIdx)) monthsData[monthIdx]++;
+                    sessionsInYears(m, years).forEach(x => {
+                        const monthIdx = parseInt(x.d.split('-')[1]) - 1;
+                        if (!isNaN(monthIdx)) monthsData[monthIdx]++;
+                    });
                 });
 
                 // Onda suave em vez de barras: mais fácil de ler a tendência do
@@ -5325,7 +5587,7 @@
                 // concatenar innerHTML dentro do loop, principalmente em catálogos grandes).
                 grid.innerHTML = this.filtered.map(m => {
                     const safeTitle = escapeHtml(m.title);
-                    const img = m.poster || `https://via.placeholder.com/300x450/2b2013/e0a93b?text=${encodeURIComponent(m.title || 'Sem+Capa')}`;
+                    const img = m.poster || placeholderPoster(m.title || 'Sem capa');
                     const score = scoreFn(m);
                     const mainGenre = (m.genres || '').split(',')[0].trim();
                     // Só mostra o "esqueleto" pulsando enquanto ainda faz sentido esperar uma
@@ -5334,10 +5596,17 @@
                     const stillLoading = !m.poster && !m.posterFailed;
                     const directorTxt = (m.director || '').trim();
                     const showWatched = this.sortBy === 'watchedDesc' || this.sortBy === 'watchedAsc';
-                    const watchedTxt = showWatched && m.date ? formatDateBR(m.date) : '';
+                    const lastS = lastSession(m);
+                    const nSess = sessionsOf(m).length;
+                    const watchedTxt = showWatched && lastS ? formatDateBR(lastS.d) + (nSess > 1 ? ` · ${nSess}ª vez` : '') : '';
+                    const miss = missingScores(m);
+                    const pendingBadge = !miss.length ? '' : miss.length === 2
+                        ? `<div class="pending-badge" title="Ainda sem as notas do Israel e do Ricardo">Sem notas</div>`
+                        : `<div class="pending-badge" style="--pb:${miss[0] === 'Israel' ? 'var(--color-israel)' : 'var(--color-ricardo)'}" title="Ainda sem a nota do ${miss[0]}">Falta ${miss[0]}</div>`;
                     return `
                         <div class="movie-card" onclick="app.openModal(${m.id})" title="${safeTitle}">
                             <div class="rank-badge">#${m[rankKey]}</div>
+                            ${pendingBadge}
                             ${mainGenre ? `<div class="card-genre-tag">${escapeHtml(mainGenre)}</div>` : ''}
                             <div class="score-badge" style="background:${scoreColor(score)}">${score.toFixed(1)}</div>
                             <img src="${img}" id="poster-${m.id}" loading="lazy" alt="${safeTitle}" ${stillLoading ? 'data-loading="true"' : ''}>
@@ -5354,8 +5623,12 @@
             // --- 3. FUNCIONALIDADE ADICIONAR / MODAL / EDIÇÃO ---
             
             async addMovie() {
-                // Template vazio — sem ID ainda, quem gera é o Postgres ao inserir
+                // Rascunho só neste aparelho: nada vai para a nuvem (nem aparece no outro
+                // aparelho) até tocar em Salvar. Fechar ou cancelar não deixa rastro.
+                if (this.editingId != null) this.closeModal();
                 const draft = {
+                    id: -1,
+                    rewatches: [],
                     title: "",
                     originalTitle: "",
                     director: "",
@@ -5370,26 +5643,98 @@
                     poster: null,
                     avg: 0
                 };
-
-                const saved = await cloud.insertMovie(draft);
-                if (!saved) return; // erro já mostrado pelo cloud.insertMovie
-
-                // Adiciona e atualiza
-                this.movies.push(saved);
-                this.processData(); // Recalcula grid
-
-                // Abre já em modo de edição
-                this.openModal(saved.id);
+                this.draft = draft;
+                this.openModal(draft.id);
                 this.toggleEdit(true);
             }
 
+            // Filme por id, incluindo o rascunho de "+ Novo" (que só existe neste aparelho até salvar)
+            getMovie(id) {
+                if (this.draft && this.draft.id === id) return this.draft;
+                return this.movies.find(x => x.id === id);
+            }
+            editingMovie() { return this.editingId == null ? null : this.getMovie(this.editingId); }
+            isDraft(m) { return !!(m && this.draft && m === this.draft); }
+
+            // --- Novas sessões do mesmo filme ---
+            findDuplicate(title, original) {
+                const t = normalizeKey(title), o = normalizeKey(original);
+                if (!t && !o) return null;
+                const hits = this.movies.filter(m => {
+                    const mt = normalizeKey(m.title), mo = normalizeKey(m.originalTitle);
+                    return (t && (t === mt || t === mo)) || (o && (o === mo || o === mt));
+                });
+                if (!hits.length) return null;
+                const y = (document.getElementById('eYear') || {}).value;
+                return hits.find(m => y && String(m.year) === String(y)) || hits[0];
+            }
+            rewatchSqlHint() {
+                showToast('Para registrar novas sessões, rode no Supabase (SQL Editor) a linha que veio junto com esta versão: alter table movies add column if not exists rewatches jsonb not null default \'[]\';', 'error', 12000);
+            }
+            async addRewatch(m, date) {
+                if (!cloud.hasRewatchCol) { this.rewatchSqlHint(); return false; }
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) { showToast('Escolha a data da sessão.', 'error'); return false; }
+                const list = normalizeRewatches(m.rewatches);
+                list.push({ d: date, at: new Date().toISOString() });
+                list.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+                m.rewatches = list;
+                this.processData();
+                await cloud.upsertMovie(m);
+                const n = sessionsOf(m).length;
+                showToast(`Nova sessão de "${m.title}" registrada (${n}ª vez). O tempo foi somado e a nota continua a mesma.`, 'success', 6000);
+                return true;
+            }
+            async removeRewatch(index) {
+                const m = this.editingMovie();
+                if (!m || this.isDraft(m)) return;
+                const list = normalizeRewatches(m.rewatches);
+                const r = list[index];
+                if (!r) return;
+                const ok = await showConfirm(`Remover a sessão de ${formatDateBR(r.d)} de "${m.title}"? O tempo dessa sessão sai das contas.`, { title: 'Remover sessão?', okLabel: 'Remover', danger: true });
+                if (!ok) return;
+                list.splice(index, 1);
+                m.rewatches = list;
+                this.processData();
+                this.openModal(m.id);
+                cloud.upsertMovie(m);
+            }
+            showRewatchForm(show) {
+                const f = document.getElementById('mRewatchForm');
+                if (!f) return;
+                f.style.display = show ? 'flex' : 'none';
+                if (show) { const d = document.getElementById('mRewatchDate'); d.value = todayLocalISO(); d.focus(); }
+            }
+            async confirmRewatch() {
+                const m = this.editingMovie();
+                if (!m || this.isDraft(m)) return;
+                const date = document.getElementById('mRewatchDate').value;
+                const ok = await this.addRewatch(m, date);
+                if (ok) this.openModal(m.id);
+            }
+            renderSessions(m) {
+                const el = document.getElementById('mSessions');
+                if (!el) return;
+                const rw = normalizeRewatches(m.rewatches);
+                const list = rw.length
+                    ? `<div class="sessions-list"><span class="sessions-l">Assistido ${rw.length + 1} vezes:</span> ${m.date ? `<span class="session-chip">${formatDateBR(m.date)}</span>` : ''}${rw.map((r, i) => `<span class="session-chip">${formatDateBR(r.d)}<button type="button" onclick="app.removeRewatch(${i})" aria-label="Remover a sessão de ${formatDateBR(r.d)}" title="Remover esta sessão">×</button></span>`).join('')}</div>`
+                    : '';
+                el.innerHTML = `${list}
+                    <button type="button" class="btn rewatch-btn" onclick="app.showRewatchForm(true)">🔁 Assistimos de novo</button>
+                    <div class="rewatch-form" id="mRewatchForm" style="display:none;">
+                        <label for="mRewatchDate">Data da nova sessão</label>
+                        <input type="date" id="mRewatchDate">
+                        <button type="button" class="btn btn-primary" onclick="app.confirmRewatch()">Registrar</button>
+                        <button type="button" class="btn" onclick="app.showRewatchForm(false)">Cancelar</button>
+                    </div>`;
+            }
+
             openModal(id) {
-                const m = this.movies.find(x => x.id === id);
+                const m = this.getMovie(id);
                 if(!m) return;
                 this.editingId = id;
 
                 // Preencher Visualização
-                document.getElementById('mPoster').src = m.poster || 'https://via.placeholder.com/300x450/2b2013/e0a93b?text=Sem+Capa';
+                document.getElementById('mPoster').src = m.poster || placeholderPoster(m.title || 'Sem capa');
                 document.getElementById('mTitle').innerText = m.title || "Sem Título";
 
                 // Mostra um botão de nova tentativa quando a busca automática de capa já
@@ -5416,8 +5761,17 @@
                 const pillsEl = document.getElementById('mGenrePills');
                 pillsEl.innerHTML = genreNames.map(g => `<span class="genre-pill">${escapeHtml(g)}</span>`).join('');
 
-                document.getElementById('sIsrael').innerText = m.scIsr.toFixed(1);
-                document.getElementById('sRicardo').innerText = m.scRic.toFixed(1);
+                const scoreTxt = v => v > 0 ? v.toFixed(1) : '<span class="s-pending">pendente</span>';
+                document.getElementById('sIsrael').innerHTML = scoreTxt(m.scIsr);
+                document.getElementById('sRicardo').innerHTML = scoreTxt(m.scRic);
+                const miss = missingScores(m);
+                const pn = document.getElementById('mPendingNote');
+                if (pn) {
+                    pn.style.display = miss.length ? 'block' : 'none';
+                    pn.textContent = !miss.length ? '' : (miss.length === 2
+                        ? '⏳ Este filme ainda não tem as notas de vocês. Use “Editar Informações” para registrar.'
+                        : `⏳ Falta a nota do ${miss[0]}. A média por enquanto é só a do ${miss[0] === 'Israel' ? 'Ricardo' : 'Israel'}. Use “Editar Informações” para registrar.`);
+                }
                 document.getElementById('sAvg').innerText = m.avg.toFixed(1);
                 document.getElementById('sImdb').innerText = m.scImdb.toFixed(1);
                 
@@ -5425,6 +5779,7 @@
                 const [y,mm,dd] = m.date.split('-');
                 document.getElementById('mData').innerText = `Data: ${dd}/${mm}/${y}`;
                 document.getElementById('mLocal').innerText = `Local: ${m.local}`;
+                this.renderSessions(m);
 
                 // Resenhas
                 document.getElementById('rIsrael').innerText = m.revIsr || "Nenhuma resenha.";
@@ -5468,7 +5823,7 @@
                 const el = document.getElementById(`eReview${person}`);
                 const display = document.getElementById(`cnt${person}`);
                 if(el && display) {
-                    display.innerText = `${el.value.length}/200`;
+                    display.innerText = `${el.value.length}/500`;
                 }
             }
 
@@ -5477,7 +5832,7 @@
                 const edit = document.getElementById('editMode');
                 
                 if (isEdit) {
-                    const m = this.movies.find(x => x.id === this.editingId);
+                    const m = this.editingMovie();
                     document.getElementById('eTitle').value = m.title;
                     document.getElementById('eOriginalTitle').value = m.originalTitle || '';
                     
@@ -5509,9 +5864,16 @@
                 }
             }
 
+            // Botão "Cancelar" da edição: num filme novo, fecha e descarta o rascunho
+            cancelEdit() {
+                if (this.isDraft(this.editingMovie())) { this.closeModal(); return; }
+                this.toggleEdit(false);
+            }
+
             // FUNÇÃO ADICIONADA: EXCLUIR FILME
             async deleteMovie() {
-                const m = this.movies.find(x => x.id === this.editingId);
+                const m = this.editingMovie();
+                if (this.isDraft(m)) { this.closeModal(); return; }
                 const label = m && m.title ? `"${m.title}"` : 'este filme';
                 const ok = await showConfirm(`Isso remove ${label} permanentemente do catálogo. Essa ação não pode ser desfeita.`, {
                     title: 'Excluir filme?',
@@ -5529,9 +5891,45 @@
                 }
             }
 
-            saveEdits() {
-                const m = this.movies.find(x => x.id === this.editingId);
-                
+            async saveEdits() {
+                const m = this.editingMovie();
+                if (!m) return;
+                const isNew = this.isDraft(m);
+                if (isNew && !document.getElementById('eTitle').value.trim()) {
+                    showToast('Preencha o título do filme.', 'error');
+                    document.getElementById('eTitle').focus();
+                    return;
+                }
+
+                // Filme novo com o mesmo título (ou título original) de um que já está no
+                // catálogo: pergunta se é uma nova sessão. Nova sessão soma o tempo de novo,
+                // mas o filme continua com uma nota só.
+                if (isNew) {
+                    const dup = this.findDuplicate(document.getElementById('eTitle').value, document.getElementById('eOriginalTitle').value);
+                    if (dup) {
+                        const when = dup.date ? `foi visto em ${formatDateBR(dup.date)}` : 'já está cadastrado';
+                        const note = dup.avg > 0 ? `, nota ${dup.avg.toFixed(1).replace('.', ',')}` : '';
+                        const choice = await showConfirm(
+                            `"${dup.title}"${dup.year ? ` (${dup.year})` : ''} ${when}${note}. Se vocês assistiram de novo, registro uma nova sessão: o tempo conta outra vez e a nota continua a mesma. Se for outro filme com o mesmo nome (um remake, por exemplo), cadastre como outro filme.`,
+                            { title: 'Esse filme já está no catálogo', okLabel: 'Registrar nova sessão', danger: false, altLabel: 'É outro filme', cancelLabel: 'Voltar' }
+                        );
+                        if (choice === false) return;
+                        if (choice === true) {
+                            const date = document.getElementById('eDate').value || todayLocalISO();
+                            const done = await this.addRewatch(dup, date);
+                            if (!done) return;
+                            const link = this._pendingLink && this._pendingLink.movieId === m.id ? this._pendingLink : null;
+                            this.draft = null;
+                            this._pendingLink = null;
+                            this.editingId = null;
+                            this.openModal(dup.id);
+                            if (link && this.pending.some(p => p.id === link.pendingId)) this.deletePending(link.pendingId);
+                            return;
+                        }
+                        // 'alt': segue o cadastro normal como outro filme
+                    }
+                }
+
                 // Captura valores
                 m.title = document.getElementById('eTitle').value || "Sem Título";
                 m.originalTitle = document.getElementById('eOriginalTitle').value.trim();
@@ -5554,13 +5952,13 @@
                 m.scImdb = clampScore(parseFloat(document.getElementById('eImdb').value));
                 m.local = document.getElementById('eLocal').value;
                 
-                // Limpeza de Resenha e Enforcement de limite 200 chars
-                const cleanText = (t) => t.replace(/(\r\n|\n|\r)/gm, " ").replace(/\t/g, " ").substring(0, 200);
+                // Limpeza de Resenha e limite de 500 caracteres
+                const cleanText = (t) => t.replace(/(\r\n|\n|\r)/gm, " ").replace(/\t/g, " ").substring(0, 500);
                 
                 m.revIsr = cleanText(document.getElementById('eReviewIsrael').value);
                 m.revRic = cleanText(document.getElementById('eReviewRicardo').value);
                 
-                m.avg = (m.scIsr + m.scRic) / 2;
+                m.avg = movieAvg(m);
 
                 // Tenta buscar poster novo se o titulo mudou e não é vazio — mas só força
                 // um novo fetch (bulk, sem dupla verificação) se a capa atual não tiver
@@ -5571,13 +5969,33 @@
                 }
 
                 this.hasUnsavedChanges = true; // Marca como alterado
-                // Re-processa
-                this.processData();
-                this.openModal(m.id);
-                cloud.upsertMovie(m); // salva na nuvem em segundo plano
+
+                if (isNew) {
+                    // Só agora o filme vai para a nuvem (e aparece no outro aparelho), completo
+                    const draftId = m.id;
+                    const payload = { ...m }; delete payload.id;
+                    const saved = await cloud.insertMovie(payload);
+                    if (!saved) return; // erro já mostrado; o formulário continua aberto
+                    if (m._posterFetchedForTitle) saved._posterFetchedForTitle = m._posterFetchedForTitle;
+                    this.draft = null;
+                    // o aviso em tempo real do próprio cadastro pode chegar antes: não duplica
+                    const already = this.movies.findIndex(x => x.id === saved.id);
+                    if (already >= 0) this.movies[already] = saved; else this.movies.push(saved);
+                    this.editingId = saved.id;
+                    if (this._pendingLink && this._pendingLink.movieId === draftId) this._pendingLink.movieId = saved.id;
+                    this.processData();
+                    this.openModal(saved.id);
+                    showToast(`"${saved.title}" cadastrado.`, 'success');
+                } else {
+                    // Re-processa
+                    this.processData();
+                    this.openModal(m.id);
+                    cloud.upsertMovie(m); // salva na nuvem em segundo plano
+                }
+                const savedId = this.editingId;
 
                 // Cadastro aberto pelo "Assistimos" do sorteio: o filme sai da lista de espera
-                if (this._pendingLink && this._pendingLink.movieId === m.id && (m.title || '').trim()) {
+                if (this._pendingLink && this._pendingLink.movieId === savedId && (m.title || '').trim()) {
                     const link = this._pendingLink; this._pendingLink = null;
                     if (this.pending.some(p => p.id === link.pendingId)) {
                         this.deletePending(link.pendingId);
@@ -5591,8 +6009,11 @@
                 // (criado por "Adicionar Filme" e fechado sem preencher nada), remove o
                 // registro fantasma em vez de deixá-lo perdido, sem título, no catálogo.
                 if (this.editingId !== null) {
-                    const m = this.movies.find(x => x.id === this.editingId);
-                    if (m && !m.title.trim()) {
+                    const m = this.editingMovie();
+                    if (this.isDraft(m)) {
+                        // Filme novo nunca salvo: só descarta o rascunho (nada foi para a nuvem)
+                        this.draft = null;
+                    } else if (m && !m.title.trim()) {
                         this.movies = this.movies.filter(x => x.id !== this.editingId);
                         this.processData();
                         cloud.deleteMovie(m.id); // remove também da nuvem, já tinha sido criado lá
@@ -5645,7 +6066,8 @@
                         revRic: m.revRic,
                         poster: m.poster || null,
                         posterFailed: !!m.posterFailed,
-                        createdAt: m.createdAt || ''
+                        createdAt: m.createdAt || '',
+                        rewatches: normalizeRewatches(m.rewatches)
                     })),
                     pending: this.pending,
                     series: sapp.exportSeries()
@@ -5661,7 +6083,33 @@
                 downloadTextFile(JSON.stringify(payload, null, 2), `cinetracker_${dateSuffix}.json`, 'application/json');
                 this.hasUnsavedChanges = false;
                 markSynced();
+                try { localStorage.setItem('cinetracker_last_backup', todayLocalISO()); localStorage.removeItem('cinetracker_backup_snooze'); } catch (e) {}
+                this.renderBackupBanner();
                 showToast('Arquivo JSON exportado com sucesso.', 'success');
+            }
+
+            // Lembrete de backup: aparece no topo dos catálogos quando o último "Exportar JSON"
+            // feito NESTE aparelho tem 30 dias ou mais (ou nunca foi feito). "Agora não" adia 30 dias.
+            renderBackupBanner() {
+                let last = '', snooze = '';
+                try { last = localStorage.getItem('cinetracker_last_backup') || ''; snooze = localStorage.getItem('cinetracker_backup_snooze') || ''; } catch (e) {}
+                const daysSince = iso => Math.floor((new Date(todayLocalISO() + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 86400000);
+                const due = (!last || daysSince(last) >= 30) && (!snooze || daysSince(snooze) >= 30) && this.movies.length > 0;
+                const msg = !last
+                    ? '<b>Nenhum backup feito neste aparelho ainda.</b> Baixe uma cópia do catálogo (filmes, séries e lista de sorteio) para guardar.'
+                    : `<b>Último backup há ${daysSince(last)} dias.</b> Baixe uma cópia atualizada do catálogo para guardar.`;
+                document.querySelectorAll('.backup-slot').forEach(el => {
+                    el.innerHTML = due ? `
+                        <div class="backup-banner" role="status">
+                            <p>💾 ${msg}</p>
+                            <button type="button" class="btn btn-primary" onclick="app.exportJSON()">📦 Exportar JSON</button>
+                            <button type="button" class="btn" onclick="app.snoozeBackup()">Agora não</button>
+                        </div>` : '';
+                });
+            }
+            snoozeBackup() {
+                try { localStorage.setItem('cinetracker_backup_snooze', todayLocalISO()); } catch (e) {}
+                this.renderBackupBanner();
             }
 
             // --- 5. ESTATÍSTICAS ---
@@ -5669,26 +6117,24 @@
             // Estatísticas que comparam anos entre si (evolução por ano, melhor/pior ano,
             // ano mais produtivo) sempre usam `this.movies` (histórico completo), pois não
             // faz sentido "comparar anos" dentro de um único ano selecionado.
-            computeStats(list) {
+            computeStats(list, years) {
                 const full = this.movies;
                 if (!full.length) return null;
 
                 list = list || full;
                 const total = list.length;
                 const sum = arr => arr.reduce((a,b) => a+b, 0);
-                const avgIsr = total ? sum(list.map(m => m.scIsr)) / total : 0;
-                const avgRic = total ? sum(list.map(m => m.scRic)) / total : 0;
+                // Médias de cada um só sobre os filmes que ele avaliou; a nossa, sobre os filmes com alguma nota
+                const avgOver = (arr, fn) => arr.length ? sum(arr.map(fn)) / arr.length : 0;
+                const avgIsr = avgOver(list.filter(m => m.scIsr > 0), m => m.scIsr);
+                const avgRic = avgOver(list.filter(m => m.scRic > 0), m => m.scRic);
                 const avgImdb = total ? sum(list.map(m => m.scImdb)) / total : 0;
-                const avgNossa = total ? sum(list.map(m => m.avg)) / total : 0;
+                const avgNossa = avgOver(list.filter(m => m.avg > 0), m => m.avg);
+                const bothRated = list.filter(m => m.scIsr > 0 && m.scRic > 0);
 
-                // Tempo total
+                // Tempo total: cada sessão no período conta
                 let mins = 0;
-                list.forEach(m => {
-                    if (m.duration && m.duration.includes(':')) {
-                        const [h, mm] = m.duration.split(':').map(Number);
-                        mins += (h*60) + mm;
-                    }
-                });
+                list.forEach(m => { mins += movieMinutes(m) * sessionsInYears(m, years).length; });
 
                 // Agrupamento de diretores, gêneros e locais: normaliza (sem acento, minúsculo,
                 // sem espaços extras) para juntar variações como "Ação"/"ação"/"Acao" ou
@@ -5701,16 +6147,16 @@
                             const v = (raw || '').trim();
                             if (!v) return;
                             const key = normalizeKey(v);
-                            if (!groups[key]) groups[key] = { count: 0, sum: 0, labelCounts: {} };
+                            if (!groups[key]) groups[key] = { count: 0, sum: 0, rated: 0, labelCounts: {} };
                             groups[key].count++;
-                            if (withAvg) groups[key].sum += m.avg;
+                            if (withAvg && m.avg > 0) { groups[key].sum += m.avg; groups[key].rated++; }
                             groups[key].labelCounts[v] = (groups[key].labelCounts[v] || 0) + 1;
                         });
                     });
                     return Object.values(groups).map(g => ({
                         name: pickMostCommonLabel(g.labelCounts),
                         count: g.count,
-                        avg: withAvg ? g.sum / g.count : undefined
+                        avg: withAvg ? (g.rated ? g.sum / g.rated : 0) : undefined
                     }));
                 };
 
@@ -5733,26 +6179,28 @@
                 if (outrosCount > 0) allLocals.push({ name: 'Outros', count: outrosCount, avg: undefined });
 
                 // Top 5 maiores divergências de nota entre Israel e Ricardo
-                const topDivergences = [...list]
+                // (só filmes com as duas notas: uma nota faltando não é divergência)
+                const topDivergences = [...bothRated]
                     .map(m => ({ title: m.title, scIsr: m.scIsr, scRic: m.scRic, diff: Math.abs(m.scIsr - m.scRic) }))
                     .sort((a,b) => b.diff - a.diff)
                     .slice(0, 5);
 
                 // Nível de concordância entre Israel e Ricardo (diferença média e % de filmes "próximos")
                 let agreement = null;
-                if (total) {
-                    const diffs = list.map(m => Math.abs(m.scIsr - m.scRic));
-                    const avgDiff = sum(diffs) / total;
-                    const closePct = (diffs.filter(d => d <= 1).length / total) * 100;
+                if (bothRated.length) {
+                    const diffs = bothRated.map(m => Math.abs(m.scIsr - m.scRic));
+                    const avgDiff = sum(diffs) / diffs.length;
+                    const closePct = (diffs.filter(d => d <= 1).length / diffs.length) * 100;
                     agreement = { avgDiff, closePct };
                 }
 
-                // Quem costuma dar notas mais altas (positivo = Israel mais alto)
-                const scoreGap = avgIsr - avgRic;
+                // Quem costuma dar notas mais altas (positivo = Israel mais alto), comparando
+                // os mesmos filmes: só os que os dois avaliaram
+                const scoreGap = bothRated.length ? avgOver(bothRated, m => m.scIsr) - avgOver(bothRated, m => m.scRic) : 0;
 
                 // Filme mais bem e mais mal avaliado (pela nossa média), dentro do período filtrado
                 let bestMovie = null, worstMovie = null;
-                list.forEach(m => {
+                list.filter(m => m.avg > 0).forEach(m => {
                     if (!bestMovie || m.avg > bestMovie.avg) bestMovie = m;
                     if (!worstMovie || m.avg < worstMovie.avg) worstMovie = m;
                 });
@@ -5760,18 +6208,18 @@
                 // --- Curiosidades que comparam anos entre si: sempre histórico completo ---
 
                 // Evolução da nota por ano em que assistiram (usa a data de exibição, não o ano de lançamento)
-                const yearSum = {}, yearCount = {};
+                const yearSum = {}, yearCount = {}, yearRated = {};
                 full.forEach(m => {
                     const y = (m.date || '').split('-')[0];
                     if (!y) return;
-                    yearSum[y] = (yearSum[y] || 0) + m.avg;
                     yearCount[y] = (yearCount[y] || 0) + 1;
+                    if (m.avg > 0) { yearSum[y] = (yearSum[y] || 0) + m.avg; yearRated[y] = (yearRated[y] || 0) + 1; }
                 });
-                const yearlyScores = Object.keys(yearSum).sort().map(y => ({ year: y, avg: yearSum[y]/yearCount[y], count: yearCount[y] }));
+                const yearlyScores = Object.keys(yearCount).sort().map(y => ({ year: y, avg: yearRated[y] ? yearSum[y]/yearRated[y] : 0, count: yearCount[y] }));
                 let bestYear = null, worstYear = null, mostProductiveYear = null;
                 yearlyScores.forEach(y => {
-                    if (!bestYear || y.avg > bestYear.avg) bestYear = y;
-                    if (!worstYear || y.avg < worstYear.avg) worstYear = y;
+                    if (y.avg > 0 && (!bestYear || y.avg > bestYear.avg)) bestYear = y;
+                    if (y.avg > 0 && (!worstYear || y.avg < worstYear.avg)) worstYear = y;
                     if (!mostProductiveYear || y.count > mostProductiveYear.count) mostProductiveYear = y;
                 });
 
@@ -5782,6 +6230,7 @@
                 list.forEach(m => {
                     const yr = parseInt(m.year, 10);
                     if (!yr) return;
+                    if (!(m.avg > 0)) return;
                     const dec = Math.floor(yr/10)*10;
                     decSum[dec] = (decSum[dec] || 0) + m.avg;
                     decCount[dec] = (decCount[dec] || 0) + 1;
@@ -5793,10 +6242,11 @@
                 const weekdayLabels = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
                 const weekdayCount = new Array(7).fill(0);
                 list.forEach(m => {
-                    if (!m.date) return;
-                    const d = new Date(m.date + 'T12:00:00'); // meio-dia evita erro de fuso na virada do dia
-                    if (isNaN(d.getTime())) return;
-                    weekdayCount[d.getDay()]++;
+                    sessionsInYears(m, years).forEach(x => {
+                        const d = new Date(x.d + 'T12:00:00'); // meio-dia evita erro de fuso na virada do dia
+                        if (isNaN(d.getTime())) return;
+                        weekdayCount[d.getDay()]++;
+                    });
                 });
                 const weekdayStats = weekdayLabels
                     .map((name, idx) => ({ name, count: weekdayCount[idx] }))
@@ -5859,13 +6309,13 @@
                 // Recorte de período específico da aba de Estatísticas (independente do Catálogo)
                 const filteredList = this.statsSelectedYears.size === 0
                     ? this.movies
-                    : this.movies.filter(m => this.statsSelectedYears.has(m.date.split('-')[0]));
+                    : this.movies.filter(m => sessionsInYears(m, this.statsSelectedYears).length > 0);
 
-                const s = this.computeStats(filteredList);
+                const s = this.computeStats(filteredList, this.statsSelectedYears);
                 const rankIds = ['rankDirectorsCount','rankGenresCount','rankDirectorsAvg','rankGenresAvg'];
 
-                // Atividade mensal — respeita o período selecionado
-                this.renderChart(filteredList);
+                // Atividade mensal — respeita o período selecionado (conta cada sessão)
+                this.renderChart(filteredList, this.statsSelectedYears);
 
                 if (!s) {
                     overview.innerHTML = '<div class="empty-hint" style="grid-column:1/-1">Importe os dados para ver as estatísticas.</div>';
@@ -6108,7 +6558,8 @@
                 const seriesDone = (typeof sapp !== 'undefined' ? sapp.series : [])
                     .filter(s => s._m && s._m.complete && (s.finishedDate || '').slice(0, 4) === year)
                     .sort((a, b) => (b.avg - a.avg) || a.title.localeCompare(b.title, 'pt-BR'));
-                if (!list.length && !seriesDone.length) return null;
+                const hasRewatch = this.movies.some(m => normalizeRewatches(m.rewatches).some(x => x.d.slice(0, 4) === year));
+                if (!list.length && !seriesDone.length && !hasRewatch) return null;
 
                 const sum = arr => arr.reduce((a, b) => a + b, 0);
                 const minsOf = m => {
@@ -6117,7 +6568,9 @@
                     return (h || 0) * 60 + (mm || 0);
                 };
                 const total = list.length;
-                const mins = sum(list.map(minsOf));
+                // Filmes revistos neste ano (novas sessões): o tempo de cada sessão também conta
+                const rewatchedHere = this.movies.flatMap(m => normalizeRewatches(m.rewatches).filter(x => x.d.slice(0, 4) === year).map(x => ({ m, d: x.d })));
+                const mins = sum(list.map(minsOf)) + sum(rewatchedHere.map(x => minsOf(x.m)));
                 const rated = list.filter(m => m.avg > 0);
                 const avgNossa = rated.length ? sum(rated.map(m => m.avg)) / rated.length : 0;
 
@@ -6189,13 +6642,13 @@
                 return {
                     year, list, total, mins, avgNossa, top5, worst, chrono,
                     genres, directors, locals, months, topMonthIdx, weekdays, topWeekday,
-                    longest, shortest, minsOf, divergence, people, generous, seriesDone,
+                    longest, shortest, minsOf, divergence, people, generous, seriesDone, rewatchedHere,
                     prevCount: prevList.length, prevMins: sum(prevList.map(minsOf))
                 };
             }
 
             recapYears() {
-                const years = new Set(this.movies.map(m => (m.date || '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)));
+                const years = new Set(this.movies.flatMap(m => sessionsOf(m).map(x => x.d.slice(0, 4))).filter(y => /^\d{4}$/.test(y)));
                 if (typeof sapp !== 'undefined') {
                     sapp.series.forEach(s => { const y = (s.finishedDate || '').slice(0, 4); if (s._m && s._m.complete && /^\d{4}$/.test(y)) years.add(y); });
                 }
@@ -6246,9 +6699,13 @@
                     const parts = [`<b>${plural(r.total, 'filme', 'filmes')}</b>`];
                     if (r.mins) parts.push(`<b>${hours(r.mins)}</b> de tela`);
                     lede = `Foram ${parts.join(' e ')}${r.avgNossa ? `, com nota média <b>${fmtScore(r.avgNossa)}</b>` : ''}.`;
+                    if (r.rewatchedHere.length) lede += ` Teve também ${plural(r.rewatchedHere.length, 'filme revisto', 'filmes revistos')}, que entram no tempo de tela.`;
                     if (r.seriesDone.length) lede += ` E ainda ${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')}.`;
                 } else {
-                    lede = `Nenhum filme registrado, mas <b>${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')}</b>.`;
+                    const extras = [];
+                    if (r.seriesDone.length) extras.push(`<b>${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')}</b>`);
+                    if (r.rewatchedHere.length) extras.push(`<b>${plural(r.rewatchedHere.length, 'filme revisto', 'filmes revistos')}</b>`);
+                    lede = `Nenhum filme novo registrado, mas ${extras.join(' e ')}.`;
                 }
                 const head = `
                     <div class="rc-head">
@@ -6369,6 +6826,7 @@
                 if (r.divergence) facts.push(['A maior discordância', escapeHtml(r.divergence.m.title),
                     `${escapeHtml(r.divergence.hi.r.name)} deu ${fmtScore(r.divergence.hi.v)}, ${escapeHtml(r.divergence.lo.r.name)} deu ${fmtScore(r.divergence.lo.v)}`]);
                 if (r.worst) facts.push(['A decepção do ano', escapeHtml(r.worst.title), `média ${fmtScore(r.worst.avg)}`]);
+                if (r.rewatchedHere.length) facts.push(['Vistos de novo', r.rewatchedHere.slice(0, 3).map(x => escapeHtml(x.m.title)).join(', ') + (r.rewatchedHere.length > 3 ? '…' : ''), plural(r.rewatchedHere.length, 'nova sessão', 'novas sessões')]);
                 // "Fechou o ano (até agora)" só faz sentido no ano corrente
                 if (r.year !== todayLocalISO().slice(0, 4)) facts.forEach(f => { if (f[0] === 'Fechou o ano (até agora)') f[0] = 'Fechou o ano'; });
                 const factsHtml = facts.length ? `
@@ -6402,7 +6860,8 @@
             // Salva o recap inteiro (não só o trecho visível) como PNG, para compartilhar
             async saveRecapImage() {
                 const el = document.querySelector('#recapCard .rc');
-                if (!el || typeof html2canvas === 'undefined') { showToast('Não foi possível gerar a imagem agora.', 'error'); return; }
+                if (!el) return;
+                try { await ensureHtml2canvas(); } catch (e) { showToast('Não foi possível gerar a imagem: ' + e.message + '.', 'error'); return; }
                 const year = document.getElementById('recapYearSelect').value;
                 showToast('Gerando a imagem do recap...', 'info', 3000);
                 el.classList.remove('rc-animate');
@@ -6437,9 +6896,7 @@
             // expande temporariamente as listas com rolagem interna (diretores, gêneros...)
             // para que o resumo saia completo, não cortado no que caberia na tela.
             async captureStatsCanvas() {
-                if (typeof html2canvas === 'undefined') {
-                    throw new Error('Biblioteca de captura não carregou (sem internet?).');
-                }
+                await ensureHtml2canvas();
                 const target = document.querySelector('#tab-estatisticas .stats-page-container');
                 if (!target) throw new Error('Aba de Estatísticas não encontrada.');
 
@@ -6493,7 +6950,7 @@
                 this.closeStatsExportMenu();
                 showToast('Gerando PDF do resumo...', 'info', 3000);
                 try {
-                    if (!window.jspdf) throw new Error('Biblioteca de PDF não carregou (sem internet?).');
+                    await ensureJsPDF();
                     const canvas = await this.captureStatsCanvas();
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
@@ -6890,6 +7347,46 @@
         }
         syncHeaderHeight(); // roda já na primeira renderização, não só depois do "load"
 
+        // ---- Celular: lupa, menu "⋯" e barra de abas que some com o teclado ----
+        function mobileHeader() { return document.querySelector('header'); }
+        function toggleMobileSearch(force) {
+            const h = mobileHeader(); if (!h) return;
+            const open = typeof force === 'boolean' ? force : !h.classList.contains('m-search-open');
+            h.classList.toggle('m-search-open', open);
+            const b = document.getElementById('mSearchBtn'); if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+            closeMobileMenu();
+            if (open) { const i = document.getElementById('searchInput'); if (i) setTimeout(() => i.focus(), 30); }
+        }
+        function toggleMobileMenu(ev) {
+            if (ev) ev.stopPropagation();
+            const h = mobileHeader(); if (!h) return;
+            const open = !h.classList.contains('m-menu-open');
+            h.classList.toggle('m-menu-open', open);
+            const b = document.getElementById('mMenuBtn'); if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        function closeMobileMenu() {
+            const h = mobileHeader(); if (!h || !h.classList.contains('m-menu-open')) return;
+            h.classList.remove('m-menu-open');
+            const b = document.getElementById('mMenuBtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        }
+        document.addEventListener('click', ev => {
+            const h = mobileHeader(); if (!h || !h.classList.contains('m-menu-open')) return;
+            const menu = h.querySelector('.controls');
+            // fecha ao tocar fora do menu, ou depois de escolher uma opção (exceto o seletor de arquivo, que fecha sozinho no "change")
+            if (!menu.contains(ev.target)) closeMobileMenu();
+            else if (ev.target.closest('button')) setTimeout(closeMobileMenu, 0);
+        });
+        document.addEventListener('change', ev => { if (ev.target && ev.target.id === 'fileInput') closeMobileMenu(); });
+        (function () {
+            const si = document.getElementById('searchInput');
+            if (si) si.addEventListener('input', () => { const h = mobileHeader(); if (h) h.classList.toggle('m-has-query', !!si.value); });
+            const typing = el => el && el.matches && el.matches('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]):not([type=button]), textarea, [contenteditable="true"]');
+            document.addEventListener('focusin', ev => { if (typing(ev.target)) document.body.classList.add('kb-open'); });
+            document.addEventListener('focusout', () => setTimeout(() => {
+                if (!typing(document.activeElement)) document.body.classList.remove('kb-open');
+            }, 80));
+        })();
+
         // ============================================================
         // SÉRIES — APLICAÇÃO (catálogo, modal, episódios, estatísticas)
         // ============================================================
@@ -6926,7 +7423,11 @@
                 });
             }
 
-            cur() { return this.series.find(s => s.id === this.editingId) || null; }
+            cur() {
+                if (this.draft && this.draft.id === this.editingId) return this.draft;
+                return this.series.find(s => s.id === this.editingId) || null;
+            }
+            isDraft(s) { return !!(s && this.draft && s === this.draft); }
             dur(mins) { return app.formatDuration(Math.round(mins || 0)); }
             hasPending() { return Object.values(this.timers).some(t => !!t); }
 
@@ -7087,7 +7588,7 @@
                 this.sel.year.clear(); this.sel.genre.clear();
                 this.groupFilter = 'all';
                 const gf = document.getElementById('sGroupFilter'); if (gf) gf.value = 'all';
-                document.getElementById('searchInput').value = '';
+                document.getElementById('searchInput').value = ''; document.querySelector('header').classList.remove('m-has-query');
                 this.buildFilterOptions();
                 this.closeMenu('creator');
                 this.handleFilter();
@@ -7101,7 +7602,7 @@
                 this.sel.year.clear(); this.sel.creator.clear();
                 this.groupFilter = 'all';
                 const gf = document.getElementById('sGroupFilter'); if (gf) gf.value = 'all';
-                document.getElementById('searchInput').value = '';
+                document.getElementById('searchInput').value = ''; document.querySelector('header').classList.remove('m-has-query');
                 this.buildFilterOptions();
                 this.closeMenu('genre');
                 this.handleFilter();
@@ -7113,7 +7614,8 @@
                 if (this.sel.year.size) list = list.filter(s => this.sel.year.has(s.yearStart));
                 if (this.sel.creator.size) list = list.filter(s => s.creators.some(c => this.sel.creator.has(normalizeKey(c))));
                 if (this.sel.genre.size) list = list.filter(s => genresOf(s).some(g => this.sel.genre.has(normalizeKey(g))));
-                if (q) list = list.filter(s => normalizeKey(s.title).includes(q) || normalizeKey(s.originalTitle).includes(q) || normalizeKey(s.creator).includes(q));
+                if (q) list = list.filter(s => [s.title, s.originalTitle, s.creator, s.genres, s.yearStart]
+                    .some(v => v && normalizeKey(String(v)).includes(q)));
                 this.filtered = list;
                 this.renderCatalog();
                 this.renderDashboard(list);
@@ -7232,7 +7734,7 @@
 
             // ---------------- MODAL ----------------
             openModal(id, opts = {}) {
-                const s = this.series.find(x => x.id === id);
+                const s = (this.draft && this.draft.id === id) ? this.draft : this.series.find(x => x.id === id);
                 if (!s) return;
                 this.editingId = id;
                 this.isEditing = false;
@@ -7255,7 +7757,9 @@
             closeModal() {
                 if (!this.isOpen()) return;
                 const s = this.cur();
-                if (s) {
+                if (this.isDraft(s)) {
+                    this.draft = null; // série nova nunca salva: nada foi para a nuvem
+                } else if (s) {
                     if (!s.title.trim()) {
                         // Série nova fechada sem preencher nada: remove o registro fantasma
                         this.series = this.series.filter(x => x.id !== s.id);
@@ -7578,18 +8082,17 @@
             // ---------------- CRIAR / EXCLUIR ----------------
             async addSeries() {
                 if (!this.available) { showToast('Crie a tabela "series" no Supabase primeiro (arquivo cinetracker_series_schema.sql).', 'error', 8000); return; }
-                const draft = normalizeSeriesObj({ title: '', creators: [], seasons: [] });
-                const saved = await cloud.insertSeries(draft);
-                if (!saved) return;
-                this.series.push(saved);
-                this.processData({ fetchPosters: false });
-                this.openModal(saved.id);
+                // Rascunho só neste aparelho: a série só vai para a nuvem ao tocar em Salvar
+                if (this.isOpen()) this.closeModal();
+                this.draft = deriveSeries(normalizeSeriesObj({ id: -1, title: '', creators: [], seasons: [] }));
+                this.openModal(-1);
                 this.toggleEdit(true);
             }
 
             async deleteSeries() {
                 const s = this.cur();
                 if (!s) return;
+                if (this.isDraft(s)) { this.closeModal(); return; }
                 const ok = await showConfirm(`Isso remove ${s.title ? `"${s.title}"` : 'esta série'} permanentemente, com todo o progresso de episódios. Essa ação não pode ser desfeita.`, { title: 'Excluir série?', okLabel: 'Excluir', danger: true });
                 if (!ok) return;
                 const id = s.id;
@@ -7606,6 +8109,11 @@
             }
 
             // ---------------- EDIÇÃO ----------------
+            // Botão "Cancelar" da edição: numa série nova, fecha e descarta o rascunho
+            cancelEdit() {
+                if (this.isDraft(this.cur())) { this.isEditing = false; this.closeModal(); return; }
+                this.toggleEdit(false);
+            }
             toggleEdit(on) {
                 const view = document.getElementById('sViewMode');
                 const edit = document.getElementById('sEditMode');
@@ -7663,7 +8171,7 @@
             updateCount(person) {
                 const el = document.getElementById('sfRev' + person);
                 const disp = document.getElementById('sfCnt' + person);
-                if (el && disp) disp.innerText = `${el.value.length}/200`;
+                if (el && disp) disp.innerText = `${el.value.length}/500`;
             }
 
             renderSeasonEditor() {
@@ -7858,10 +8366,12 @@
                 }
             }
 
-            saveEdits() {
+            async saveEdits() {
                 const s = this.cur();
                 if (!s) return;
                 const val = id => document.getElementById(id).value;
+                const isNew = this.isDraft(s);
+                if (isNew && !val('sfTitle').trim()) { showToast('Preencha o título da série.', 'error'); document.getElementById('sfTitle').focus(); return; }
                 const clamp = v => Math.min(10, Math.max(0, isNaN(v) ? 0 : v));
                 const wasComplete = s._m.complete;
                 const wasLocked = !wasComplete;
@@ -7887,11 +8397,28 @@
 
                 // Notas e resenhas só são gravadas se a série estava 100% assistida ao abrir a edição
                 if (!wasLocked) {
-                    const cleanText = t => t.replace(/(\r\n|\n|\r)/gm, ' ').replace(/\t/g, ' ').substring(0, 200);
+                    const cleanText = t => t.replace(/(\r\n|\n|\r)/gm, ' ').replace(/\t/g, ' ').substring(0, 500);
                     s.scIsr = clamp(parseFloat(val('sfIsrael')));
                     s.scRic = clamp(parseFloat(val('sfRicardo')));
                     s.revIsr = cleanText(val('sfRevIsrael'));
                     s.revRic = cleanText(val('sfRevRicardo'));
+                }
+
+                if (isNew) {
+                    // Só agora a série vai para a nuvem (e aparece no outro aparelho)
+                    const payload = { ...s }; delete payload.id;
+                    const saved = await cloud.insertSeries(payload);
+                    if (!saved) return; // erro já mostrado; o formulário continua aberto
+                    this.draft = null;
+                    const already = this.series.findIndex(x => x.id === saved.id);
+                    if (already >= 0) this.series[already] = saved; else this.series.push(saved);
+                    this.editingId = saved.id;
+                    this.isEditing = false;
+                    this.pendingApi = null;
+                    this.processData({ fetchPosters: true });
+                    this.openModal(saved.id);
+                    showToast(`"${saved.title}" cadastrada.`, 'success');
+                    return;
                 }
 
                 this.isEditing = false;
@@ -8263,6 +8790,7 @@
         // Fechar com ESC
         window.addEventListener('keydown', e => {
             if (e.key !== 'Escape') return;
+            if (document.querySelector('header.m-menu-open')) { closeMobileMenu(); return; }
             const recapOverlay = document.getElementById('recapOverlay');
             if (recapOverlay && recapOverlay.classList.contains('open')) { app.closeRecap(); return; }
             if (sapp.isOpen()) { sapp.closeModal(); return; }
