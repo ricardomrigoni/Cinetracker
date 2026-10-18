@@ -1059,61 +1059,155 @@
         .catalog-empty-title { font-size: 1.15rem; font-weight: 800; color: var(--text-main); }
         .catalog-empty-text { font-size: 0.9rem; color: var(--text-muted); max-width: 360px; line-height: 1.5; }
 
-        /* --- Sortear Filme: balcão de bilheteria / sorteio --- */
-        .sortear-container { padding: 24px 36px 40px 36px; max-width: 1300px; display: flex; flex-direction: column; gap: 18px; }
+        /* --- Sortear: palco com letreiro de lâmpadas + parede de cartazes --- */
+        .sortear-container { padding: 24px 36px 40px 36px; max-width: 1300px; display: flex; flex-direction: column; gap: 22px; }
 
-        .sortear-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 28px; align-items: start; }
-        .sortear-col-left { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-        .sortear-col-right { display: flex; flex-direction: column; min-width: 0; }
-
-        @media (max-width: 960px) {
-            .sortear-grid { grid-template-columns: 1fr; }
+        /* Palco: sempre escuro (é a sala de cinema), nos dois temas */
+        .dr-stage {
+            --st-bg: #1d1510; --st-ink: #f6ecd8; --st-muted: #c9b89a; --st-gold: #e0b75a;
+            position: relative; overflow: hidden;
+            display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: center;
+            padding: 30px 34px; border-radius: 22px; color: var(--st-ink);
+            background:
+                radial-gradient(ellipse 70% 90% at 18% 0%, rgba(224,183,90,0.20), transparent 62%),
+                var(--st-bg);
+            border: 1px solid rgba(224,183,90,0.25);
+            box-shadow: 0 18px 40px rgba(29,21,16,0.28);
+        }
+        .dr-marquee { position: relative; padding: 18px; border-radius: 16px; background: #2b2018; box-shadow: inset 0 0 0 1px rgba(224,183,90,0.25); }
+        .dr-bulbs { position: absolute; inset: 0; pointer-events: none; }
+        .dr-bulbs i {
+            position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%;
+            background: #ffd77a; box-shadow: 0 0 6px 1px rgba(255,200,90,0.75);
+        }
+        .dr-frame {
+            width: 190px; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: #3a2c22;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .dr-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .dr-frame-empty { font-family: 'Bebas Neue', sans-serif; font-size: 7rem; line-height: 1; color: var(--st-gold); opacity: 0.85; }
+        .dr-stage.is-rolling .dr-bulbs i { animation: drBulb 0.36s steps(1) infinite; }
+        .dr-stage.is-rolling .dr-bulbs i:nth-child(even) { animation-delay: 0.18s; }
+        @keyframes drBulb { 0% { opacity: 1; } 50% { opacity: 0.18; box-shadow: none; } }
+        .dr-stage.is-result .dr-frame { animation: drLand 0.5s cubic-bezier(.2,.8,.3,1.2); }
+        @keyframes drLand { from { transform: scale(0.94); } to { transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            .dr-stage.is-rolling .dr-bulbs i, .dr-stage.is-result .dr-frame { animation: none; }
         }
 
-        .pending-form {
-            display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
-            background: var(--bg-panel); border: 1px solid var(--border); padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow);
+        .dr-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+        .dr-eyebrow { font-size: 0.9rem; font-weight: 700; color: var(--st-gold); }
+        .dr-title {
+            font-family: 'Bebas Neue', sans-serif; font-weight: 400; color: var(--st-ink);
+            font-size: clamp(2.3rem, 4.6vw, 3.8rem); line-height: 0.95; letter-spacing: 0.01em;
+            overflow-wrap: anywhere; max-width: 18ch;
         }
-        .pending-form input[type="text"] {
-            flex: 1; min-width: 200px; background: var(--bg-input); border: 1px solid var(--border);
-            padding: 12px 16px; border-radius: 10px; color: var(--text-main); font-size: 0.95rem; font-family: inherit;
+        .dr-meta { font-size: 0.95rem; color: var(--st-muted); line-height: 1.5; min-height: 1.5em; }
+        .dr-meta b { color: var(--st-ink); font-weight: 700; }
+        .dr-pool { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+        .dr-pool-label { font-size: 0.82rem; color: var(--st-muted); margin-right: 2px; }
+        .dr-chip {
+            font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+            padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(246,236,216,0.28);
+            background: transparent; color: var(--st-ink);
         }
-        .pending-form input[type="text"]:focus { background: var(--bg-input-focus); border-color: var(--gold); box-shadow: var(--focus-ring); }
-        .pending-form select { min-width: 160px; }
+        .dr-chip span { opacity: 0.65; font-weight: 600; margin-left: 4px; }
+        .dr-chip:hover { border-color: var(--st-gold); }
+        .dr-chip.active { background: var(--st-gold); border-color: var(--st-gold); color: #1d1510; }
+        .dr-chip.active span { opacity: 0.75; }
+        .dr-chip:disabled { opacity: 0.35; cursor: default; }
+        .dr-chip:focus-visible, .dr-btn-main:focus-visible, .dr-btn-ghost:focus-visible { outline: 2px solid var(--st-gold); outline-offset: 2px; }
+        .dr-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .dr-btn-main {
+            font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 1.02rem; cursor: pointer;
+            padding: 13px 28px; border-radius: 999px; border: none;
+            background: var(--st-gold); color: #1d1510; box-shadow: 0 6px 18px rgba(224,183,90,0.28);
+        }
+        .dr-btn-main:hover { filter: brightness(1.06); }
+        .dr-btn-main:disabled { opacity: 0.55; cursor: default; }
+        .dr-btn-ghost {
+            font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer;
+            padding: 11px 18px; border-radius: 999px; background: transparent; color: var(--st-ink);
+            border: 1px solid rgba(246,236,216,0.32);
+        }
+        .dr-btn-ghost:hover { border-color: var(--st-gold); color: #fff; }
+        .dr-btn-ghost.danger:hover { border-color: #e2706e; color: #ffb3ae; }
 
-        .draw-panel {
-            background: var(--bg-panel); border: 1px dashed var(--gold); border-radius: 20px; padding: 22px 28px; box-shadow: var(--card-shadow);
-            text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
-            flex: 1;
+        /* Lista de espera */
+        .dr-list { display: flex; flex-direction: column; gap: 14px; }
+        .dr-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .dr-list-title { margin: 0; font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 2rem; letter-spacing: 0.01em; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .dr-count { font-family: 'Manrope', sans-serif; font-size: 0.85rem; font-weight: 800; background: var(--bg-input); color: var(--text-muted); border-radius: 999px; padding: 3px 10px; }
+        .dr-view { display: inline-flex; background: var(--bg-input); border-radius: 999px; padding: 3px; }
+        .dr-view button { font-family: inherit; font-size: 0.82rem; font-weight: 700; border: none; background: transparent; color: var(--text-muted); padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+        .dr-view button.active { background: var(--bg-panel); color: var(--text-main); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+        .dr-add, .dr-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .dr-add input, .dr-tools input {
+            flex: 1 1 240px; min-width: 0; background: var(--bg-input); border: 1px solid var(--border);
+            padding: 11px 14px; border-radius: 10px; color: var(--text-main); font-size: 0.95rem; font-family: inherit;
         }
-        .draw-result {
-            display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-            padding: 16px 24px 14px 24px; border-radius: 16px; background: var(--bg-secondary); min-width: 220px;
-            border: 1px solid var(--border); width: 100%; max-width: 240px;
-        }
-        .draw-poster {
-            display: none; width: 128px; height: 192px; object-fit: cover; border-radius: 10px;
-            box-shadow: 0 14px 30px rgba(0,0,0,0.32), 0 0 0 5px var(--bg-panel), 0 0 0 6px var(--gold); flex-shrink: 0;
-        }
-        .draw-text { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .draw-result .draw-eyebrow { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; }
-        .draw-result .draw-title { font-family: 'Bebas Neue', 'Manrope', sans-serif; font-size: 1.5rem; font-weight: 400; color: var(--text-main); transition: 0.08s; line-height: 1.05; }
-        .draw-result.draw-final .draw-title { color: var(--accent); }
-        .draw-actions { display: none; gap: 10px; }
+        .dr-add input:focus, .dr-tools input:focus { outline: none; background: var(--bg-input-focus); border-color: var(--gold); box-shadow: var(--focus-ring); }
+        .dr-add select { min-width: 170px; }
+        .dr-tools input { flex-basis: 200px; }
 
-        .pending-list-panel {
-            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 6px 22px; box-shadow: var(--card-shadow);
-            max-height: 640px; overflow-y: auto;
+        .dr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 18px 14px; }
+        .dr-tile { position: relative; cursor: pointer; min-width: 0; border-radius: 10px; }
+        .dr-tile:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+        .dr-tile-img { position: relative; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; background: var(--bg-input); box-shadow: 0 4px 12px rgba(0,0,0,0.14); }
+        .dr-tile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .dr-tile:hover .dr-tile-img { box-shadow: 0 0 0 2px var(--gold), 0 8px 18px rgba(0,0,0,0.2); }
+        .dr-tile.is-picked .dr-tile-img { box-shadow: 0 0 0 3px var(--accent), 0 8px 18px rgba(0,0,0,0.2); }
+        .dr-tile-title { margin-top: 8px; font-weight: 800; font-size: 0.86rem; line-height: 1.25; color: var(--text-main);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .dr-tile-sub { margin-top: 3px; font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .dr-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--gold); }
+        .dr-seen { position: absolute; left: 6px; bottom: 6px; background: rgba(29,21,16,0.86); color: #f6ecd8; font-size: 0.68rem; font-weight: 800; padding: 3px 7px; border-radius: 999px; }
+        .dr-del {
+            position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(29,21,16,0.78); color: #f6ecd8; font-size: 1.05rem; line-height: 1;
+            display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s;
         }
-        .pending-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed var(--border); gap: 10px; }
-        .pending-item:last-child { border-bottom: none; }
-        .pending-title { font-weight: 700; color: var(--text-main); }
-        .pending-by { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-        .pending-del {
-            cursor: pointer; color: var(--text-muted); font-size: 1.3rem; width: 28px; height: 28px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; line-height: 1;
+        .dr-tile:hover .dr-del, .dr-tile:focus-within .dr-del { opacity: 1; }
+        @media (hover: none) { .dr-del { opacity: 0.9; } }
+        .dr-del:hover { background: var(--score-low); }
+
+        .dr-rows { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .dr-row { display: grid; grid-template-columns: 34px 1fr auto auto; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .dr-row:last-child { border-bottom: none; }
+        .dr-row:hover { background: var(--bg-secondary); }
+        .dr-row.is-picked { background: var(--gold-soft); }
+        .dr-row img { width: 34px; height: 51px; object-fit: cover; border-radius: 4px; background: var(--bg-input); display: block; }
+        .dr-row-title { font-weight: 800; font-size: 0.93rem; color: var(--text-main); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dr-row-sub { font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .dr-row .dr-del { position: static; opacity: 1; width: 30px; height: 30px; background: transparent; color: var(--text-muted); }
+        .dr-row .dr-del:hover { background: rgba(166,39,44,0.14); color: var(--score-low); }
+        .dr-row-seen { font-size: 0.7rem; font-weight: 800; color: var(--score-high); white-space: nowrap; }
+        .dr-empty { padding: 30px 20px; text-align: center; color: var(--text-muted); background: var(--bg-panel); border: 1px dashed var(--border); border-radius: 14px; }
+        .dr-foot { display: flex; gap: 18px; justify-content: flex-end; }
+        .dr-link { font-family: inherit; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
+        .dr-link:hover { color: var(--accent); }
+        .dr-link input { display: none; }
+
+        @media (max-width: 760px) {
+            .sortear-container { gap: 18px; }
+            .dr-stage { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 26px 18px 24px; gap: 20px; }
+            .dr-info { align-items: center; }
+            .dr-title { max-width: none; font-size: clamp(2.1rem, 9vw, 2.8rem); }
+            .dr-marquee { padding: 15px; }
+            .dr-frame { width: 128px; }
+            .dr-frame-empty { font-size: 5rem; }
+            .dr-tools { flex-wrap: nowrap; }
+            .dr-tools input { flex: 1 1 0; }
+            .dr-tools select { flex: none; }
+            .dr-pool, .dr-actions { justify-content: center; }
+            .dr-btn-main { width: 100%; max-width: 320px; }
+            .dr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 10px; }
+            .dr-add select { flex: 1 1 auto; min-width: 0; }
+            .dr-add .btn { flex: none; }
+            .dr-row { grid-template-columns: 34px 1fr auto; }
+            .dr-row .dr-row-sub { display: none; }
+            .dr-foot { justify-content: center; }
         }
-        .pending-del:hover { background: rgba(166,39,44,0.15); color: var(--score-low); }
 
         .filter-badge { background: var(--accent); color: #fff8ec; border-radius: 999px; font-size: 0.66rem; font-weight: 800; padding: 1px 6px; margin-left: 6px; }
 
@@ -1232,7 +1326,7 @@
         /* "Sair": só o ícone, sem fundo, discreto no fim da linha */
         .btn.btn-quiet { background: transparent; border-color: transparent; box-shadow: none; opacity: 0.55; padding-left: 8px; padding-right: 8px; }
         .btn.btn-quiet:hover, .btn.btn-quiet:focus-visible { opacity: 1; background: var(--bg-input); }
-        @media (max-width: 1240px) {
+        @media (max-width: 1360px) {
             header { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
         }
 
@@ -1658,50 +1752,59 @@
         <div class="sortear-container">
             <div>
                 <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Sortear Filme</h3>
-                <div style="color:var(--text-muted); font-size:0.9rem;">Adicionem títulos que ainda não assistiram e sorteiem o próximo. Essa lista é independente do catálogo principal — assistir um filme sorteado não o marca automaticamente como visto.</div>
+                <div style="color:var(--text-muted); font-size:0.9rem;">A lista de espera é separada do catálogo. Quando assistirem ao sorteado, use “Assistimos” para cadastrá-lo no catálogo e tirá-lo da lista.</div>
             </div>
 
-            <div class="sortear-grid">
-                <div class="sortear-col-left">
-                    <div class="pending-form">
-                        <input type="text" id="pendingTitle" placeholder="Título do filme" onkeyup="if(event.key==='Enter') app.addPending()">
-                        <select id="pendingBy">
-                            <option value="Ambos">Sugestão de ambos</option>
-                            <option value="Israel">Sugestão de Israel</option>
-                            <option value="Ricardo">Sugestão de Ricardo</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="app.addPending()">Adicionar</button>
+            <section class="dr-stage" id="drawStage" aria-live="polite">
+                <div class="dr-marquee" id="drawMarquee">
+                    <div class="dr-bulbs" aria-hidden="true"></div>
+                    <div class="dr-frame" id="drawFrame"><div class="dr-frame-empty">?</div></div>
+                </div>
+                <div class="dr-info">
+                    <div class="dr-eyebrow" id="drawEyebrow">Pronto para sortear</div>
+                    <div class="dr-title" id="drawTitle">Qual vai ser o próximo?</div>
+                    <div class="dr-meta" id="drawMeta"></div>
+                    <div class="dr-pool" id="drawPool" role="group" aria-label="Sortear entre"></div>
+                    <div class="dr-actions" id="drawActions">
+                        <button type="button" class="dr-btn-main" id="drawBtn" onclick="app.drawRandom()">🎲 Sortear</button>
                     </div>
+                </div>
+            </section>
 
-                    <div class="draw-panel">
-                        <button class="btn btn-primary" id="drawBtn" style="padding:13px 34px; font-size:0.95rem;" onclick="app.drawRandom()">🎲 Sortear Filme</button>
-                        <div class="draw-result" id="drawResult">
-                            <img class="draw-poster" id="drawPoster" alt="Capa do sorteado">
-                            <div class="draw-text">
-                                <div class="draw-eyebrow">O sorteado é...</div>
-                                <div class="draw-title">-</div>
-                            </div>
-                        </div>
-                        <div class="draw-actions" id="drawActions">
-                            <button class="btn" onclick="app.removeDrawn()">Remover da lista (já assistido)</button>
-                        </div>
+            <section class="dr-list">
+                <div class="dr-list-head">
+                    <h4 class="dr-list-title">Lista de espera <span class="dr-count" id="pendingCount">0</span></h4>
+                    <div class="dr-view" role="group" aria-label="Modo de exibição">
+                        <button type="button" id="pendingViewGrid" class="active" onclick="app.setPendingView('grid')">Cartazes</button>
+                        <button type="button" id="pendingViewList" onclick="app.setPendingView('list')">Lista</button>
                     </div>
                 </div>
 
-                <div class="sortear-col-right">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-                        <h4 style="margin:0; font-weight:700; color:var(--text-main);">Lista de espera (<span id="pendingCount">0</span>)</h4>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn" onclick="app.exportPending()" style="font-size:0.8rem; padding:8px 14px;">Exportar lista</button>
-                            <label class="btn" style="font-size:0.8rem; padding:8px 14px;">
-                                Importar lista
-                                <input type="file" id="pendingFileInput" accept=".txt">
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pending-list-panel" id="pendingList"></div>
+                <div class="dr-add">
+                    <input type="text" id="pendingTitle" placeholder="Adicionar filme à lista…" onkeyup="if(event.key==='Enter') app.addPending()" aria-label="Título do filme">
+                    <select id="pendingBy" aria-label="Quem sugeriu">
+                        <option value="Ambos">Sugestão de ambos</option>
+                        <option value="Israel">Sugestão de Israel</option>
+                        <option value="Ricardo">Sugestão de Ricardo</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="app.addPending()">Adicionar</button>
                 </div>
-            </div>
+
+                <div class="dr-tools">
+                    <input type="search" id="pendingSearch" placeholder="Procurar na lista" oninput="app.handlePendingSearch(this.value)" aria-label="Procurar na lista">
+                    <select id="pendingSort" onchange="app.handlePendingSort(this.value)" aria-label="Ordenar lista">
+                        <option value="az">A–Z</option>
+                        <option value="recent">Adicionados por último</option>
+                    </select>
+                </div>
+
+                <div id="pendingList"></div>
+
+                <div class="dr-foot">
+                    <button type="button" class="dr-link" onclick="app.exportPending()">Exportar lista</button>
+                    <label class="dr-link">Importar lista<input type="file" id="pendingFileInput" accept=".txt"></label>
+                </div>
+            </section>
         </div>
     </div>
     <!-- /tab-sortear -->
@@ -1850,31 +1953,38 @@
         <div class="sortear-container">
             <div>
                 <h3 style="font-size:1.5rem; font-weight:700; margin:0 0 6px 0; color:var(--text-main);">Sortear Série</h3>
-                <div style="color:var(--text-muted); font-size:0.9rem;">A fila é formada automaticamente pelas séries ainda não iniciadas do catálogo. Ao começar a assistir (marcando um episódio), a série sai da fila.</div>
+                <div style="color:var(--text-muted); font-size:0.9rem;">A fila é formada sozinha pelas séries do catálogo que vocês ainda não começaram. Ao marcar o primeiro episódio, a série sai da fila.</div>
             </div>
-            <div class="sortear-grid">
-                <div class="sortear-col-left">
-                    <div class="draw-panel">
-                        <button class="btn btn-primary" id="sDrawBtn" style="padding:13px 34px; font-size:0.95rem;" onclick="sapp.drawRandom()">🎲 Sortear Série</button>
-                        <div class="draw-result" id="sDrawResult">
-                            <img class="draw-poster" id="sDrawPoster" alt="Capa da sorteada">
-                            <div class="draw-text">
-                                <div class="draw-eyebrow">A sorteada é...</div>
-                                <div class="draw-title">-</div>
-                            </div>
-                        </div>
-                        <div class="draw-actions" id="sDrawActions">
-                            <button class="btn btn-primary" onclick="sapp.openDrawn()">Abrir série</button>
-                        </div>
+
+            <section class="dr-stage" id="sDrawStage" aria-live="polite">
+                <div class="dr-marquee" id="sDrawMarquee">
+                    <div class="dr-bulbs" aria-hidden="true"></div>
+                    <div class="dr-frame" id="sDrawFrame"><div class="dr-frame-empty">?</div></div>
+                </div>
+                <div class="dr-info">
+                    <div class="dr-eyebrow" id="sDrawEyebrow">Pronto para sortear</div>
+                    <div class="dr-title" id="sDrawTitle">Qual vai ser a próxima?</div>
+                    <div class="dr-meta" id="sDrawMeta"></div>
+                    <div class="dr-pool" id="sDrawPool"></div>
+                    <div class="dr-actions" id="sDrawActions">
+                        <button type="button" class="dr-btn-main" id="sDrawBtn" onclick="sapp.drawRandom()">🎲 Sortear</button>
                     </div>
                 </div>
-                <div class="sortear-col-right">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
-                        <h4 style="margin:0; font-weight:700; color:var(--text-main);">Fila de espera (<span id="sPendingCount">0</span>)</h4>
+            </section>
+
+            <section class="dr-list">
+                <div class="dr-list-head">
+                    <h4 class="dr-list-title">Fila de espera <span class="dr-count" id="sPendingCount">0</span></h4>
+                    <div class="dr-view" role="group" aria-label="Modo de exibição">
+                        <button type="button" id="sPendingViewGrid" class="active" onclick="sapp.setQueueView('grid')">Cartazes</button>
+                        <button type="button" id="sPendingViewList" onclick="sapp.setQueueView('list')">Lista</button>
                     </div>
-                    <div class="pending-list-panel" id="sPendingList"></div>
                 </div>
-            </div>
+                <div class="dr-tools">
+                    <input type="search" id="sPendingSearch" placeholder="Procurar na fila" oninput="sapp.handleQueueSearch(this.value)" aria-label="Procurar na fila">
+                </div>
+                <div id="sPendingList"></div>
+            </section>
         </div>
     </div>
     <!-- /tab-s-sortear -->
@@ -3432,6 +3542,25 @@
         // listener, que fica no document) e também ao girar/redimensionar a tela.
         document.addEventListener('click', () => requestAnimationFrame(fitOpenMenus));
         window.addEventListener('resize', fitOpenMenus);
+
+        // Capas da lista de espera do sorteio, guardadas neste aparelho: { tituloNormalizado: { p, y, o } }
+        function loadPendingPosterCache() {
+            try { return JSON.parse(localStorage.getItem('cinetracker_pending_posters_v1') || '{}') || {}; } catch (e) { return {}; }
+        }
+        function savePendingPosterCache(cache) {
+            try { localStorage.setItem('cinetracker_pending_posters_v1', JSON.stringify(cache)); } catch (e) {}
+        }
+        // Lâmpadas em volta do cartaz no palco do sorteio (posições em %, acompanham o tamanho)
+        function buildMarqueeBulbs(el) {
+            if (!el || el.childElementCount) return;
+            const at = (x, y) => `<i style="left:${x}; top:${y}"></i>`;
+            const pos = (n, k) => `calc(9px + (100% - 18px) * ${k / (n - 1)})`;
+            let html = '';
+            const H = 8, V = 11;
+            for (let k = 0; k < H; k++) html += at(pos(H, k), '9px') + at(pos(H, k), 'calc(100% - 9px)');
+            for (let k = 1; k < V - 1; k++) html += at('9px', pos(V, k)) + at('calc(100% - 9px)', pos(V, k));
+            el.innerHTML = html;
+        }
 
         function compareInsertion(a, b) {
             const ca = a.createdAt || '', cb = b.createdAt || '';
@@ -5446,6 +5575,15 @@
                 this.processData();
                 this.openModal(m.id);
                 cloud.upsertMovie(m); // salva na nuvem em segundo plano
+
+                // Cadastro aberto pelo "Assistimos" do sorteio: o filme sai da lista de espera
+                if (this._pendingLink && this._pendingLink.movieId === m.id && (m.title || '').trim()) {
+                    const link = this._pendingLink; this._pendingLink = null;
+                    if (this.pending.some(p => p.id === link.pendingId)) {
+                        this.deletePending(link.pendingId);
+                        showToast(`“${link.title}” foi cadastrado e saiu da lista de espera.`, 'success');
+                    }
+                }
             }
 
             closeModal() {
@@ -5463,6 +5601,8 @@
                 this.teardownFocusTrap();
                 document.getElementById('modalOverlay').style.display = 'none';
                 document.body.style.overflow = 'auto'; // Destrava scroll
+                // Fechou sem salvar o cadastro vindo do sorteio: o filme continua na lista
+                if (this._pendingLink && this._pendingLink.movieId === this.editingId) this._pendingLink = null;
                 this.editingId = null;
             }
 
@@ -6398,115 +6538,286 @@
                 if (!saved) return; // erro já mostrado pelo cloud.insertPending
                 this.pending.push(saved);
                 this.renderPending();
-                this.resetDraw();
             }
 
             deletePending(id) {
                 this.pending = this.pending.filter(p => p.id !== id);
+                const st = this.pendingState();
+                if (st.current === id) { st.current = null; st.source = null; }
                 this.renderPending();
                 cloud.deletePending(id);
             }
 
+            // ---------- Sorteio: estado, capas e parede de cartazes ----------
+            pendingState() {
+                if (!this._dr) {
+                    let view = 'grid';
+                    try { view = localStorage.getItem('cinetracker_pending_view') === 'list' ? 'list' : 'grid'; } catch (e) {}
+                    this._dr = { pool: 'all', search: '', sort: 'az', view, current: null, source: null, posters: loadPendingPosterCache(), inFlight: new Set() };
+                }
+                return this._dr;
+            }
+            pendingKey(p) { return normalizeKey(p.title); }
+            pendingInfo(p) { return this.pendingState().posters[this.pendingKey(p)] || null; }
+            pendingPoster(p, size = 'w342') {
+                const e = this.pendingInfo(p);
+                return e && e.p ? `https://image.tmdb.org/t/p/${size}${e.p}` : placeholderPoster(p.title);
+            }
+            // Filmes que já estão no catálogo (pelo título ou título original): ajudam a limpar a lista
+            seenKeys() {
+                const set = new Set();
+                this.movies.forEach(m => { if (m.title) set.add(normalizeKey(m.title)); if (m.originalTitle) set.add(normalizeKey(m.originalTitle)); });
+                return set;
+            }
+            isPendingSeen(p, seen) {
+                const e = this.pendingInfo(p);
+                return seen.has(this.pendingKey(p)) || !!(e && e.o && seen.has(normalizeKey(e.o)));
+            }
+            byInfo(by) {
+                if (by === 'Israel') return { label: 'Israel', color: 'var(--color-israel)' };
+                if (by === 'Ricardo') return { label: 'Ricardo', color: 'var(--color-ricardo)' };
+                return { label: 'Ambos', color: 'var(--gold)' };
+            }
+            pendingPool() {
+                const pool = this.pendingState().pool;
+                return pool === 'all' ? this.pending.slice() : this.pending.filter(p => (p.by || 'Ambos') === pool);
+            }
+
+            setPendingView(v) {
+                const st = this.pendingState(); st.view = v === 'list' ? 'list' : 'grid';
+                try { localStorage.setItem('cinetracker_pending_view', st.view); } catch (e) {}
+                this.renderPending();
+            }
+            handlePendingSearch(v) { this.pendingState().search = v || ''; this.renderPendingList(); }
+            handlePendingSort(v) { this.pendingState().sort = v === 'recent' ? 'recent' : 'az'; this.renderPendingList(); }
+            setDrawPool(pool) {
+                const st = this.pendingState(); st.pool = pool;
+                if (st.current && !this.pendingPool().some(p => p.id === st.current)) { st.current = null; st.source = null; }
+                this.renderPending();
+            }
+
             renderPending() {
                 const wrap = document.getElementById('pendingList');
-                const countEl = document.getElementById('pendingCount');
                 if (!wrap) return;
+                const st = this.pendingState();
+                if (st.current && !this.pending.some(p => p.id === st.current)) { st.current = null; st.source = null; }
+                const countEl = document.getElementById('pendingCount');
                 if (countEl) countEl.innerText = this.pending.length;
+                document.getElementById('pendingViewGrid')?.classList.toggle('active', st.view === 'grid');
+                document.getElementById('pendingViewList')?.classList.toggle('active', st.view === 'list');
+                this.renderDrawPool();
+                if (!this._rolling) this.renderDrawStage();
+                this.renderPendingList();
+                this.fetchPendingPosters();
+            }
 
+            renderDrawPool() {
+                const el = document.getElementById('drawPool');
+                if (!el) return;
+                const st = this.pendingState();
+                const n = by => this.pending.filter(p => (p.by || 'Ambos') === by).length;
+                const chips = [['all', 'Todos', this.pending.length], ['Israel', 'Israel', n('Israel')], ['Ricardo', 'Ricardo', n('Ricardo')], ['Ambos', 'Ambos', n('Ambos')]];
+                el.innerHTML = `<span class="dr-pool-label">Sortear entre</span>` + chips.map(([k, label, c]) =>
+                    `<button type="button" class="dr-chip ${st.pool === k ? 'active' : ''}" ${c === 0 && k !== 'all' ? 'disabled' : ''} aria-pressed="${st.pool === k}" onclick="app.setDrawPool('${k}')">${label}<span>${c}</span></button>`).join('');
+            }
+
+            renderPendingList() {
+                const wrap = document.getElementById('pendingList');
+                if (!wrap) return;
+                const st = this.pendingState();
                 if (!this.pending.length) {
-                    wrap.innerHTML = '<div class="empty-hint">Nenhum filme na lista ainda. Adicione títulos acima para sortear depois.</div>';
+                    wrap.innerHTML = '<div class="dr-empty">A lista está vazia. Adicione acima os filmes que vocês querem ver.</div>';
                     return;
                 }
-                const sorted = [...this.pending].sort((a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' }));
-                wrap.innerHTML = sorted.map(p => `
-                    <div class="pending-item">
-                        <div>
-                            <div class="pending-title">${escapeHtml(p.title)}</div>
-                            <div class="pending-by" style="${p.by === 'Israel' ? 'color:var(--color-israel)' : p.by === 'Ricardo' ? 'color:var(--color-ricardo)' : ''}">${p.by && p.by !== 'Ambos' ? 'Sugestão de ' + escapeHtml(p.by) : 'Sugestão de ambos'}</div>
-                        </div>
-                        <div class="pending-del" onclick="app.deletePending(${p.id})" title="Remover">×</div>
-                    </div>
-                `).join('');
-            }
-
-            resetDraw() {
-                const resultEl = document.getElementById('drawResult');
-                const actionsEl = document.getElementById('drawActions');
-                const posterEl = document.getElementById('drawPoster');
-                if (resultEl) { resultEl.style.display = 'none'; resultEl.classList.remove('draw-final'); }
-                if (actionsEl) actionsEl.style.display = 'none';
-                if (posterEl) { posterEl.style.display = 'none'; posterEl.src = ''; }
-                this.lastDrawnId = null;
-                this.drawRequestId++; // invalida qualquer busca de capa ainda em andamento
-            }
-
-            drawRandom() {
-                if (!this.pending.length) {
-                    alert('Adicione pelo menos um filme à lista antes de sortear.');
+                const q = normalizeKey(st.search);
+                let list = this.pendingPool();
+                if (q) list = list.filter(p => this.pendingKey(p).includes(q));
+                list.sort(st.sort === 'recent'
+                    ? (a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)
+                    : (a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' }));
+                if (!list.length) {
+                    wrap.innerHTML = `<div class="dr-empty">Nenhum filme encontrado${q ? ` para “${escapeHtml(st.search)}”` : ' neste filtro'}.</div>`;
                     return;
                 }
-                const resultEl = document.getElementById('drawResult');
-                const actionsEl = document.getElementById('drawActions');
-                const posterEl = document.getElementById('drawPoster');
-                const btn = document.getElementById('drawBtn');
-                const titleEl = resultEl.querySelector('.draw-title');
-
-                this.drawRequestId++;
-                const requestId = this.drawRequestId;
-
-                btn.disabled = true;
-                actionsEl.style.display = 'none';
-                resultEl.classList.remove('draw-final');
-                resultEl.style.display = 'flex';
-                if (posterEl) { posterEl.style.display = 'none'; posterEl.src = ''; }
-
-                let ticks = 0;
-                const maxTicks = 16 + Math.floor(Math.random() * 8);
-                const interval = setInterval(() => {
-                    const r = this.pending[Math.floor(Math.random() * this.pending.length)];
-                    titleEl.innerText = r.title;
-                    ticks++;
-                    if (ticks >= maxTicks) {
-                        clearInterval(interval);
-                        const winner = this.pending[Math.floor(Math.random() * this.pending.length)];
-                        this.lastDrawnId = winner.id;
-                        titleEl.innerText = winner.title;
-                        resultEl.classList.add('draw-final');
-                        actionsEl.style.display = 'flex';
-                        btn.disabled = false;
-                        // Busca a capa apenas do filme sorteado (não da lista inteira)
-                        this.fetchDrawPoster(winner.title, requestId);
-                    }
-                }, 90);
+                const seen = this.seenKeys();
+                const year = p => { const e = this.pendingInfo(p); return e && e.y ? e.y : ''; };
+                if (st.view === 'list') {
+                    wrap.innerHTML = `<div class="dr-rows">${list.map(p => {
+                        const b = this.byInfo(p.by); const isSeen = this.isPendingSeen(p, seen);
+                        return `
+                        <div class="dr-row ${st.current === p.id ? 'is-picked' : ''}" data-pkey="${escapeHtml(this.pendingKey(p))}" tabindex="0" role="button" onclick="app.pickPending(${p.id})" onkeydown="if(event.key==='Enter') app.pickPending(${p.id})">
+                            <img src="${this.pendingPoster(p, 'w92')}" alt="" loading="lazy">
+                            <div style="min-width:0;">
+                                <div class="dr-row-title">${escapeHtml(p.title)}${year(p) ? ` <span style="color:var(--text-muted); font-weight:600;">(${year(p)})</span>` : ''}</div>
+                                ${isSeen ? '<div class="dr-row-seen">✓ já está no catálogo</div>' : ''}
+                            </div>
+                            <div class="dr-row-sub"><span class="dr-dot" style="background:${b.color}"></span>${b.label}</div>
+                            <button type="button" class="dr-del" onclick="event.stopPropagation(); app.deletePending(${p.id})" aria-label="Remover ${escapeHtml(p.title)} da lista" title="Remover da lista">×</button>
+                        </div>`; }).join('')}</div>`;
+                } else {
+                    wrap.innerHTML = `<div class="dr-grid">${list.map(p => {
+                        const b = this.byInfo(p.by); const isSeen = this.isPendingSeen(p, seen);
+                        return `
+                        <div class="dr-tile ${st.current === p.id ? 'is-picked' : ''}" data-pkey="${escapeHtml(this.pendingKey(p))}" tabindex="0" role="button" onclick="app.pickPending(${p.id})" onkeydown="if(event.key==='Enter') app.pickPending(${p.id})" title="${escapeHtml(p.title)}">
+                            <div class="dr-tile-img">
+                                <img src="${this.pendingPoster(p)}" alt="" loading="lazy">
+                                ${isSeen ? '<span class="dr-seen">✓ já assistido</span>' : ''}
+                                <button type="button" class="dr-del" onclick="event.stopPropagation(); app.deletePending(${p.id})" aria-label="Remover ${escapeHtml(p.title)} da lista" title="Remover da lista">×</button>
+                            </div>
+                            <div class="dr-tile-title">${escapeHtml(p.title)}</div>
+                            <div class="dr-tile-sub"><span class="dr-dot" style="background:${b.color}"></span>${b.label}${year(p) ? `, ${year(p)}` : ''}</div>
+                        </div>`; }).join('')}</div>`;
+                }
             }
 
-            // Busca a capa do filme sorteado, para exibir ao lado do resultado.
-            // requestId evita que um sorteio antigo (ainda buscando na API) sobrescreva
-            // a capa de um sorteio mais recente.
-            async fetchDrawPoster(title, requestId) {
-                const posterEl = document.getElementById('drawPoster');
-                if (!posterEl) return;
-                try {
-                    const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(title)}&language=pt-BR`;
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    if (requestId !== this.drawRequestId) return; // resultado desatualizado
-                    if (data.results && data.results.length && data.results[0].poster_path) {
-                        posterEl.src = `https://image.tmdb.org/t/p/w185${data.results[0].poster_path}`;
-                        posterEl.style.display = 'block';
-                    } else {
-                        posterEl.style.display = 'none';
-                        posterEl.src = '';
-                    }
-                } catch(e) {
-                    posterEl.style.display = 'none';
+            // Palco: estado vazio, resultado do sorteio ou filme escolhido na lista
+            renderDrawStage() {
+                const stage = document.getElementById('drawStage');
+                if (!stage) return;
+                buildMarqueeBulbs(document.querySelector('#drawMarquee .dr-bulbs'));
+                const st = this.pendingState();
+                const p = st.current != null ? this.pending.find(x => x.id === st.current) : null;
+                const frame = document.getElementById('drawFrame');
+                const eyebrow = document.getElementById('drawEyebrow');
+                const title = document.getElementById('drawTitle');
+                const meta = document.getElementById('drawMeta');
+                const actions = document.getElementById('drawActions');
+                stage.classList.remove('is-rolling');
+                const pool = this.pendingPool();
+                const poolTxt = st.pool === 'all'
+                    ? `${pool.length} ${pool.length === 1 ? 'filme' : 'filmes'} na lista`
+                    : `${pool.length} ${pool.length === 1 ? 'sugestão' : 'sugestões'} ${st.pool === 'Ambos' ? 'de ambos' : 'de ' + st.pool}`;
+                if (!p) {
+                    stage.classList.remove('is-result');
+                    frame.innerHTML = '<div class="dr-frame-empty">?</div>';
+                    eyebrow.textContent = 'Pronto para sortear';
+                    title.textContent = this.pending.length ? 'Qual vai ser o próximo?' : 'A lista está vazia';
+                    meta.textContent = this.pending.length ? `Sorteio entre ${poolTxt}.` : 'Adicione filmes à lista de espera para sortear.';
+                    actions.innerHTML = `<button type="button" class="dr-btn-main" id="drawBtn" onclick="app.drawRandom()" ${pool.length ? '' : 'disabled'}>🎲 Sortear</button>`;
+                    return;
                 }
+                const e = this.pendingInfo(p);
+                const b = this.byInfo(p.by);
+                const isSeen = this.isPendingSeen(p, this.seenKeys());
+                frame.innerHTML = `<img src="${this.pendingPoster(p)}" alt="Cartaz de ${escapeHtml(p.title)}">`;
+                eyebrow.textContent = st.source === 'escolha' ? 'Escolhido da lista' : 'Hoje na tela';
+                title.textContent = p.title;
+                const bits = [];
+                if (e && e.y) bits.push(e.y);
+                if (e && e.o && normalizeKey(e.o) !== this.pendingKey(p)) bits.push(`<i>${escapeHtml(e.o)}</i>`);
+                meta.innerHTML = `${bits.length ? bits.join(', ') + '<br>' : ''}Sugestão de <b style="color:${b.color === 'var(--gold)' ? 'var(--st-gold)' : b.color}">${b.label === 'Ambos' ? 'ambos' : b.label}</b>${isSeen ? '<br>Já está no catálogo de vocês.' : ''}`;
+                actions.innerHTML = `
+                    <button type="button" class="dr-btn-main" id="drawBtn" onclick="app.drawRandom(true)" ${pool.length > 1 ? '' : 'disabled'}>🎲 ${st.source === 'escolha' ? 'Sortear' : 'Sortear outro'}</button>
+                    ${isSeen ? '' : `<button type="button" class="dr-btn-ghost" onclick="app.watchPicked()">🍿 Assistimos: cadastrar</button>`}
+                    <button type="button" class="dr-btn-ghost danger" onclick="app.removeDrawn()">Remover da lista</button>`;
+                stage.classList.add('is-result');
+            }
+
+            pickPending(id) {
+                if (this._rolling) return;
+                const st = this.pendingState();
+                st.current = id; st.source = 'escolha';
+                this.renderDrawStage();
+                this.renderPendingList();
+                document.getElementById('drawStage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // Sorteio com "roleta": os cartazes passam pela moldura cada vez mais devagar
+            // até parar no sorteado. exclude=true evita repetir o que está no palco.
+            drawRandom(exclude = false) {
+                if (this._rolling) return;
+                const st = this.pendingState();
+                let pool = this.pendingPool();
+                if (!pool.length) { showToast('Adicione pelo menos um filme à lista antes de sortear.', 'info'); return; }
+                if (exclude && st.current != null && pool.length > 1) pool = pool.filter(p => p.id !== st.current);
+                const winner = pool[Math.floor(Math.random() * pool.length)];
+                const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const finish = () => {
+                    this._rolling = false;
+                    st.current = winner.id; st.source = 'sorteio';
+                    this.renderDrawStage();
+                    this.renderPendingList();
+                };
+                if (reduce || pool.length === 1) { finish(); return; }
+
+                this._rolling = true;
+                const stage = document.getElementById('drawStage');
+                const frame = document.getElementById('drawFrame');
+                const title = document.getElementById('drawTitle');
+                stage.classList.remove('is-result'); stage.classList.add('is-rolling');
+                document.getElementById('drawEyebrow').textContent = 'Sorteando…';
+                document.getElementById('drawMeta').textContent = '';
+                document.querySelectorAll('#drawActions button').forEach(b => b.disabled = true);
+                frame.innerHTML = '<img alt="">';
+                const img = frame.querySelector('img');
+                const reqId = ++this.drawRequestId;
+                const TICKS = 22;
+                let last = null, i = 0;
+                const tick = () => {
+                    if (reqId !== this.drawRequestId) return;
+                    i++;
+                    let p;
+                    if (i >= TICKS) p = winner;
+                    else { do { p = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && p === last); }
+                    last = p;
+                    img.src = this.pendingPoster(p);
+                    title.textContent = p.title;
+                    if (i >= TICKS) { setTimeout(finish, 350); return; }
+                    const t = i / TICKS;
+                    setTimeout(tick, 55 + t * t * 300);
+                };
+                tick();
             }
 
             removeDrawn() {
-                if (this.lastDrawnId == null) return;
-                this.deletePending(this.lastDrawnId);
-                this.resetDraw();
+                const st = this.pendingState();
+                if (st.current == null) return;
+                this.deletePending(st.current);
+            }
+
+            // "Assistimos": abre o formulário de filme novo já preenchido com o sorteado e
+            // tira o filme da lista de espera quando o cadastro for salvo.
+            async watchPicked() {
+                const st = this.pendingState();
+                const p = this.pending.find(x => x.id === st.current);
+                if (!p) return;
+                const e = this.pendingInfo(p);
+                await this.addMovie();
+                if (this.editingId == null) return;
+                this._pendingLink = { movieId: this.editingId, pendingId: p.id, title: p.title };
+                const t = document.getElementById('eTitle');
+                if (t) t.value = p.title;
+                if (e && e.o) { const o = document.getElementById('eOriginalTitle'); if (o) o.value = e.o; }
+                if (e && e.y) { const y = document.getElementById('eYear'); if (y) y.value = e.y; }
+                this.fetchMetadata();
+            }
+
+            // Capas da lista de espera: buscadas no TMDB uma vez e guardadas neste
+            // aparelho (a lista na nuvem guarda só título e quem sugeriu).
+            async fetchPendingPosters() {
+                const st = this.pendingState();
+                const todo = this.pending.filter(p => !st.posters[this.pendingKey(p)] && !st.inFlight.has(this.pendingKey(p)));
+                if (!todo.length) return;
+                todo.forEach(p => st.inFlight.add(this.pendingKey(p)));
+                for (let i = 0; i < todo.length; i += 4) {
+                    const batch = todo.slice(i, i + 4);
+                    await Promise.all(batch.map(async p => {
+                        const key = this.pendingKey(p);
+                        try {
+                            const { bestMatch, hadNetworkError } = await searchMovieBestMatch(p.title, '', '');
+                            if (hadNetworkError && !bestMatch) return; // tenta de novo numa próxima vez
+                            st.posters[key] = bestMatch
+                                ? { p: bestMatch.poster_path || '', y: (bestMatch.release_date || '').slice(0, 4), o: bestMatch.original_title || '' }
+                                : { p: '', y: '', o: '' };
+                            const url = this.pendingPoster(p);
+                            document.querySelectorAll(`[data-pkey="${CSS.escape(key)}"] img`).forEach(im => { im.src = im.closest('.dr-row') ? this.pendingPoster(p, 'w92') : url; });
+                            if (st.current === p.id && !this._rolling) this.renderDrawStage();
+                        } finally { st.inFlight.delete(key); }
+                    }));
+                    savePendingPosterCache(st.posters);
+                    if (i + 4 < todo.length) await new Promise(r => setTimeout(r, 300));
+                }
+                this.renderPendingList();
             }
 
             exportPending() {
@@ -6522,11 +6833,13 @@
                 a.click();
             }
 
+            // Importa uma lista exportada antes (.txt). Antes isso só mudava a tela deste
+            // aparelho; agora substitui a lista na nuvem, depois de confirmar.
             loadPendingFile(e) {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = ev => {
+                reader.onload = async ev => {
                     const lines = ev.target.result.split('\n');
                     // Detecta o separador: ";" é o novo padrão, mas arquivos antigos usavam TAB.
                     const delimiter = (lines[0] || '').includes('\t') ? '\t' : ';';
@@ -6535,13 +6848,21 @@
                         const line = lines[i].trim();
                         if (!line) continue;
                         const c = line.split(delimiter);
-                        if (!c[0]) continue;
+                        if (!c[0] || !c[0].trim()) continue;
                         imported.push({ id: i, title: c[0].trim(), by: (c[1] || 'Ambos').trim() });
                     }
-                    this.pending = imported;
-                    this.savePendingStorage();
+                    if (!imported.length) { showToast('O arquivo não tem nenhum filme.', 'error'); return; }
+                    const ok = await showConfirm(
+                        `Isso substitui a lista de espera inteira (${this.pending.length} filmes hoje) pelos ${imported.length} filmes do arquivo, nos dois aparelhos.`,
+                        { title: 'Substituir a lista de espera?', okLabel: 'Substituir', danger: true }
+                    );
+                    if (!ok) return;
+                    const saved = await cloud.replaceAllPending(imported);
+                    if (!saved) return;
+                    this.pending = saved;
+                    this.pendingState().current = null;
                     this.renderPending();
-                    this.resetDraw();
+                    showToast(`${saved.length} filmes importados para a lista de espera.`, 'success');
                 };
                 reader.readAsText(file);
                 e.target.value = '';
@@ -7774,54 +8095,144 @@
             // ---------------- SORTEAR SÉRIE ----------------
             queue() { return this.series.filter(s => s._m.group === 'nao_iniciadas').sort((a, b) => a.title.localeCompare(b.title, 'pt-BR', { sensitivity: 'base' })); }
 
-            renderSortear() {
-                const wrap = document.getElementById('sPendingList');
-                const cnt = document.getElementById('sPendingCount');
-                if (!wrap) return;
-                const q = this.queue();
-                if (cnt) cnt.innerText = q.length;
-                if (!q.length) { wrap.innerHTML = '<div class="empty-hint">Nenhuma série na fila. Cadastre séries pelo botão “Novo” — as que ainda não foram iniciadas aparecem aqui.</div>'; return; }
-                wrap.innerHTML = q.map(s => `
-                    <div class="pending-item" style="cursor:pointer;" onclick="sapp.openModal(${s.id})">
-                        <div>
-                            <div class="pending-title">${escapeHtml(s.title)}${s.yearStart ? ` <span class="rank-item-count">(${escapeHtml(s.yearStart)})</span>` : ''}</div>
-                            <div class="pending-by">${s.seasons.length ? `${s.seasons.length} temporada${s.seasons.length !== 1 ? 's' : ''} · ${this.dur(s._m.totalMin)}` : 'Sem temporadas registradas'}${s.creator ? ' · ' + escapeHtml(s.creator) : ''}</div>
-                        </div>
-                    </div>`).join('');
+            queueState() {
+                if (!this._dq) {
+                    let view = 'grid';
+                    try { view = localStorage.getItem('cinetracker_squeue_view') === 'list' ? 'list' : 'grid'; } catch (e) {}
+                    this._dq = { search: '', view, current: null, source: null };
+                }
+                return this._dq;
+            }
+            setQueueView(v) {
+                const st = this.queueState(); st.view = v === 'list' ? 'list' : 'grid';
+                try { localStorage.setItem('cinetracker_squeue_view', st.view); } catch (e) {}
+                this.renderSortear();
+            }
+            handleQueueSearch(v) { this.queueState().search = v || ''; this.renderQueueList(); }
+            seriesMeta(s) {
+                const bits = [];
+                if (s.yearStart) bits.push(escapeHtml(seriesYearsLabel(s, true) || s.yearStart));
+                if (s.seasons.length) bits.push(`${s.seasons.length} temporada${s.seasons.length !== 1 ? 's' : ''}`);
+                if (s._m && s._m.totalMin) bits.push(this.dur(s._m.totalMin));
+                return bits.join(', ');
             }
 
-            drawRandom() {
+            renderSortear() {
+                const wrap = document.getElementById('sPendingList');
+                if (!wrap) return;
+                const st = this.queueState();
                 const q = this.queue();
-                if (!q.length) { showToast('Não há séries na fila para sortear.', 'info'); return; }
-                const resultEl = document.getElementById('sDrawResult');
-                const actionsEl = document.getElementById('sDrawActions');
-                const posterEl = document.getElementById('sDrawPoster');
-                const btn = document.getElementById('sDrawBtn');
-                const titleEl = resultEl.querySelector('.draw-title');
-                btn.disabled = true;
-                actionsEl.style.display = 'none';
-                resultEl.classList.remove('draw-final');
-                resultEl.style.display = 'flex';
-                posterEl.style.display = 'none'; posterEl.src = '';
-                let ticks = 0;
-                const maxTicks = 16 + Math.floor(Math.random() * 8);
-                const interval = setInterval(() => {
-                    titleEl.innerText = q[Math.floor(Math.random() * q.length)].title;
-                    ticks++;
-                    if (ticks >= maxTicks) {
-                        clearInterval(interval);
-                        const winner = q[Math.floor(Math.random() * q.length)];
-                        this.lastDrawnId = winner.id;
-                        titleEl.innerText = winner.title;
-                        resultEl.classList.add('draw-final');
-                        actionsEl.style.display = 'flex';
-                        btn.disabled = false;
-                        posterEl.src = winner.poster || placeholderPoster(winner.title);
-                        posterEl.style.display = 'block';
-                    }
-                }, 90);
+                if (st.current != null && !q.some(s => s.id === st.current)) { st.current = null; st.source = null; }
+                const cnt = document.getElementById('sPendingCount');
+                if (cnt) cnt.innerText = q.length;
+                document.getElementById('sPendingViewGrid')?.classList.toggle('active', st.view === 'grid');
+                document.getElementById('sPendingViewList')?.classList.toggle('active', st.view === 'list');
+                if (!this._rolling) this.renderDrawStage();
+                this.renderQueueList();
             }
-            openDrawn() { if (this.lastDrawnId != null) this.openModal(this.lastDrawnId); }
+
+            renderQueueList() {
+                const wrap = document.getElementById('sPendingList');
+                if (!wrap) return;
+                const st = this.queueState();
+                const all = this.queue();
+                if (!all.length) { wrap.innerHTML = '<div class="dr-empty">Nenhuma série na fila. As séries cadastradas que vocês ainda não começaram aparecem aqui.</div>'; return; }
+                const term = normalizeKey(st.search);
+                const list = term ? all.filter(s => normalizeKey(s.title).includes(term) || normalizeKey(s.originalTitle).includes(term)) : all;
+                if (!list.length) { wrap.innerHTML = `<div class="dr-empty">Nenhuma série encontrada para “${escapeHtml(st.search)}”.</div>`; return; }
+                const poster = s => s.poster || placeholderPoster(s.title);
+                if (st.view === 'list') {
+                    wrap.innerHTML = `<div class="dr-rows">${list.map(s => `
+                        <div class="dr-row ${st.current === s.id ? 'is-picked' : ''}" style="grid-template-columns:34px 1fr auto;" tabindex="0" role="button" onclick="sapp.pickQueued(${s.id})" onkeydown="if(event.key==='Enter') sapp.pickQueued(${s.id})">
+                            <img src="${poster(s)}" alt="" loading="lazy">
+                            <div style="min-width:0;"><div class="dr-row-title">${escapeHtml(s.title)}</div><div class="dr-row-sub" style="display:flex;">${this.seriesMeta(s) || 'Sem temporadas registradas'}</div></div>
+                            <span></span>
+                        </div>`).join('')}</div>`;
+                } else {
+                    wrap.innerHTML = `<div class="dr-grid">${list.map(s => `
+                        <div class="dr-tile ${st.current === s.id ? 'is-picked' : ''}" tabindex="0" role="button" onclick="sapp.pickQueued(${s.id})" onkeydown="if(event.key==='Enter') sapp.pickQueued(${s.id})" title="${escapeHtml(s.title)}">
+                            <div class="dr-tile-img"><img src="${poster(s)}" alt="" loading="lazy"></div>
+                            <div class="dr-tile-title">${escapeHtml(s.title)}</div>
+                            <div class="dr-tile-sub">${s.seasons.length ? `${s.seasons.length} temporada${s.seasons.length !== 1 ? 's' : ''}` : (escapeHtml(s.yearStart || '') || '&nbsp;')}</div>
+                        </div>`).join('')}</div>`;
+                }
+            }
+
+            renderDrawStage() {
+                const stage = document.getElementById('sDrawStage');
+                if (!stage) return;
+                buildMarqueeBulbs(document.querySelector('#sDrawMarquee .dr-bulbs'));
+                const st = this.queueState();
+                const q = this.queue();
+                const s = st.current != null ? q.find(x => x.id === st.current) : null;
+                const frame = document.getElementById('sDrawFrame');
+                stage.classList.remove('is-rolling');
+                document.getElementById('sDrawPool').innerHTML = '';
+                if (!s) {
+                    stage.classList.remove('is-result');
+                    frame.innerHTML = '<div class="dr-frame-empty">?</div>';
+                    document.getElementById('sDrawEyebrow').textContent = 'Pronto para sortear';
+                    document.getElementById('sDrawTitle').textContent = q.length ? 'Qual vai ser a próxima?' : 'A fila está vazia';
+                    document.getElementById('sDrawMeta').textContent = q.length ? `Sorteio entre ${q.length} ${q.length === 1 ? 'série' : 'séries'} que vocês ainda não começaram.` : 'Cadastre séries pelo botão “Novo” para formar a fila.';
+                    document.getElementById('sDrawActions').innerHTML = `<button type="button" class="dr-btn-main" id="sDrawBtn" onclick="sapp.drawRandom()" ${q.length ? '' : 'disabled'}>🎲 Sortear</button>`;
+                    return;
+                }
+                frame.innerHTML = `<img src="${s.poster || placeholderPoster(s.title)}" alt="Cartaz de ${escapeHtml(s.title)}">`;
+                document.getElementById('sDrawEyebrow').textContent = st.source === 'escolha' ? 'Escolhida da fila' : 'Hoje na tela';
+                document.getElementById('sDrawTitle').textContent = s.title;
+                const meta = this.seriesMeta(s);
+                document.getElementById('sDrawMeta').innerHTML = `${meta}${s.creator ? `${meta ? '<br>' : ''}Criada por <b>${escapeHtml(s.creator)}</b>` : ''}`;
+                document.getElementById('sDrawActions').innerHTML = `
+                    <button type="button" class="dr-btn-main" id="sDrawBtn" onclick="sapp.drawRandom(true)" ${q.length > 1 ? '' : 'disabled'}>🎲 ${st.source === 'escolha' ? 'Sortear' : 'Sortear outra'}</button>
+                    <button type="button" class="dr-btn-ghost" onclick="sapp.openDrawn()">Abrir série</button>`;
+                stage.classList.add('is-result');
+            }
+
+            pickQueued(id) {
+                if (this._rolling) return;
+                const st = this.queueState(); st.current = id; st.source = 'escolha';
+                this.renderDrawStage(); this.renderQueueList();
+                document.getElementById('sDrawStage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            drawRandom(exclude = false) {
+                if (this._rolling) return;
+                const st = this.queueState();
+                let pool = this.queue();
+                if (!pool.length) { showToast('Não há séries na fila para sortear.', 'info'); return; }
+                if (exclude && st.current != null && pool.length > 1) pool = pool.filter(s => s.id !== st.current);
+                const winner = pool[Math.floor(Math.random() * pool.length)];
+                const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const finish = () => { this._rolling = false; st.current = winner.id; st.source = 'sorteio'; this.renderDrawStage(); this.renderQueueList(); };
+                if (reduce || pool.length === 1) { finish(); return; }
+                this._rolling = true;
+                const stage = document.getElementById('sDrawStage');
+                const frame = document.getElementById('sDrawFrame');
+                const title = document.getElementById('sDrawTitle');
+                stage.classList.remove('is-result'); stage.classList.add('is-rolling');
+                document.getElementById('sDrawEyebrow').textContent = 'Sorteando…';
+                document.getElementById('sDrawMeta').textContent = '';
+                document.querySelectorAll('#sDrawActions button').forEach(b => b.disabled = true);
+                frame.innerHTML = '<img alt="">';
+                const img = frame.querySelector('img');
+                const reqId = this._drawReq = (this._drawReq || 0) + 1;
+                const TICKS = 22; let last = null, i = 0;
+                const tick = () => {
+                    if (reqId !== this._drawReq) return;
+                    i++;
+                    let s;
+                    if (i >= TICKS) s = winner;
+                    else { do { s = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && s === last); }
+                    last = s;
+                    img.src = s.poster || placeholderPoster(s.title);
+                    title.textContent = s.title;
+                    if (i >= TICKS) { setTimeout(finish, 350); return; }
+                    const t = i / TICKS;
+                    setTimeout(tick, 55 + t * t * 300);
+                };
+                tick();
+            }
+            openDrawn() { const id = this.queueState().current; if (id != null) this.openModal(id); }
 
             // ---------------- IMPORTAR / EXPORTAR ----------------
             exportSeries() {
