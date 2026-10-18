@@ -1141,14 +1141,18 @@
             .brand small { display: none; } /* "ISRAEL & RICARDO" some, sobra espaço */
             .search-box { order: 3; flex: 1 1 100%; }
             .search-box input, .search-box input:focus { width: 100%; box-sizing: border-box; }
-            /* Botões do cabeçalho quebram em linhas em vez de rolar de lado: com rolagem
-               e alinhamento à direita, os primeiros (como "Sair") ficavam escondidos
-               fora da tela, sem como alcançá-los. */
+            /* Botões do cabeçalho numa linha só. Começam da esquerda (antes, alinhados à
+               direita com rolagem, o primeiro botão ficava escondido fora da tela); se a
+               tela for estreita demais, a linha rola de lado até o ícone de sair, no fim. */
             .controls {
                 order: 2; flex: 1 1 100%; justify-content: flex-start;
-                flex-wrap: wrap; gap: 8px; overflow: visible;
+                flex-wrap: nowrap; gap: 5px;
+                overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+                padding-bottom: 2px;
             }
-            .controls .btn { flex-shrink: 0; padding: 9px 12px; font-size: 0.8rem; }
+            .controls::-webkit-scrollbar { display: none; }
+            .controls .btn { flex-shrink: 0; padding: 9px 10px; font-size: 0.8rem; }
+            .controls .btn.btn-quiet { padding-left: 6px; padding-right: 6px; }
             /* Nos botões só-texto (sem ícone), mantém o texto; nos com ícone unicode
                na frente, o próprio emoji já comunica a ação mesmo compacto */
 
@@ -1224,6 +1228,10 @@
         [data-theme="dark"] .mode-btn.active { color: #1b1611; box-shadow: 0 2px 10px rgba(224, 169, 59, 0.25); }
         .nav-group { display: contents; }
         .controls { margin-left: auto; }
+        @media (max-width: 400px) { .hide-narrow { display: none; } }
+        /* "Sair": só o ícone, sem fundo, discreto no fim da linha */
+        .btn.btn-quiet { background: transparent; border-color: transparent; box-shadow: none; opacity: 0.55; padding-left: 8px; padding-right: 8px; }
+        .btn.btn-quiet:hover, .btn.btn-quiet:focus-visible { opacity: 1; background: var(--bg-input); }
         @media (max-width: 1240px) {
             header { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
         }
@@ -1424,9 +1432,6 @@
             <input type="text" id="searchInput" placeholder="Buscar filme, diretor..." onkeyup="app.handleSearch()">
         </div>
         <div class="controls">
-            <button class="btn" onclick="cloud.signOut()" id="signOutBtn" title="Sair da conta" style="display:none;">
-                🚪 Sair
-            </button>
             <button class="btn" onclick="app.toggleTheme()" id="themeBtn" title="Alternar Modo Escuro">
                 🌙
             </button>
@@ -1437,7 +1442,8 @@
                 Importar
                 <input type="file" id="fileInput" accept=".txt,.json">
             </label>
-            <button class="btn btn-primary" onclick="app.exportJSON()" title="Baixa um arquivo JSON com todo o catálogo — use como backup">📦 Exportar JSON</button>
+            <button class="btn btn-primary" onclick="app.exportJSON()" title="Baixa um arquivo JSON com todo o catálogo — use como backup">📦 Exportar<span class="hide-narrow"> JSON</span></button>
+            <button class="btn btn-quiet" onclick="cloud.signOut()" id="signOutBtn" title="Sair da conta" aria-label="Sair da conta" style="display:none;">🚪</button>
         </div>
     </header>
 
@@ -2525,29 +2531,40 @@
         // para achar o filme certo entre homônimos (ex: remakes); 3) sem nada disso,
         // cai no primeiro resultado (comportamento anterior, preserva capas que já
         // funcionavam).
-        function pickBestResult(results, originalTitleHint, year) {
+        // Pontua cada resultado e fica com o melhor. Antes, sem título original idêntico,
+        // o app caía no PRIMEIRO resultado — que muitas vezes era um curta homônimo sem
+        // capa, e aí o filme ficava "sem capa" mesmo com o certo logo abaixo na lista.
+        // Critérios (do mais ao menos importante):
+        //   - título original igual ao cadastrado (+100)
+        //   - título em português ou original igual ao digitado (+80; parecido: +20)
+        //   - ano de lançamento igual (+40) ou com 1 ano de diferença (+25) — lançamentos
+        //     no Brasil costumam sair no ano seguinte; muito longe do ano informado: −30
+        //     (é isso que separa remakes/homônimos, ex: "O Chamado" 1998 x 2002)
+        //   - ter capa (+15) e ser conhecido (até +10, pelo número de votos)
+        function pickBestResult(results, originalTitleHint, year, titlePt) {
             if (!results || !results.length) return null;
             const hint = normalizeKey(originalTitleHint || '');
-            const yearStr = year ? String(year).trim() : '';
-
-            if (hint) {
-                const exactMatches = results.filter(r => normalizeKey(r.original_title || '') === hint);
-                if (exactMatches.length === 1) return exactMatches[0];
-                if (exactMatches.length > 1) {
-                    if (yearStr) {
-                        const withYear = exactMatches.find(r => (r.release_date || '').startsWith(yearStr));
-                        if (withYear) return withYear;
-                    }
-                    return exactMatches[0];
+            const typed = normalizeKey(titlePt || '');
+            const y = parseInt(year, 10);
+            let best = null, bestScore = -Infinity;
+            results.forEach((r, idx) => {
+                const nt = normalizeKey(r.title || ''), no = normalizeKey(r.original_title || '');
+                let sc = 0;
+                if (hint && no === hint) sc += 100;
+                if (typed && (nt === typed || no === typed)) sc += 80;
+                else if (typed && nt && (nt.includes(typed) || typed.includes(nt))) sc += 20;
+                const ry = parseInt((r.release_date || '').slice(0, 4), 10);
+                if (y && ry) {
+                    const d = Math.abs(ry - y);
+                    sc += d === 0 ? 40 : d === 1 ? 25 : d === 2 ? 5 : -30;
                 }
-            }
-
-            if (yearStr) {
-                const byYear = results.find(r => (r.release_date || '').startsWith(yearStr));
-                if (byYear) return byYear;
-            }
-
-            return results[0];
+                if (r.poster_path) sc += 15;
+                sc += Math.min(10, Math.log10((r.vote_count || 0) + 1) * 3);
+                sc -= idx * 0.3; // empate: respeita a ordem de relevância do próprio TMDB
+                if (sc > bestScore) { bestScore = sc; best = r; }
+            });
+            if (best) best._matchScore = bestScore;
+            return best;
         }
 
         // Faz uma única busca no TMDB por um termo (título em português OU título
@@ -2561,7 +2578,13 @@
             try {
                 let url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=pt-BR`;
                 if (year) url += `&year=${encodeURIComponent(year)}`;
-                const res = await fetch(url);
+                let res = await fetch(url);
+                // Muitas buscas seguidas (ex: várias capas de uma vez): o TMDB responde 429
+                // "devagar". Espera um pouco e tenta de novo, em vez de dar o filme como sem capa.
+                for (let attempt = 1; res.status === 429 && attempt <= 3; attempt++) {
+                    await new Promise(r => setTimeout(r, 1200 * attempt));
+                    res = await fetch(url);
+                }
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
                 return data.results || [];
@@ -2603,10 +2626,22 @@
                 return deduped;
             }
 
-            let results = await collect(true);
-            if (!results.length && year) results = await collect(false);
+            const merge = (a, b) => { const ids = new Set(a.map(r => r.id)); return a.concat(b.filter(r => !ids.has(r.id))); };
+            const hasTitleMatch = list => { const m = pickBestResult(list, hint, year, titlePt); return !!m && m._matchScore >= 80; };
 
-            const bestMatch = pickBestResult(results, hint, year);
+            // 1) com o ano; 2) sem o ano, se ainda não apareceu nenhum título que bata (ano
+            // digitado diferente do TMDB, por exemplo); 3) só a parte antes do subtítulo
+            // ("Ponto Final: Match Point" -> "Ponto Final"), como último recurso.
+            let results = await collect(true);
+            if (year && !hasTitleMatch(results)) results = merge(results, await collect(false));
+            if (!hasTitleMatch(results)) {
+                const base = (titlePt || '').split(/\s[-–—]\s|:/)[0].trim();
+                if (base && base.length >= 3 && normalizeKey(base) !== normalizeKey(titlePt || '')) {
+                    results = merge(results, await searchTMDBTerm(base, null, errorFlag));
+                }
+            }
+
+            const bestMatch = pickBestResult(results, hint, year, titlePt);
             return { bestMatch, hadNetworkError: errorFlag.failed };
         }
 
@@ -4529,13 +4564,26 @@
             // "Tentar buscar capa novamente" no modal (retryPosterFetch), evitando gastar
             // requisições à toa a cada processamento.
             async fetchPosters(forceIds = null) {
+                // A busca de capas melhorou: filmes que a versão anterior deu como "sem capa"
+                // ganham UMA nova tentativa automática neste aparelho.
+                let retryOld = false;
+                try { retryOld = !forceIds && localStorage.getItem('cinetracker_poster_search_v2') !== 'done' && this.movies.length > 0; } catch (e) {}
+                if (retryOld) {
+                    this.movies.forEach(m => { if (!m.poster && m.posterFailed) m.posterFailed = false; });
+                    try { localStorage.setItem('cinetracker_poster_search_v2', 'done'); } catch (e) {}
+                }
+                // Evita buscar o mesmo filme duas vezes ao mesmo tempo (o processamento roda de
+                // novo a cada mudança vinda da nuvem, inclusive as que esta própria busca grava)
+                if (!this._posterInFlight) this._posterInFlight = new Set();
                 const targets = this.movies.filter(m => {
+                    if (this._posterInFlight.has(m.id)) return false;
                     if (forceIds) return forceIds.includes(m.id);
                     return !m.poster && !m.posterFailed;
                 });
                 if (!targets.length) return;
+                targets.forEach(m => this._posterInFlight.add(m.id));
 
-                const BATCH_SIZE = 5;
+                const BATCH_SIZE = 4;
                 let hadNetworkError = false;
 
                 for (let i = 0; i < targets.length; i += BATCH_SIZE) {
@@ -4553,12 +4601,22 @@
                             // Atualiza DOM se existir
                             const el = document.getElementById(`poster-${m.id}`);
                             if (el) { el.src = m.poster; el.removeAttribute('data-loading'); }
-                        } else {
-                            // A API respondeu normalmente, só não achou nada parecido
+                            // Grava na nuvem: antes a capa encontrada ficava só na tela e sumia
+                            // ao abrir o app de novo (e a busca recomeçava toda vez).
+                            cloud.upsertMovie(m);
+                        } else if (!err) {
+                            // A busca rodou de verdade e não achou nada: marca e grava, para
+                            // não repetir a cada abertura (o botão manual continua disponível).
                             m.posterFailed = true;
+                            document.getElementById(`poster-${m.id}`)?.removeAttribute('data-loading');
+                            cloud.upsertMovie(m);
+                        } else {
+                            // Falha de rede/limite do TMDB: não marca nada, tenta de novo na próxima vez
                             document.getElementById(`poster-${m.id}`)?.removeAttribute('data-loading');
                         }
                     }));
+                    batch.forEach(m => this._posterInFlight.delete(m.id));
+                    if (i + BATCH_SIZE < targets.length) await new Promise(r => setTimeout(r, 350));
                 }
 
                 if (hadNetworkError) {
