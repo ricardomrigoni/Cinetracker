@@ -424,6 +424,9 @@
             transform: rotate(45deg); border-radius: 3px 0 0 0;
         }
         .multi-select-menu-right::before { left: auto; right: 24px; }
+        /* Quando o menu precisa ser deslocado para caber na tela, a setinha deixaria de
+           apontar para o botão — então some. */
+        .multi-select-menu.menu-shifted::before { display: none; }
         .multi-select-scroll-area { max-height: 260px; overflow-y: auto; }
         .multi-select-option {
             display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
@@ -610,40 +613,143 @@
         .confirm-message { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 22px; }
         .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-        /* --- Recap do ano: cartaz de neon noturno --- */
+        /* --- Recap do ano: "programa da sessão" impresso ---
+           Paleta própria e fixa (igual no tema claro e no escuro): é um impresso,
+           como um cartaz ou ingresso, e precisa sair igual quando salvo como imagem. */
         .recap-overlay {
+            --rc-paper: #f6ecd8; --rc-paper-2: #efe1c4; --rc-ink: #2a1d14; --rc-muted: #6f5a46;
+            --rc-red: #a6272c; --rc-gold: #b8912c; --rc-film: #1d1510;
             display: none; position: fixed; inset: 0; z-index: 250;
-            background: rgba(6, 4, 2, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            flex-direction: column; align-items: center; justify-content: center; gap: 18px;
-            padding: 20px;
+            background: rgba(18, 11, 7, 0.82); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding: 0 16px 40px;
         }
-        .recap-overlay.open { display: flex; }
-        .recap-close {
-            position: absolute; top: 20px; right: 28px; color: #f5ead2; font-size: 2rem;
-            cursor: pointer; line-height: 1; z-index: 2; opacity: 0.85;
+        .recap-overlay.open { display: block; }
+        .recap-sheet { max-width: 760px; margin: 0 auto; }
+        .recap-toolbar {
+            position: sticky; top: 0; z-index: 3;
+            display: flex; align-items: center; gap: 10px; padding: 14px 0;
         }
-        .recap-close:hover { opacity: 1; }
-        .recap-card {
-            width: 100%; max-width: 380px; max-height: 74vh; overflow-y: auto;
-            border-radius: 20px; padding: 40px 30px;
-            background: linear-gradient(165deg, #3a0f10 0%, #a6272c 55%, #b8912c 100%);
-            color: #fff8ec; display: flex; flex-direction: column; gap: 4px;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.55);
-            border: 1px solid rgba(255,248,236,0.15);
+        .recap-toolbar select, .recap-tool-btn {
+            font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 0.88rem;
+            background: rgba(246,236,216,0.14); color: #f6ecd8; border: 1px solid rgba(246,236,216,0.28);
+            border-radius: 999px; padding: 9px 16px; cursor: pointer;
         }
-        .recap-eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.85; font-weight: 700; }
-        .recap-year { font-family: 'Bebas Neue', sans-serif; font-size: 3.4rem; font-weight: 400; line-height: 1; margin: 2px 0 14px 0; }
-        .recap-block { margin-top: 12px; }
-        .recap-block-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; font-weight: 700; letter-spacing: 0.5px; }
-        .recap-block-value { font-size: 1.5rem; font-weight: 800; margin-top: 2px; line-height: 1.2; }
-        .recap-block-sub { font-size: 0.82rem; opacity: 0.85; margin-top: 3px; }
-        .recap-divider { height: 1px; background: rgba(255,248,236,0.25); margin: 12px 0 0 0; }
-        .recap-year-nav { display: flex; align-items: center; gap: 12px; color: #f5ead2; }
-        .recap-year-nav select {
-            background: rgba(255,248,236,0.18); color: #fff8ec; border: none; border-radius: 999px;
-            padding: 9px 16px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+        .recap-toolbar select option { color: #2a1d14; }
+        .recap-toolbar select:hover, .recap-tool-btn:hover { background: rgba(246,236,216,0.24); }
+        .recap-toolbar select:focus-visible, .recap-tool-btn:focus-visible { outline: 2px solid var(--rc-gold); outline-offset: 2px; }
+        .recap-tool-close { margin-left: auto; width: 40px; height: 40px; padding: 0; font-size: 1.4rem; line-height: 1; }
+
+        .rc {
+            background: var(--rc-paper); color: var(--rc-ink);
+            border-radius: 6px; overflow: hidden; font-family: 'Manrope', sans-serif;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
         }
-        .recap-year-nav select option { color: #2a2016; }
+        .rc-head { padding: 34px 34px 26px; }
+        .rc-kicker { font-size: 0.95rem; font-weight: 700; color: var(--rc-muted); }
+        .rc-year {
+            font-family: 'Bebas Neue', sans-serif; font-weight: 400; color: var(--rc-red);
+            font-size: clamp(6rem, 26vw, 11.5rem); line-height: 0.8; margin: 8px 0 18px -0.04em;
+            letter-spacing: 0.005em;
+        }
+        .rc-lede { font-size: 1.18rem; line-height: 1.5; font-weight: 600; max-width: 36ch; margin: 0; }
+        .rc-lede b { color: var(--rc-red); font-weight: 800; }
+
+        /* Película: o único momento "ousado" do recap */
+        .rc-strip { background: var(--rc-film); padding: 16px 0 18px; }
+        .rc-sprockets { display: flex; gap: 12px; height: 9px; margin: 0 10px; overflow: hidden; }
+        .rc-sprockets i { flex: 0 0 11px; height: 9px; border-radius: 2px; background: var(--rc-paper); opacity: 0.88; }
+        .rc-frames { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 14px 16px; }
+        .rc-frame { position: relative; cursor: pointer; }
+        .rc-frame img {
+            display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover;
+            border-radius: 3px; background: #3a2c22;
+        }
+        .rc-frame-n {
+            position: absolute; left: 6px; bottom: 2px; font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.6rem; line-height: 1; color: var(--rc-paper);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.85);
+        }
+        .rc-frame:focus-visible { outline: 2px solid var(--rc-gold); outline-offset: 3px; border-radius: 3px; }
+        .rc-strip-empty { color: rgba(246,236,216,0.7); text-align: center; padding: 26px 20px; font-size: 0.9rem; }
+
+        .rc-section { padding: 26px 34px 28px; border-top: 2px dashed rgba(42,29,20,0.22); }
+        .rc-h { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 2rem; line-height: 1; margin: 0 0 4px; letter-spacing: 0.01em; }
+        .rc-hsub { color: var(--rc-muted); font-size: 0.86rem; margin: 0 0 16px; }
+
+        .rc-toplist { list-style: none; margin: 0; padding: 0; }
+        .rc-toplist li {
+            display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 12px;
+            padding: 9px 0; border-bottom: 1px solid rgba(42,29,20,0.1); cursor: pointer;
+        }
+        .rc-toplist li:last-child { border-bottom: none; }
+        .rc-toplist li:hover .rc-t-title { color: var(--rc-red); }
+        .rc-t-n { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--rc-gold); line-height: 1; }
+        .rc-t-title { font-weight: 800; font-size: 1rem; line-height: 1.25; }
+        .rc-t-meta { color: var(--rc-muted); font-size: 0.8rem; margin-top: 2px; }
+        .rc-score { min-width: 44px; text-align: center; padding: 5px 8px; border-radius: 6px; color: #fff; font-weight: 800; font-size: 0.92rem; }
+
+        .rc-figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        .rc-fig-v { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 0.95; color: var(--rc-red); }
+        .rc-fig-l { font-size: 0.85rem; font-weight: 700; margin-top: 4px; }
+        .rc-fig-s { font-size: 0.78rem; color: var(--rc-muted); margin-top: 2px; }
+
+        .rc-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; align-items: end; height: 150px; }
+        .rc-mcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
+        .rc-mcount { font-size: 0.72rem; font-weight: 800; color: var(--rc-muted); min-height: 1em; }
+        .rc-mbar { width: 100%; max-width: 30px; background: var(--rc-gold); border-radius: 3px 3px 0 0; min-height: 3px; }
+        .rc-mcol.is-top .rc-mbar { background: var(--rc-red); }
+        .rc-mcol.is-top .rc-mcount { color: var(--rc-red); }
+        .rc-mbar.is-zero { background: rgba(42,29,20,0.12); }
+        .rc-mlbl { font-size: 0.72rem; font-weight: 700; color: var(--rc-muted); }
+
+        .rc-people { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 22px; }
+        .rc-person { border-left: 4px solid var(--pc); padding: 2px 0 2px 14px; }
+        .rc-p-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; line-height: 1; color: var(--pc); }
+        .rc-p-line { font-size: 0.88rem; margin-top: 8px; line-height: 1.4; }
+        .rc-p-line b { font-weight: 800; }
+        .rc-p-muted { color: var(--rc-muted); }
+
+        .rc-facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 30px; }
+        .rc-fact { padding: 12px 0; border-bottom: 1px solid rgba(42,29,20,0.1); }
+        .rc-fact-l { font-size: 0.8rem; color: var(--rc-muted); font-weight: 700; }
+        .rc-fact-v { font-weight: 800; font-size: 1.02rem; margin-top: 3px; line-height: 1.3; }
+        .rc-fact-s { font-size: 0.8rem; color: var(--rc-muted); margin-top: 2px; }
+
+        .rc-series { display: flex; flex-wrap: wrap; gap: 14px; }
+        .rc-serie { width: 92px; cursor: pointer; }
+        .rc-serie img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px; display: block; background: var(--rc-paper-2); }
+        .rc-serie-t { font-size: 0.78rem; font-weight: 800; margin-top: 6px; line-height: 1.25; }
+        .rc-serie-s { font-size: 0.74rem; color: var(--rc-muted); }
+
+        .rc-foot { background: var(--rc-paper-2); padding: 14px 34px; display: flex; justify-content: space-between; gap: 10px; font-size: 0.78rem; color: var(--rc-muted); }
+        .rc-foot b { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 1.15rem; color: var(--rc-ink); letter-spacing: 0.04em; }
+        .rc-empty { padding: 10px 34px 34px; color: var(--rc-muted); }
+
+        /* Uma única entrada orquestrada: o ano sobe e os quadros da película acendem em sequência */
+        @keyframes rcRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+        @keyframes rcFrame { from { opacity: 0; filter: brightness(2.2) saturate(0); } to { opacity: 1; filter: none; } }
+        .rc.rc-animate .rc-year { animation: rcRise 0.7s cubic-bezier(.2,.7,.2,1) both; }
+        .rc.rc-animate .rc-frame { animation: rcFrame 0.6s ease-out both; animation-delay: calc(0.35s + var(--i) * 0.12s); }
+        @media (prefers-reduced-motion: reduce) {
+            .rc.rc-animate .rc-year, .rc.rc-animate .rc-frame { animation: none; }
+        }
+
+        @media (max-width: 640px) {
+            .recap-overlay { padding: 0 10px 30px; }
+            .rc-head { padding: 26px 20px 20px; }
+            .rc-section { padding: 22px 20px 24px; }
+            .rc-foot { padding: 12px 20px; }
+            .rc-lede { font-size: 1.02rem; }
+            .rc-frames { gap: 6px; padding: 12px 10px; }
+            .rc-frame-n { font-size: 1.7rem; left: 4px; }
+            .rc-figures { grid-template-columns: 1fr 1fr; gap: 16px; }
+            .rc-fig-v { font-size: 2.5rem; }
+            .rc-facts { grid-template-columns: 1fr; }
+            .rc-months { gap: 3px; height: 130px; }
+            .rc-serie { width: calc((100% - 28px) / 3); }
+            .recap-tool-btn.recap-tool-save span { display: none; }
+        }
         .recap-trigger-btn {
             background: linear-gradient(120deg, #a6272c, #b8912c); color: #fff8ec; border: none;
         }
@@ -1035,10 +1141,12 @@
             .brand small { display: none; } /* "ISRAEL & RICARDO" some, sobra espaço */
             .search-box { order: 3; flex: 1 1 100%; }
             .search-box input, .search-box input:focus { width: 100%; box-sizing: border-box; }
+            /* Botões do cabeçalho quebram em linhas em vez de rolar de lado: com rolagem
+               e alinhamento à direita, os primeiros (como "Sair") ficavam escondidos
+               fora da tela, sem como alcançá-los. */
             .controls {
-                order: 2; flex: 1 1 auto; justify-content: flex-end;
-                overflow-x: auto; -webkit-overflow-scrolling: touch;
-                padding-bottom: 2px;
+                order: 2; flex: 1 1 100%; justify-content: flex-start;
+                flex-wrap: wrap; gap: 8px; overflow: visible;
             }
             .controls .btn { flex-shrink: 0; padding: 9px 12px; font-size: 0.8rem; }
             /* Nos botões só-texto (sem ícone), mantém o texto; nos com ícone unicode
@@ -1069,7 +1177,7 @@
             .edit-form input, .edit-form textarea, .edit-form select { font-size: 16px; } /* evita zoom automático ao focar campo */
 
             /* Menus suspensos de filtro: nunca ultrapassam a largura da tela */
-            .multi-select-menu { min-width: 0; width: max-content; max-width: 88vw; }
+            .multi-select-menu { min-width: 0; width: max-content; max-width: calc(100vw - 24px); }
             .multi-select-btn { min-width: 0; }
 
             /* Estatísticas: gráficos mais compactos horizontalmente */
@@ -1403,11 +1511,11 @@
                     <option value="without">Sem Resenha</option>
                 </select>
                 <select id="sortFilter" onchange="app.handleSortChange(this.value)" title="Ordenar catálogo por">
+                    <option value="watchedDesc" selected>Assistido: mais recente primeiro</option>
+                    <option value="watchedAsc">Assistido: mais antigo primeiro</option>
                     <option value="avg">Ordenar por: Nossa Média</option>
                     <option value="isr">Ordenar por: Nota do Israel</option>
                     <option value="ric">Ordenar por: Nota do Ricardo</option>
-                    <option value="watchedDesc">Assistido: mais recente primeiro</option>
-                    <option value="watchedAsc">Assistido: mais antigo primeiro</option>
                 </select>
             </div>
         </div>
@@ -1954,11 +2062,14 @@
     </div>
 
     <!-- Recap do ano — cartão estilizado só para visualização, tipo "retrospectiva" -->
-    <div class="recap-overlay" id="recapOverlay">
-        <div class="recap-close" onclick="app.closeRecap()">×</div>
-        <div class="recap-card" id="recapCard"></div>
-        <div class="recap-year-nav">
-            <select id="recapYearSelect" onchange="app.renderRecap(this.value)"></select>
+    <div class="recap-overlay" id="recapOverlay" onclick="if (event.target === this) app.closeRecap()">
+        <div class="recap-sheet" role="dialog" aria-modal="true" aria-label="Recap do ano">
+            <div class="recap-toolbar">
+                <select id="recapYearSelect" onchange="app.renderRecap(this.value)" aria-label="Ano do recap"></select>
+                <button type="button" class="recap-tool-btn recap-tool-save" onclick="app.saveRecapImage()">🖼️<span> Salvar imagem</span></button>
+                <button type="button" class="recap-tool-btn recap-tool-close" onclick="app.closeRecap()" aria-label="Fechar recap">×</button>
+            </div>
+            <div id="recapCard"></div>
         </div>
     </div>
 
@@ -2035,6 +2146,7 @@
                     revRic: row.review_ric || '',
                     poster: row.poster_url || null,
                     posterFailed: !!row.poster_failed,
+                    createdAt: row.created_at || '',
                     avg: (scIsr + scRic) / 2
                 };
             },
@@ -2130,7 +2242,10 @@
                 const del = await supabaseClient.from('movies').delete().gt('id', 0);
                 if (del.error) { showToast('Não foi possível limpar os filmes antigos na nuvem: ' + del.error.message, 'error'); return null; }
                 if (!movies.length) return [];
-                const rows = movies.map(m => { const r = this.movieToDb(m); delete r.id; return r; });
+                // Reinsere na ordem original de inclusão e mantém a data/hora de inclusão de cada
+                // filme (quando existe), para o desempate de "mesmo dia" continuar valendo.
+                const ordered = [...movies].sort(compareInsertion);
+                const rows = ordered.map(m => { const r = this.movieToDb(m); delete r.id; if (m.createdAt) r.created_at = m.createdAt; return r; });
                 const { data, error } = await supabaseClient.from('movies').insert(rows).select();
                 if (error) { showToast('Não foi possível enviar os filmes para a nuvem: ' + error.message, 'error'); return null; }
                 return data.map(row => this.movieFromDb(row));
@@ -3253,6 +3368,42 @@
 
         // Data de hoje no fuso local, "AAAA-MM-DD" (toISOString puro usaria UTC e
         // marcaria o dia seguinte para quem assiste à noite no Brasil).
+        // Ordem de inclusão de um filme: data/hora gravada pelo banco ao criar (created_at,
+        // quando a tabela tem essa coluna) e, como reforço, o id (sempre crescente).
+        // Negativo = "a" foi incluído antes de "b".
+        // Mantém qualquer menu suspenso de filtro (anos, diretor, gênero, exportar...) inteiro
+        // dentro da tela. O menu abre alinhado ao botão; se isso o empurrar para fora da
+        // borda (comum no celular, quando o botão quebra de linha), ele é deslocado o
+        // necessário para caber, com 12px de folga.
+        function fitMenuInViewport(menu) {
+            menu.style.transform = '';
+            menu.classList.remove('menu-shifted');
+            const vw = document.documentElement.clientWidth || window.innerWidth;
+            const r = menu.getBoundingClientRect();
+            if (!r.width) return;
+            const gap = 12;
+            let delta = 0;
+            if (r.right > vw - gap) delta = (vw - gap) - r.right;
+            if (r.left + delta < gap) delta = gap - r.left;
+            if (Math.abs(delta) > 0.5) {
+                menu.style.transform = `translateX(${Math.round(delta)}px)`;
+                menu.classList.add('menu-shifted');
+            }
+        }
+        function fitOpenMenus() {
+            document.querySelectorAll('.multi-select-menu.open').forEach(fitMenuInViewport);
+        }
+        // Roda depois do clique que abriu o menu (o onclick do botão executa antes deste
+        // listener, que fica no document) e também ao girar/redimensionar a tela.
+        document.addEventListener('click', () => requestAnimationFrame(fitOpenMenus));
+        window.addEventListener('resize', fitOpenMenus);
+
+        function compareInsertion(a, b) {
+            const ca = a.createdAt || '', cb = b.createdAt || '';
+            if (ca && cb && ca !== cb) return ca < cb ? -1 : 1;
+            return (Number(a.id) || 0) - (Number(b.id) || 0);
+        }
+
         function todayLocalISO() {
             const d = new Date();
             d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -3826,7 +3977,7 @@
                 this.selectedDirectors = new Set(); // chaves normalizadas — vazio = todos
                 this.selectedGenres = new Set(); // chaves normalizadas — vazio = todos
                 this._autosaveTimer = null;
-                this.sortBy = 'avg'; // 'avg' | 'isr' | 'ric' — ranking padrão é a nossa média
+                this.sortBy = 'watchedDesc'; // 'watchedDesc' | 'watchedAsc' | 'avg' | 'isr' | 'ric' — padrão: assistido mais recente primeiro
                 this.reviewFilter = 'all'; // 'all' | 'with' | 'without' — filtro de resenha do Catálogo
                 this.navHistory = []; // pilha de "de onde vim", para o botão Voltar
                 this.init();
@@ -4126,6 +4277,7 @@
                         revRic: m.revRic || '',
                         poster: m.poster || null,
                         posterFailed: !!m.posterFailed,
+                        createdAt: m.createdAt || '',
                         avg: (scIsr + scRic) / 2
                     };
                 });
@@ -4834,17 +4986,19 @@
                     );
                 }
 
-                // Ordena pela métrica escolhida (padrão: nossa média)
+                // Ordena pela métrica escolhida (padrão: assistido mais recente primeiro)
                 // Ordenação por data assistida: dir = 1 (crescente) ou -1 (decrescente). Filmes sem
-                // data vão sempre para o fim da lista,
-                // independente do sentido. Empates são desfeitos pela nossa média.
+                // data vão sempre para o fim da lista, independente do sentido. Filmes assistidos
+                // no MESMO dia são desempatados pela ordem em que foram incluídos no app
+                // (data/hora de inclusão gravada pelo banco; na falta dela, o id, que também cresce
+                // a cada inclusão) — quem foi incluído depois conta como visto depois.
                 const byDate = (valueFn, dir) => (a, b) => {
                     const va = valueFn(a), vb = valueFn(b);
                     const ea = va === '' || va == null || Number.isNaN(va);
                     const eb = vb === '' || vb == null || Number.isNaN(vb);
                     if (ea !== eb) return ea ? 1 : -1;
                     if (!ea && va !== vb) return va < vb ? -dir : dir;
-                    return (b.avg - a.avg) || (b.scImdb - a.scImdb);
+                    return compareInsertion(a, b) * dir;
                 };
                 const watchedKey = m => m.date || '';                       // 'AAAA-MM-DD' compara bem como texto
                 const comparators = {
@@ -5023,7 +5177,7 @@
                     duration: "",
                     genres: "",
                     scIsr: 0, scRic: 0, scImdb: 0,
-                    date: new Date().toISOString().split('T')[0],
+                    date: todayLocalISO(),
                     local: "",
                     revIsr: "", revRic: "",
                     poster: null,
@@ -5292,7 +5446,8 @@
                         revIsr: m.revIsr,
                         revRic: m.revRic,
                         poster: m.poster || null,
-                        posterFailed: !!m.posterFailed
+                        posterFailed: !!m.posterFailed,
+                        createdAt: m.createdAt || ''
                     })),
                     pending: this.pending,
                     series: sapp.exportSeries()
@@ -5742,156 +5897,332 @@
             }
 
             // --- Recap do ano ---
-            // Um cartão estilizado (ao gosto "retrospectiva/wrapped") com um resumo de um
-            // ano específico, só para visualização dentro do próprio app — não gera arquivo
-            // nem link para compartilhar.
+            // Um "programa da sessão" com a retrospectiva de um ano: Top 5, números do ano,
+            // mês a mês, um bloco por participante, curiosidades e as séries concluídas.
             computeRecap(year) {
-                const list = this.movies.filter(m => (m.date || '').split('-')[0] === year);
-                if (!list.length) return null;
+                // Cores fixas (as do tema claro): o recap é um "impresso" em papel creme
+                const PEOPLE = [
+                    { id: 'isr', name: 'Israel',  color: '#c07a1e', score: m => Number(m.scIsr) || 0 },
+                    { id: 'ric', name: 'Ricardo', color: '#2c6e6b', score: m => Number(m.scRic) || 0 }
+                ];
+                const yearOf = m => (m.date || '').slice(0, 4);
+                const list = this.movies.filter(m => yearOf(m) === year);
+                const seriesDone = (typeof sapp !== 'undefined' ? sapp.series : [])
+                    .filter(s => s._m && s._m.complete && (s.finishedDate || '').slice(0, 4) === year)
+                    .sort((a, b) => (b.avg - a.avg) || a.title.localeCompare(b.title, 'pt-BR'));
+                if (!list.length && !seriesDone.length) return null;
 
-                const total = list.length;
                 const sum = arr => arr.reduce((a, b) => a + b, 0);
-                const avgNossa = sum(list.map(m => m.avg)) / total;
-                const avgIsr = sum(list.map(m => m.scIsr)) / total;
-                const avgRic = sum(list.map(m => m.scRic)) / total;
+                const minsOf = m => {
+                    if (!m.duration || !m.duration.includes(':')) return 0;
+                    const [h, mm] = m.duration.split(':').map(Number);
+                    return (h || 0) * 60 + (mm || 0);
+                };
+                const total = list.length;
+                const mins = sum(list.map(minsOf));
+                const rated = list.filter(m => m.avg > 0);
+                const avgNossa = rated.length ? sum(rated.map(m => m.avg)) / rated.length : 0;
 
-                let mins = 0;
-                list.forEach(m => {
-                    if (m.duration && m.duration.includes(':')) {
-                        const [h, mm] = m.duration.split(':').map(Number);
-                        mins += (h * 60) + mm;
-                    }
-                });
+                // Ordem cronológica de verdade: data assistida e, no mesmo dia, ordem de inclusão
+                const chrono = [...list].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : compareInsertion(a, b)));
+                const best = (a, b) => (b.avg - a.avg) || (b.scImdb - a.scImdb) || compareInsertion(a, b);
+                const top5 = [...rated].sort(best).slice(0, 5);
+                const worst = rated.length >= 6 ? [...rated].sort((a, b) => (a.avg - b.avg) || compareInsertion(a, b))[0] : null;
 
-                // Gênero e diretor mais frequentes do ano (agrupamento normalizado, igual às Estatísticas)
+                // Agrupamento normalizado (junta "Ação"/"ação"/"Acao"), igual às Estatísticas
                 const pickTop = (extractFn) => {
                     const groups = {};
                     list.forEach(m => {
+                        const seen = new Set();
                         extractFn(m).forEach(raw => {
-                            const v = (raw || '').trim();
-                            if (!v) return;
-                            const key = normalizeKey(v);
+                            const v = (raw || '').trim(); if (!v) return;
+                            const key = normalizeKey(v); if (seen.has(key)) return; seen.add(key);
                             if (!groups[key]) groups[key] = { count: 0, labelCounts: {} };
                             groups[key].count++;
                             groups[key].labelCounts[v] = (groups[key].labelCounts[v] || 0) + 1;
                         });
                     });
-                    let best = null, bestCount = 0;
-                    Object.values(groups).forEach(g => {
-                        if (g.count > bestCount) { bestCount = g.count; best = pickMostCommonLabel(g.labelCounts); }
-                    });
-                    return { name: best, count: bestCount };
+                    const arr = Object.values(groups).sort((a, b) => b.count - a.count);
+                    return { top: arr[0] ? { name: pickMostCommonLabel(arr[0].labelCounts), count: arr[0].count } : null, distinct: arr.length };
                 };
-                const topGenre = pickTop(m => (m.genres || '').split(',').map(g => g.trim()).filter(Boolean));
-                const topDirector = pickTop(m => (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director));
+                const genres = pickTop(m => (m.genres || '').split(',').map(g => g.trim()).filter(Boolean));
+                const directors = pickTop(m => (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director));
+                const locals = pickTop(m => [m.local]);
 
-                let bestMovie = null;
-                list.forEach(m => { if (!bestMovie || m.avg > bestMovie.avg) bestMovie = m; });
+                const months = new Array(12).fill(0);
+                list.forEach(m => { const mi = parseInt((m.date || '').slice(5, 7), 10) - 1; if (mi >= 0 && mi < 12) months[mi]++; });
+                const topMonthIdx = months.indexOf(Math.max(...months));
 
-                // Mês mais assistido do ano
-                const monthNames = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-                const monthCount = new Array(12).fill(0);
+                const weekdays = new Array(7).fill(0);
                 list.forEach(m => {
-                    const mi = parseInt((m.date || '').split('-')[1], 10) - 1;
-                    if (!isNaN(mi) && mi >= 0 && mi < 12) monthCount[mi]++;
+                    const [y, mo, d] = (m.date || '').split('-').map(Number);
+                    if (y && mo && d) weekdays[new Date(y, mo - 1, d).getDay()]++;
                 });
-                let topMonthIdx = 0;
-                monthCount.forEach((c, i) => { if (c > monthCount[topMonthIdx]) topMonthIdx = i; });
+                const topWeekday = Math.max(...weekdays) > 0 ? weekdays.indexOf(Math.max(...weekdays)) : -1;
 
-                // Comparação com o ano anterior, se houver dados
+                const timed = list.filter(m => minsOf(m) > 0);
+                const longest = timed.length ? timed.reduce((a, b) => minsOf(b) > minsOf(a) ? b : a) : null;
+                const shortest = timed.length >= 2 ? timed.reduce((a, b) => minsOf(b) < minsOf(a) ? b : a) : null;
+
+                // Maior divergência do ano (entre quem avaliou)
+                let divergence = null;
+                list.forEach(m => {
+                    const sc = PEOPLE.map(r => ({ r, v: r.score(m) })).filter(x => x.v > 0);
+                    if (sc.length < 2) return;
+                    sc.sort((a, b) => b.v - a.v);
+                    const diff = sc[0].v - sc[sc.length - 1].v;
+                    if (diff >= 1 && (!divergence || diff > divergence.diff)) divergence = { m, diff, hi: sc[0], lo: sc[sc.length - 1] };
+                });
+
+                // Um bloco por participante
+                const people = PEOPLE.map(r => {
+                    const mine = list.filter(m => r.score(m) > 0);
+                    if (!mine.length) return { rater: r, n: 0 };
+                    const fav = [...mine].sort((a, b) => (r.score(b) - r.score(a)) || (b.avg - a.avg) || compareInsertion(a, b))[0];
+                    const nines = mine.filter(m => r.score(m) >= 9).length;
+                    return { rater: r, n: mine.length, avg: sum(mine.map(m => r.score(m))) / mine.length, fav, favScore: r.score(fav), nines };
+                });
+                const withAvg = people.filter(p => p.n);
+                const generous = withAvg.length >= 2 ? [...withAvg].sort((a, b) => b.avg - a.avg)[0] : null;
+
                 const prevYear = String(Number(year) - 1);
-                const prevCount = this.movies.filter(m => (m.date || '').split('-')[0] === prevYear).length;
-                const diffCount = prevCount > 0 ? total - prevCount : null;
+                const prevList = this.movies.filter(m => yearOf(m) === prevYear);
 
                 return {
-                    year, total, avgNossa, avgIsr, avgRic, mins,
-                    topGenre, topDirector, bestMovie,
-                    topMonth: monthNames[topMonthIdx], topMonthCount: monthCount[topMonthIdx],
-                    diffCount
+                    year, list, total, mins, avgNossa, top5, worst, chrono,
+                    genres, directors, locals, months, topMonthIdx, weekdays, topWeekday,
+                    longest, shortest, minsOf, divergence, people, generous, seriesDone,
+                    prevCount: prevList.length, prevMins: sum(prevList.map(minsOf))
                 };
             }
 
+            recapYears() {
+                const years = new Set(this.movies.map(m => (m.date || '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)));
+                if (typeof sapp !== 'undefined') {
+                    sapp.series.forEach(s => { const y = (s.finishedDate || '').slice(0, 4); if (s._m && s._m.complete && /^\d{4}$/.test(y)) years.add(y); });
+                }
+                return [...years].sort().reverse();
+            }
+
             openRecap() {
-                const years = [...new Set(this.movies.map(m => (m.date || '').split('-')[0]))].filter(Boolean).sort().reverse();
+                const years = this.recapYears();
                 if (!years.length) {
-                    showToast('Ainda não há filmes suficientes para gerar um recap.', 'info');
+                    showToast('Ainda não há filmes com data para gerar um recap.', 'info');
                     return;
                 }
                 const sel = document.getElementById('recapYearSelect');
-                sel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+                sel.innerHTML = years.map(y => `<option value="${y}">Recap de ${y}</option>`).join('');
                 sel.value = years[0];
-                this.renderRecap(years[0]);
                 document.getElementById('recapOverlay').classList.add('open');
+                document.getElementById('recapOverlay').scrollTop = 0;
+                document.body.style.overflow = 'hidden';
+                this.renderRecap(years[0], { animate: true });
             }
 
             closeRecap() {
                 document.getElementById('recapOverlay').classList.remove('open');
+                document.body.style.overflow = '';
             }
 
-            renderRecap(year) {
+            renderRecap(year, opts = {}) {
                 const r = this.computeRecap(year);
                 const card = document.getElementById('recapCard');
+                const fmtScore = v => v.toFixed(1).replace('.', ',');
+                const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+                const hours = mins => {
+                    const h = Math.floor(mins / 60), mm = mins % 60;
+                    return h ? `${h}h${mm ? String(mm).padStart(2, '0') : ''}` : `${mm} min`;
+                };
+                const poster = m => m.poster || placeholderPoster(m.title);
+                const yr = m => m.year ? ` (${escapeHtml(String(m.year))})` : '';
+                const foot = `<div class="rc-foot"><b>CineTracker</b><span>Recap de ${escapeHtml(year)}</span></div>`;
+
                 if (!r) {
-                    card.innerHTML = `<div class="recap-eyebrow">Recap</div><div class="recap-year">${escapeHtml(year)}</div><div class="recap-block-sub">Nenhum filme registrado nesse ano.</div>`;
+                    card.innerHTML = `<div class="rc"><div class="rc-head"><div class="rc-year">${escapeHtml(year)}</div><p class="rc-lede">Nenhum filme ou série concluída registrada nesse ano.</p></div>${foot}</div>`;
                     return;
                 }
-                const diffTxt = r.diffCount === null ? '' :
-                    `<div class="recap-block-sub">${r.diffCount >= 0 ? '+' : ''}${r.diffCount} em relação a ${Number(r.year) - 1}</div>`;
 
-                card.innerHTML = `
-                    <div class="recap-eyebrow">Seu recap de cinema</div>
-                    <div class="recap-year">${escapeHtml(r.year)}</div>
+                // --- Abertura
+                let lede;
+                if (r.total) {
+                    const parts = [`<b>${plural(r.total, 'filme', 'filmes')}</b>`];
+                    if (r.mins) parts.push(`<b>${hours(r.mins)}</b> de tela`);
+                    lede = `Foram ${parts.join(' e ')}${r.avgNossa ? `, com nota média <b>${fmtScore(r.avgNossa)}</b>` : ''}.`;
+                    if (r.seriesDone.length) lede += ` E ainda ${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')}.`;
+                } else {
+                    lede = `Nenhum filme registrado, mas <b>${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')}</b>.`;
+                }
+                const head = `
+                    <div class="rc-head">
+                        <div class="rc-kicker">A temporada de vocês em</div>
+                        <div class="rc-year">${escapeHtml(r.year)}</div>
+                        <p class="rc-lede">${lede}</p>
+                    </div>`;
 
-                    <div class="recap-block">
-                        <div class="recap-block-label">Filmes assistidos</div>
-                        <div class="recap-block-value">${r.total}</div>
-                        ${diffTxt}
-                    </div>
-                    <div class="recap-divider"></div>
+                // --- Película com o Top 5
+                let strip = '', top = '';
+                if (r.total) {
+                    strip = `
+                        <div class="rc-strip">
+                            <div class="rc-sprockets">${'<i></i>'.repeat(48)}</div>
+                            ${r.top5.length ? `<div class="rc-frames">${r.top5.map((m, i) => `
+                                <div class="rc-frame" style="--i:${i}" tabindex="0" role="button" onclick="app.openFromRecap(${m.id})" onkeydown="if(event.key==='Enter') app.openFromRecap(${m.id})" title="${escapeHtml(m.title)}">
+                                    <img src="${poster(m)}" alt="${escapeHtml(m.title)}" loading="lazy">
+                                    <span class="rc-frame-n">${i + 1}</span>
+                                </div>`).join('')}
+                                ${Array.from({ length: 5 - r.top5.length }, () => '<div></div>').join('')}
+                            </div>` : `<div class="rc-strip-empty">Os filmes deste ano ainda não têm nota.</div>`}
+                            <div class="rc-sprockets">${'<i></i>'.repeat(48)}</div>
+                        </div>`;
+                    if (r.top5.length) {
+                        top = `
+                            <section class="rc-section">
+                                <h3 class="rc-h">Os ${r.top5.length === 5 ? 'cinco' : r.top5.length} melhores do ano</h3>
+                                <p class="rc-hsub">Pela nossa média. Toque em um filme para abri-lo.</p>
+                                <ol class="rc-toplist">${r.top5.map((m, i) => `
+                                    <li onclick="app.openFromRecap(${m.id})">
+                                        <span class="rc-t-n">${i + 1}</span>
+                                        <div>
+                                            <div class="rc-t-title">${escapeHtml(m.title)}${yr(m)}</div>
+                                            <div class="rc-t-meta">${escapeHtml(m.director || 'Diretor não informado')}${m.date ? `, visto em ${formatDateBR(m.date)}` : ''}</div>
+                                        </div>
+                                        <span class="rc-score" style="background:${scoreColor(m.avg)}">${fmtScore(m.avg)}</span>
+                                    </li>`).join('')}
+                                </ol>
+                            </section>`;
+                    }
+                }
 
-                    <div class="recap-block">
-                        <div class="recap-block-label">Tempo assistido</div>
-                        <div class="recap-block-value">${this.formatDuration(r.mins)}</div>
-                    </div>
-                    <div class="recap-divider"></div>
+                // --- Números do ano
+                let figures = '';
+                if (r.total) {
+                    const cmp = (now, before, unit) => {
+                        if (!before) return '';
+                        const d = now - before;
+                        if (d === 0) return `<div class="rc-fig-s">igual a ${Number(r.year) - 1}</div>`;
+                        return `<div class="rc-fig-s">${unit(Math.abs(d))} a ${d > 0 ? 'mais' : 'menos'} que em ${Number(r.year) - 1}</div>`;
+                    };
+                    figures = `
+                        <section class="rc-section">
+                            <h3 class="rc-h">O ano em números</h3>
+                            <div class="rc-figures" style="margin-top:14px;">
+                                <div><div class="rc-fig-v">${r.total}</div><div class="rc-fig-l">${r.total === 1 ? 'filme' : 'filmes'}</div>${cmp(r.total, r.prevCount, n => n)}</div>
+                                <div><div class="rc-fig-v">${r.mins ? hours(r.mins) : '—'}</div><div class="rc-fig-l">de tela</div>${r.mins ? cmp(r.mins, r.prevMins, hours) : ''}</div>
+                                <div><div class="rc-fig-v">${r.avgNossa ? fmtScore(r.avgNossa) : '—'}</div><div class="rc-fig-l">nota média</div></div>
+                                <div><div class="rc-fig-v">${r.directors.distinct}</div><div class="rc-fig-l">${r.directors.distinct === 1 ? 'diretor' : 'diretores diferentes'}</div></div>
+                            </div>
+                        </section>`;
+                }
 
-                    <div class="recap-block">
-                        <div class="recap-block-label">Nossa média do ano</div>
-                        <div class="recap-block-value">${r.avgNossa.toFixed(2)}</div>
-                        <div class="recap-block-sub"><span style="color:var(--color-israel); font-weight:700;">Israel ${r.avgIsr.toFixed(1)}</span> · <span style="color:var(--color-ricardo); font-weight:700;">Ricardo ${r.avgRic.toFixed(1)}</span></div>
-                    </div>
+                // --- Mês a mês
+                let monthsHtml = '';
+                if (r.total) {
+                    const maxM = Math.max(...r.months, 1);
+                    const ml = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+                    const mNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+                    monthsHtml = `
+                        <section class="rc-section">
+                            <h3 class="rc-h">Mês a mês</h3>
+                            <p class="rc-hsub">O mês mais movimentado foi ${mNames[r.topMonthIdx]}, com ${plural(r.months[r.topMonthIdx], 'filme', 'filmes')}.</p>
+                            <div class="rc-months" role="img" aria-label="Filmes por mês em ${escapeHtml(r.year)}">
+                                ${r.months.map((c, i) => `
+                                    <div class="rc-mcol ${i === r.topMonthIdx && c ? 'is-top' : ''}" title="${mNames[i]}: ${plural(c, 'filme', 'filmes')}">
+                                        <span class="rc-mcount">${c || ''}</span>
+                                        <div class="rc-mbar ${c ? '' : 'is-zero'}" style="height:${c ? Math.max(6, c / maxM * 100) : 3}%"></div>
+                                        <span class="rc-mlbl">${ml[i]}</span>
+                                    </div>`).join('')}
+                            </div>
+                        </section>`;
+                }
 
-                    ${r.topGenre.name ? `
-                    <div class="recap-divider"></div>
-                    <div class="recap-block">
-                        <div class="recap-block-label">Gênero da temporada</div>
-                        <div class="recap-block-value">${escapeHtml(r.topGenre.name)}</div>
-                        <div class="recap-block-sub">${r.topGenre.count} filme${r.topGenre.count > 1 ? 's' : ''}</div>
-                    </div>` : ''}
+                // --- Cada participante
+                let peopleHtml = '';
+                if (r.total && r.people.some(p => p.n)) {
+                    peopleHtml = `
+                        <section class="rc-section">
+                            <h3 class="rc-h">Cada um no seu ano</h3>
+                            <p class="rc-hsub">${r.generous && r.people.filter(p => p.n).length >= 2 ? `Quem deu as notas mais altas foi ${escapeHtml(r.generous.rater.name)}.` : 'O favorito de cada um, pela própria nota.'}</p>
+                            <div class="rc-people">${r.people.map(p => `
+                                <div class="rc-person" style="--pc:${p.rater.color}">
+                                    <div class="rc-p-name">${escapeHtml(p.rater.name)}</div>
+                                    ${p.n ? `
+                                        <div class="rc-p-line">Média <b>${fmtScore(p.avg)}</b> em ${plural(p.n, 'filme', 'filmes')}</div>
+                                        <div class="rc-p-line">Favorito: <b>${escapeHtml(p.fav.title)}</b> <span class="rc-p-muted">(${fmtScore(p.favScore)})</span></div>
+                                        <div class="rc-p-line rc-p-muted">${p.nines ? `${plural(p.nines, 'nota 9 ou mais', 'notas 9 ou mais')}` : 'Nenhuma nota 9 este ano'}</div>
+                                    ` : `<div class="rc-p-line rc-p-muted">Não deu notas neste ano.</div>`}
+                                </div>`).join('')}
+                            </div>
+                        </section>`;
+                }
 
-                    ${r.topDirector.name ? `
-                    <div class="recap-divider"></div>
-                    <div class="recap-block">
-                        <div class="recap-block-label">Diretor mais visto</div>
-                        <div class="recap-block-value">${escapeHtml(r.topDirector.name)}</div>
-                        <div class="recap-block-sub">${r.topDirector.count} filme${r.topDirector.count > 1 ? 's' : ''}</div>
-                    </div>` : ''}
+                // --- Curiosidades
+                const facts = [];
+                const wd = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+                if (r.genres.top) facts.push(['Gênero do ano', escapeHtml(r.genres.top.name), plural(r.genres.top.count, 'filme', 'filmes')]);
+                if (r.directors.top && r.directors.top.count >= 2) facts.push(['Diretor do ano', escapeHtml(r.directors.top.name), plural(r.directors.top.count, 'filme', 'filmes')]);
+                if (r.topWeekday >= 0 && r.total >= 3) facts.push(['Dia preferido', wd[r.topWeekday].charAt(0).toUpperCase() + wd[r.topWeekday].slice(1), `${plural(r.weekdays[r.topWeekday], 'filme', 'filmes')} nesse dia da semana`]);
+                if (r.locals.top) facts.push(['Onde mais assistiram', escapeHtml(r.locals.top.name), `${Math.round(r.locals.top.count / r.total * 100)}% dos filmes`]);
+                if (r.longest) facts.push(['O mais longo', escapeHtml(r.longest.title), r.longest.duration]);
+                if (r.shortest && r.shortest !== r.longest) facts.push(['O mais curto', escapeHtml(r.shortest.title), r.shortest.duration]);
+                if (r.chrono.length >= 2) {
+                    facts.push(['Abriu o ano', escapeHtml(r.chrono[0].title), formatDateBR(r.chrono[0].date)]);
+                    facts.push(['Fechou o ano (até agora)', escapeHtml(r.chrono[r.chrono.length - 1].title), formatDateBR(r.chrono[r.chrono.length - 1].date)]);
+                }
+                if (r.divergence) facts.push(['A maior discordância', escapeHtml(r.divergence.m.title),
+                    `${escapeHtml(r.divergence.hi.r.name)} deu ${fmtScore(r.divergence.hi.v)}, ${escapeHtml(r.divergence.lo.r.name)} deu ${fmtScore(r.divergence.lo.v)}`]);
+                if (r.worst) facts.push(['A decepção do ano', escapeHtml(r.worst.title), `média ${fmtScore(r.worst.avg)}`]);
+                // "Fechou o ano (até agora)" só faz sentido no ano corrente
+                if (r.year !== todayLocalISO().slice(0, 4)) facts.forEach(f => { if (f[0] === 'Fechou o ano (até agora)') f[0] = 'Fechou o ano'; });
+                const factsHtml = facts.length ? `
+                    <section class="rc-section">
+                        <h3 class="rc-h">Curiosidades</h3>
+                        <div class="rc-facts">${facts.map(([l, v, sub]) => `
+                            <div class="rc-fact"><div class="rc-fact-l">${l}</div><div class="rc-fact-v">${v}</div>${sub ? `<div class="rc-fact-s">${sub}</div>` : ''}</div>`).join('')}
+                        </div>
+                    </section>` : '';
 
-                    ${r.bestMovie ? `
-                    <div class="recap-divider"></div>
-                    <div class="recap-block">
-                        <div class="recap-block-label">Melhor filme do ano</div>
-                        <div class="recap-block-value" style="font-size:1.25rem;">${escapeHtml(r.bestMovie.title)}</div>
-                        <div class="recap-block-sub">Nota ${r.bestMovie.avg.toFixed(1)}</div>
-                    </div>` : ''}
+                // --- Séries concluídas no ano
+                const seriesHtml = r.seriesDone.length ? `
+                    <section class="rc-section">
+                        <h3 class="rc-h">Séries que vocês terminaram</h3>
+                        <p class="rc-hsub">${plural(r.seriesDone.length, 'série concluída', 'séries concluídas')} em ${escapeHtml(r.year)}.</p>
+                        <div class="rc-series">${r.seriesDone.map(s => `
+                            <div class="rc-serie" onclick="app.openSeriesFromRecap(${s.id})" title="${escapeHtml(s.title)}">
+                                <img src="${s.poster || placeholderPoster(s.title)}" alt="${escapeHtml(s.title)}" loading="lazy">
+                                <div class="rc-serie-t">${escapeHtml(s.title)}</div>
+                                <div class="rc-serie-s">${s.rated ? `nota ${fmtScore(s.avg)}` : 'sem nota ainda'}</div>
+                            </div>`).join('')}
+                        </div>
+                    </section>` : '';
 
-                    <div class="recap-divider"></div>
-                    <div class="recap-block">
-                        <div class="recap-block-label">Mês mais assistido</div>
-                        <div class="recap-block-value" style="font-size:1.25rem; text-transform:capitalize;">${escapeHtml(r.topMonth)}</div>
-                        <div class="recap-block-sub">${r.topMonthCount} filme${r.topMonthCount > 1 ? 's' : ''}</div>
-                    </div>
-                `;
+                card.innerHTML = `<div class="rc ${opts.animate ? 'rc-animate' : ''}">${head}${strip}${top}${figures}${monthsHtml}${peopleHtml}${factsHtml}${seriesHtml}${foot}</div>`;
+            }
+
+            openFromRecap(id) { this.closeRecap(); this.openModal(id); }
+            openSeriesFromRecap(id) { this.closeRecap(); app.switchTab('s-catalogo'); sapp.openModal(id); }
+
+            // Salva o recap inteiro (não só o trecho visível) como PNG, para compartilhar
+            async saveRecapImage() {
+                const el = document.querySelector('#recapCard .rc');
+                if (!el || typeof html2canvas === 'undefined') { showToast('Não foi possível gerar a imagem agora.', 'error'); return; }
+                const year = document.getElementById('recapYearSelect').value;
+                showToast('Gerando a imagem do recap...', 'info', 3000);
+                el.classList.remove('rc-animate');
+                try {
+                    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#f6ecd8', logging: false });
+                    canvas.toBlob(blob => {
+                        if (!blob) { showToast('Não foi possível gerar a imagem do recap.', 'error'); return; }
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `cinetracker_recap_${year}.png`;
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    }, 'image/png');
+                } catch (e) {
+                    console.error('Erro ao gerar imagem do recap', e);
+                    showToast('Não foi possível gerar a imagem do recap.', 'error');
+                }
             }
 
             // --- Exportar aba Estatísticas como imagem ou PDF ---
