@@ -1676,6 +1676,10 @@
         .stack-bar i { display: block; min-width: 3px; }
         .stack-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 20px; margin-top: 14px; }
         .stack-item { display: flex; align-items: center; gap: 8px; font-size: 0.83rem; min-width: 0; }
+        .stack-item.is-click { cursor: pointer; border-radius: 8px; padding: 4px 6px; margin: -4px -6px; }
+        .stack-item.is-click:hover { background: var(--bg-input); }
+        .stack-item.is-click:hover .stack-name { color: var(--accent); }
+        .stack-go { color: var(--text-muted); font-weight: 800; font-size: 1rem; line-height: 1; }
         .stack-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
         .stack-name { font-weight: 700; color: var(--text-main); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .stack-val { color: var(--text-muted); white-space: nowrap; font-size: 0.78rem; }
@@ -1937,6 +1941,47 @@
             .hero-n { font-size: 3.2rem; }
             .col-v { font-size: 0.6rem; }
         }
+
+        /* ============================================================
+           CATÁLOGO — filtros em grade uniforme, ocupando toda a largura
+           (3 por linha no computador e no tablet, 2 por linha no celular)
+           ============================================================ */
+        .filters-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+        .filters-bar .filters-controls { grid-column: 1 / -1; }
+        .filters-controls { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+        .filters-controls > * { grid-column: span 2; min-width: 0; }
+        /* 5 filtros (séries): os dois da segunda linha dividem a largura ao meio */
+        .filters-controls > :nth-child(4):nth-last-child(2), .filters-controls > :nth-child(5):last-child { grid-column: span 3; }
+        .filters-controls .multi-select, .filters-controls .multi-select-btn, .filters-controls select { width: 100%; min-width: 0; }
+        .filters-controls .multi-select-btn, .filters-controls select { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; text-align: left; min-height: 42px; }
+        .filters-controls .multi-select-btn { color: var(--text-main); font-weight: 600; }
+        .filters-controls .multi-select-menu { min-width: max(100%, 220px); }
+        .filters-controls .is-active { border-color: var(--accent); background-color: var(--gold-soft); color: var(--accent); }
+        [data-theme="dark"] .filters-controls .is-active { color: var(--gold); border-color: var(--gold); }
+        .filters-clear {
+            border: 1px dashed var(--border); background: transparent; cursor: pointer; font-family: inherit;
+            color: var(--accent); font-size: 0.8rem; font-weight: 700; padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+        }
+        .filters-clear:hover { border-color: var(--accent); background: var(--gold-soft); }
+        .m-local-link { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+        .m-local-link:hover { color: var(--accent); }
+        @media (max-width: 640px) {
+            .filters-bar h3 { font-size: 1.7rem; }
+            .filters-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .filters-controls > *, .filters-controls > :nth-child(4):nth-last-child(2) { grid-column: span 1; }
+            /* número ímpar de filtros: o último ocupa a linha inteira */
+            .filters-controls > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+            .filters-controls .multi-select-btn, .filters-controls select { font-size: 0.8rem; padding-left: 12px; padding-right: 26px; }
+            .filters-controls .multi-select-btn::after { right: 11px; }
+            .filters-controls select { background-position: right 11px top 50%; }
+        }
+
+        /* Séries: 7 números no topo do catálogo sem sobrar um cartão sozinho na última linha */
+        @media (min-width: 1101px) { #sStatsGrid { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+        @media (min-width: 641px) and (max-width: 1100px) {
+            #sStatsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            #sStatsGrid > .stat-card:nth-child(7):last-child { grid-column: span 2; }
+        }
     </style>
 </head>
 <body data-mode="movies">
@@ -2025,6 +2070,7 @@
     <div class="gallery-container">
         <div class="filters-bar">
             <h3>Catálogo</h3>
+            <button type="button" class="filters-clear" id="clearFiltersBtn" onclick="app.clearCatalogFilters()" hidden>✕ Limpar filtros</button>
             <div class="filters-controls">
                 <div class="multi-select" id="yearFilterWrap">
                     <button type="button" class="btn multi-select-btn" id="yearFilterBtn" onclick="app.toggleYearMenu()">Todo o histórico</button>
@@ -2061,18 +2107,24 @@
                         <div id="genreOptionsList" class="multi-select-scroll-area"></div>
                     </div>
                 </div>
-                <select id="reviewFilter" onchange="app.handleReviewFilterChange(this.value)" title="Filtrar por resenha ou nota pendente">
-                    <option value="all">Mostrar: todos</option>
+                <select id="localFilter" onchange="app.handleLocalFilterChange(this.value)" title="Filtrar por onde assistiram" aria-label="Onde assistiram">
+                    <option value="all">Todos os lugares</option>
+                    <option value="cinema">Cinema</option>
+                    <option value="ricardo">Ricardo</option>
+                    <option value="outros">Outros lugares</option>
+                </select>
+                <select id="reviewFilter" onchange="app.handleReviewFilterChange(this.value)" title="Filtrar por resenha ou nota pendente" aria-label="Resenha e notas">
+                    <option value="all">Todos os filmes</option>
                     <option value="with">Com resenha</option>
                     <option value="without">Sem resenha</option>
                     <option value="pending">Com nota pendente</option>
                 </select>
-                <select id="sortFilter" onchange="app.handleSortChange(this.value)" title="Ordenar catálogo por">
-                    <option value="watchedDesc" selected>Assistido: mais recente primeiro</option>
-                    <option value="watchedAsc">Assistido: mais antigo primeiro</option>
-                    <option value="avg">Ordenar por: Nossa Média</option>
-                    <option value="isr">Ordenar por: Nota do Israel</option>
-                    <option value="ric">Ordenar por: Nota do Ricardo</option>
+                <select id="sortFilter" onchange="app.handleSortChange(this.value)" title="Ordenar catálogo por" aria-label="Ordenar">
+                    <option value="watchedDesc" selected>Mais recentes primeiro</option>
+                    <option value="watchedAsc">Mais antigos primeiro</option>
+                    <option value="avg">Por nossa média</option>
+                    <option value="isr">Por nota do Israel</option>
+                    <option value="ric">Por nota do Ricardo</option>
                 </select>
             </div>
         </div>
@@ -2122,7 +2174,7 @@
             <div class="st-page-head">
                 <div class="st-page-title">
                     <h3>Israel &amp; Ricardo</h3>
-                    <p>Os dois lado a lado: cada indicador aparece com o valor de cada um no mesmo lugar. Considera todo o histórico; nota 0 conta como "sem nota". Toque em um filme para abri-lo.</p>
+                    <p>Os dois lado a lado: cada indicador aparece com o valor de cada um no mesmo lugar. Toque em um filme para abri-lo.</p>
                 </div>
             </div>
             <div id="profilesBody" class="st-body"></div>
@@ -2241,7 +2293,7 @@
                     </div>
                 </div>
                 <select id="sGroupFilter" onchange="sapp.handleGroupFilter(this.value)" title="Filtrar por situação">
-                    <option value="all">Situação: todas</option>
+                    <option value="all">Todas as situações</option>
                     <option value="assistindo">Assistindo</option>
                     <option value="em_dia">Em dia</option>
                     <option value="finalizadas">Finalizadas</option>
@@ -2249,13 +2301,13 @@
                     <option value="avaliar">Aguardando nota</option>
                 </select>
                 <select id="sSortFilter" onchange="sapp.handleSort(this.value)" title="Ordenar séries por">
-                    <option value="recent">Ordenar por: Atividade recente</option>
-                    <option value="avg">Ordenar por: Nossa Média</option>
-                    <option value="isr">Ordenar por: Nota do Israel</option>
-                    <option value="ric">Ordenar por: Nota do Ricardo</option>
-                    <option value="progress">Ordenar por: Progresso</option>
-                    <option value="year">Ordenar por: Ano de estreia</option>
-                    <option value="title">Ordenar por: Título (A–Z)</option>
+                    <option value="recent">Atividade recente</option>
+                    <option value="avg">Por nossa média</option>
+                    <option value="isr">Por nota do Israel</option>
+                    <option value="ric">Por nota do Ricardo</option>
+                    <option value="progress">Por progresso</option>
+                    <option value="year">Por ano de estreia</option>
+                    <option value="title">Por título (A–Z)</option>
                 </select>
             </div>
         </div>
@@ -2282,7 +2334,7 @@
             <div class="st-page-head">
                 <div class="st-page-title">
                     <h3>Israel &amp; Ricardo — Séries</h3>
-                    <p>Os dois lado a lado nas séries concluídas e avaliadas. Toque em uma série para abri-la.</p>
+                    <p>Os dois lado a lado nas séries concluídas. Toque em uma série para abri-la.</p>
                 </div>
             </div>
             <div id="sProfilesBody" class="st-body"></div>
@@ -3871,6 +3923,21 @@
         // quando a aba ainda estava escondida).
         // ============================================================
 
+        // Onde assistiram: os dois lugares principais e o resto como "Outros".
+        // Agrupa sem diferenciar acentos/maiúsculas ("cinema", "Cinemark", "Casa do Ricardo"...).
+        const LOCAL_BUCKETS = [
+            { key: 'cinema', label: 'Cinema', color: 'var(--cat-1)' },
+            { key: 'ricardo', label: 'Ricardo', color: 'var(--color-ricardo)' },
+            { key: 'outros', label: 'Outros', color: 'var(--text-muted)' }
+        ];
+        function localBucket(local) {
+            const k = normalizeKey(local);
+            if (/\bcine/.test(k)) return 'cinema';
+            if (/\bricardo\b/.test(k)) return 'ricardo';
+            return 'outros';
+        }
+        function localBucketLabel(local) { return LOCAL_BUCKETS.find(b => b.key === localBucket(local)).label; }
+
         // Estado dos seletores (abas internas) e listas expandidas: sobrevive às
         // re-renderizações que acontecem quando chega uma mudança da nuvem.
         const UI = { seg: {}, exp: {} };
@@ -4067,13 +4134,13 @@
             if (!total) return stEmpty('Sem dados.');
             // Paleta sem o laranja e o verde-azulado, que são as cores do Israel e do Ricardo
             const pal = ['var(--cat-1)', 'var(--cat-2)', 'var(--cat-5)', 'var(--cat-7)', 'var(--cat-6)'];
-            const color = i => items[i].other ? 'var(--text-muted)' : pal[i % pal.length];
+            const color = i => items[i].color || (items[i].other ? 'var(--text-muted)' : pal[i % pal.length]);
             return `
                 <div class="stack-bar" role="img" aria-label="${escapeHtml(items.map(it => `${it.name}: ${it.count}`).join(', '))}">
                     ${items.map((it, i) => `<i style="flex:${it.count}; background:${color(i)}" title="${escapeHtml(it.name)}: ${it.count}"></i>`).join('')}
                 </div>
                 <div class="stack-legend">${items.map((it, i) => `
-                    <div class="stack-item"><span class="stack-dot" style="background:${color(i)}"></span><span class="stack-name">${escapeHtml(it.name)}</span><span class="stack-val"><b>${Math.round(it.count / total * 100)}%</b> · ${pl(it.count, unit[0], unit[1])}</span></div>`).join('')}
+                    <div class="stack-item${it.click ? ' is-click' : ''}"${clickAttrs(it.click)}><span class="stack-dot" style="background:${color(i)}"></span><span class="stack-name">${escapeHtml(it.name)}</span><span class="stack-val"><b>${Math.round(it.count / total * 100)}%</b> · ${pl(it.count, unit[0], unit[1])}</span>${it.click ? '<span class="stack-go" aria-hidden="true">›</span>' : ''}</div>`).join('')}
                 </div>`;
         }
 
@@ -4204,7 +4271,7 @@
             return hi - lo < 2 ? [Math.max(0, hi - 2), Math.max(2, hi)] : [lo, hi];
         }
         function dbAxis(lo, hi) {
-            return `<div class="db-axis"><span>${lo}</span>${lo > 0 || hi < 10 ? '<span>escala ampliada para destacar a diferença</span>' : ''}<span>${hi}</span></div>`;
+            return `<div class="db-axis"><span>${lo}</span><span>${hi}</span></div>`;
         }
         function dbLegend() {
             return `<div class="db-legend"><span><i class="db-dot db-isr"></i>Israel</span><span><i class="db-dot db-ric"></i>Ricardo</span></div>`;
@@ -4281,22 +4348,21 @@
             rated.forEach(m => { hist[Math.min(10, Math.max(1, Math.round(sc(m)))) - 1]++; });
 
             const top10 = [...rated].sort((a, b) => (sc(b) - sc(a)) || (other(b) - other(a)) || byTitle(a, b)).slice(0, 10);
-            const bottom5 = [...rated].sort((a, b) => (sc(a) - sc(b)) || (other(a) - other(b)) || byTitle(a, b)).slice(0, 5);
+            const bottom10 = [...rated].sort((a, b) => (sc(a) - sc(b)) || (other(a) - other(b)) || byTitle(a, b)).slice(0, 10);
 
             const withImdb = rated.filter(m => m.scImdb > 0).map(m => ({ m, diff: sc(m) - m.scImdb }));
             const meanDiff = withImdb.length ? withImdb.reduce((a, x) => a + x.diff, 0) / withImdb.length : null;
-            const above = withImdb.filter(x => x.diff > 0.049).sort((a, b) => b.diff - a.diff || byTitle(a.m, b.m)).slice(0, 5);
-            const below = withImdb.filter(x => x.diff < -0.049).sort((a, b) => a.diff - b.diff || byTitle(a.m, b.m)).slice(0, 5);
+            const above = withImdb.filter(x => x.diff > 0.049).sort((a, b) => b.diff - a.diff || byTitle(a.m, b.m)).slice(0, 10);
+            const below = withImdb.filter(x => x.diff < -0.049).sort((a, b) => a.diff - b.diff || byTitle(a.m, b.m)).slice(0, 10);
             const corr = pearsonCorr(withImdb.map(x => sc(x.m)), withImdb.map(x => x.m.scImdb));
 
             const favs = {};
             cfg.groups.forEach(g => { favs[g.key] = groupExtremes(rated, g.fn, g.min, sc); });
 
             return {
-                n, avg, modeKey, modeCount, hist, top10, bottom5,
+                n, avg, modeKey, modeCount, hist, top10, bottom10,
                 high: rated.filter(m => sc(m) >= 9).length,
                 low: rated.filter(m => sc(m) < 5).length,
-                pending: cfg.pendingPool.filter(m => !(sc(m) > 0)).length,
                 imdbCount: withImdb.length, meanDiff, above, below, corr, favs
             };
         }
@@ -4312,9 +4378,9 @@
             const absD = both.map(m => Math.abs(d(m)));
             const avgOf = (arr, fn) => arr.length ? arr.reduce((a, x) => a + fn(x), 0) / arr.length : 0;
 
-            const isrMore = both.filter(m => d(m) > 0.049).sort((a, b) => d(b) - d(a) || b.scIsr - a.scIsr || byTitle(a, b)).slice(0, 8);
-            const ricMore = both.filter(m => d(m) < -0.049).sort((a, b) => d(a) - d(b) || b.scRic - a.scRic || byTitle(a, b)).slice(0, 8);
-            const sync = both.filter(m => Math.abs(d(m)) <= 0.5).sort((a, b) => (b.scIsr + b.scRic) - (a.scIsr + a.scRic) || Math.abs(d(a)) - Math.abs(d(b)) || byTitle(a, b)).slice(0, 8);
+            const isrMore = both.filter(m => d(m) > 0.049).sort((a, b) => d(b) - d(a) || b.scIsr - a.scIsr || byTitle(a, b)).slice(0, 10);
+            const ricMore = both.filter(m => d(m) < -0.049).sort((a, b) => d(a) - d(b) || b.scRic - a.scRic || byTitle(a, b)).slice(0, 10);
+            const sync = both.filter(m => Math.abs(d(m)) <= 0.5).sort((a, b) => (b.scIsr + b.scRic) - (a.scIsr + a.scRic) || Math.abs(d(a)) - Math.abs(d(b)) || byTitle(a, b)).slice(0, 10);
 
             // Médias de cada um, ano a ano e por grupo (gênero, diretor/criador, década),
             // sempre sobre os mesmos títulos — senão a diferença viria de títulos diferentes.
@@ -4374,15 +4440,12 @@
             const placar = `
                 <div class="st-panel tape-panel">
                     ${vsHead()}
-                    ${tapeRow(cfg.ratedLabel, fI.n, fR.n, { scale: 'rel' })}
                     ${tapeRow('Nota média', fI.n ? fI.avg : null, fR.n ? fR.avg : null, { fmt: v => v.toFixed(2), scale: 'abs10', tie: 0.005 })}
                     ${tapeRow('Nota mais dada', fI.modeKey ? parseFloat(fI.modeKey) : null, fR.modeKey ? parseFloat(fR.modeKey) : null, { fmt: v => v.toFixed(1), scale: 'abs10', noLead: true, subA: fI.modeCount ? `${fI.modeCount}×` : '', subB: fR.modeCount ? `${fR.modeCount}×` : '' })}
                     ${tapeRow('Notas 9 ou mais', pctOf(fI.high, fI.n), pctOf(fR.high, fR.n), { fmt: v => v + '%', scale: 'pct', subA: pl(fI.high, N[0], N[1]), subB: pl(fR.high, N[0], N[1]) })}
                     ${tapeRow('Notas abaixo de 5', pctOf(fI.low, fI.n), pctOf(fR.low, fR.n), { fmt: v => v + '%', scale: 'pct', subA: pl(fI.low, N[0], N[1]), subB: pl(fR.low, N[0], N[1]) })}
-                    ${tapeRow('Em relação ao IMDb', fI.meanDiff, fR.meanDiff, { fmt: v => fmtSigned(v), scale: 'none', noLead: true, subA: fI.imdbCount ? 'por ' + N[0] : '', subB: fR.imdbCount ? 'por ' + N[0] : '' })}
+                    ${tapeRow('Diferença para o IMDb', fI.meanDiff, fR.meanDiff, { fmt: v => fmtSigned(v), scale: 'none', noLead: true, subA: fI.imdbCount ? 'por ' + N[0] : '', subB: fR.imdbCount ? 'por ' + N[0] : '' })}
                     ${tapeRow('Sintonia com o IMDb', fI.corr, fR.corr, { fmt: corrTxt, scale: 'none', subA: fI.corr === null ? '' : corrLabel(fI.corr), subB: fR.corr === null ? '' : corrLabel(fR.corr) })}
-                    ${fI.pending || fR.pending ? tapeRow(cfg.pendingLabel, fI.pending, fR.pending, { scale: 'rel', noLead: true }) : ''}
-                    <p class="st-foot-note">Cada um é medido n${G.os} ${N[1]} em que deu nota. "Em relação ao IMDb" é quanto a nota da pessoa fica, em média, acima (+) ou abaixo (−) da do IMDb; "sintonia" é a correlação (de −1 a 1).</p>
                 </div>`;
 
             // ---------- 2. Mesmo título ----------
@@ -4410,8 +4473,8 @@
                         ${mini(Math.round(P.closePct) + '%', 'Notas próximas', 'até 1 ponto de diferença')}
                         ${mini(P.corr === null ? '—' : P.corr.toFixed(2), 'Sintonia', P.corr === null ? 'dados insuficientes' : `correlação ${corrLabel(P.corr)}`)}
                     </div>`;
-                const titleRow = (m, i) => dbRow(`${escapeHtml(m.title)}${yr(m)}`, '', m.scIsr, m.scRic, 0, 10, open(m), 'db-title' + (i >= 5 ? ' rk-more' : ''));
-                const titleList = (arr, k) => `<div class="rk-list${UI.exp[k] ? ' is-open' : ''}" data-exp="${k}">${arr.map(titleRow).join('')}${moreBtn(k, arr.length, 5)}</div>`;
+                const titleRow = (m, i) => dbRow(`${escapeHtml(m.title)}${yr(m)}`, '', m.scIsr, m.scRic, 0, 10, open(m), 'db-title');
+                const titleList = (arr, k) => `<div class="rk-list${UI.exp[k] ? ' is-open' : ''}" data-exp="${k}">${arr.map(titleRow).join('')}</div>`;
                 const lists = {
                     isr: P.isrMore.length ? titleList(P.isrMore, sid('t-isr')) : stEmpty(`${G.um} ${N[0]} em que Israel deu nota maior.`),
                     ric: P.ricMore.length ? titleList(P.ricMore, sid('t-ric')) : stEmpty(`${G.um} ${N[0]} em que Ricardo deu nota maior.`),
@@ -4420,18 +4483,18 @@
                 const kk = sid('titles');
                 mesmo = `
                     <div class="st-grid-2">
-                        ${stPanel('Quem deu a nota maior', `n${G.os} ${pl(P.n, N[0], N[1])} ${G.dos} pelos dois`, h2h + minis)}
-                        ${stPanel('Título a título', 'régua de 0 a 10 · toque para abrir',
+                        ${stPanel('Quem deu a nota maior', '', h2h + minis)}
+                        ${stPanel('Título a título', '',
                             `${segHtml(kk, [['isr', 'Israel gostou mais', PERSON.isr.color], ['ric', 'Ricardo gostou mais', PERSON.ric.color], ['sync', 'Em sintonia']], 'isr', 'seg-wide')}
                              ${dbLegend()}
                              <div ${paneAttrs(kk, 'isr', 'isr')}>${lists.isr}</div>
                              <div ${paneAttrs(kk, 'ric', 'isr')}>${lists.ric}</div>
-                             <div ${paneAttrs(kk, 'sync', 'isr')}><p class="st-foot-note st-foot-top">As mais bem avaliadas em que as notas ficaram iguais ou a até meio ponto.</p>${lists.sync}</div>`)}
+                             <div ${paneAttrs(kk, 'sync', 'isr')}>${lists.sync}</div>`)}
                     </div>`;
             }
 
             // ---------- 3. Distribuição ----------
-            const distrib = stPanel('Como cada um distribui as notas', `${G.quantos} ${N[1]} receberam cada nota (arredondada) · ${fI.n} de Israel e ${fR.n} de Ricardo`,
+            const distrib = stPanel('Como cada um distribui as notas', '',
                 buildButterfly(fI.hist, fR.hist, fI.n, fR.n) +
                 `<div class="bf-sum"><span class="c-isr">Israel: média <b>${fI.n ? fI.avg.toFixed(2) : '—'}</b></span><span class="c-ric">Ricardo: média <b>${fR.n ? fR.avg.toFixed(2) : '—'}</b></span></div>`);
 
@@ -4449,7 +4512,7 @@
                 }
                 return `<div ${paneAttrs(gk, g.key, cfg.groups[0].key)}>${body}</div>`;
             }).join('');
-            const gostosCmp = stPanel('Quem gosta mais de quê', `média de cada um n${G.os} mesm${G.os} ${N[1]} · ${cfg.groups.map(g => `${g.label.toLowerCase()}: mín. ${g.pairMin || g.min}`).join(' · ')}`,
+            const gostosCmp = stPanel('Quem gosta mais de quê', '',
                 segHtml(gk, cfg.groups.map(g => [g.key, g.label]), cfg.groups[0].key, 'seg-wide') + dbLegend() + groupPanes);
 
             const favCell = (g, click) => {
@@ -4466,7 +4529,7 @@
                         ${favCell(a, g.click)}${favCell(b, g.click)}
                     </div>`;
             })).join('');
-            const favs = stPanel('Favoritos de cada um', `pela média da própria nota · ${cfg.groups.map(g => `${g.label.toLowerCase()}: mín. ${g.min}`).join(' · ')}`,
+            const favs = stPanel('Favoritos de cada um', '',
                 favRows ? `<div class="fav-cmp"><div class="fc-head"><span></span><span class="c-isr">Israel</span><span class="c-ric">Ricardo</span></div>${favRows}</div>` : stEmpty(`Ainda não há ${N[1]} suficientes em nenhum grupo.`));
 
             // ---------- 5. Ao longo do tempo ----------
@@ -4476,7 +4539,7 @@
                 const [lo, hi] = dbScale(P.byYear.flatMap(r => [r.isr, r.ric]));
                 tempo = dbLegend() + dbAxis(lo, hi) + P.byYear.map(r => dbRow(escapeHtml(r.label), pl(r.n, N[0], N[1]), r.isr, r.ric, lo, hi, '', '', 2)).join('');
             }
-            const tempoPanel = stPanel('A média de cada um, ano a ano', `${cfg.yearNote} · só ${N[1]} ${G.dos} pelos dois`, tempo);
+            const tempoPanel = stPanel('A média de cada um, ano a ano', cfg.yearNote, tempo);
 
             // ---------- 6. Listas de cada um ----------
             const lk = sid('lists'), pk = sid('person');
@@ -4492,7 +4555,7 @@
             };
             const kinds = [
                 ['top', 'Top 10', f => f.top10.map(m => ({ m })), 'list', 'Ainda sem notas.'],
-                ['bottom', 'Piores', f => f.bottom5.map(m => ({ m })), 'list', 'Ainda sem notas.'],
+                ['bottom', '10 piores', f => f.bottom10.map(m => ({ m })), 'list', 'Ainda sem notas.'],
                 ['above', 'Acima do IMDb', f => f.above, 'imdb', `${G.um} ${N[0]} com nota acima do IMDb.`],
                 ['below', 'Abaixo do IMDb', f => f.below, 'imdb', `${G.um} ${N[0]} com nota abaixo do IMDb.`]
             ];
@@ -4504,13 +4567,13 @@
                         ${items.length ? items.map((x, i) => listRow(p, x.m, i, k[3], x)).join('') : stEmpty(k[4])}
                     </div>`;
             };
-            const lists = stPanel('Top 10, piores e IMDb', 'ao lado, a nota do outro (ou do IMDb) · toque para abrir',
+            const lists = stPanel('Top 10, piores e IMDb', '',
                 `<div class="pair-tools">${segHtml(lk, kinds.map(k => [k[0], k[1]]), 'top')}${segHtml(pk, [['isr', 'Israel', PERSON.isr.color], ['ric', 'Ricardo', PERSON.ric.color]], 'isr', 'seg-person pair-ptoggle')}</div>
                  ${kinds.map(k => `<div ${paneAttrs(lk, k[0], 'top')}><div class="pair-cols">${col(pI, fI, k)}${col(pR, fR, k)}</div></div>`).join('')}`);
 
             return jumpNav([[sid('placar'), 'Placar'], [sid('mesmo'), 'Mesmo título'], [sid('gostos'), 'Gostos'], [sid('tempo'), 'No tempo'], [sid('listas'), 'Listas']]) +
-                stSection(sid('placar'), 'Lado a lado', 'O placar', cfg.placarSub, `<div class="st-grid-2 grid-placar">${placar}${distrib}</div>`) +
-                stSection(sid('mesmo'), 'Quando os dois avaliam', `${G.mesmo} ${N[0]}`, `Comparação justa: só ${N[1]} com a nota dos dois.`, mesmo) +
+                stSection(sid('placar'), 'Lado a lado', 'O placar', '', `<div class="st-grid-2 grid-placar">${placar}${distrib}</div>`) +
+                stSection(sid('mesmo'), 'Quando os dois avaliam', `${G.mesmo} ${N[0]}`, '', mesmo) +
                 stSection(sid('gostos'), 'Preferências', 'Gostos', '', `<div class="st-grid-2">${gostosCmp}${favs}</div>`) +
                 stSection(sid('tempo'), 'Evolução', 'Ao longo do tempo', '', tempoPanel) +
                 stSection(sid('listas'), 'Rankings', 'As listas de cada um', '', lists);
@@ -4535,6 +4598,7 @@
                 this._autosaveTimer = null;
                 this.sortBy = 'watchedDesc'; // 'watchedDesc' | 'watchedAsc' | 'avg' | 'isr' | 'ric' — padrão: assistido mais recente primeiro
                 this.reviewFilter = 'all'; // 'all' | 'with' | 'without' — filtro de resenha do Catálogo
+                this.localFilter = 'all'; // 'all' | 'cinema' | 'ricardo' | 'outros' — onde assistiram
                 this.navHistory = []; // pilha de "de onde vim", para o botão Voltar
                 this.init();
             }
@@ -4688,6 +4752,7 @@
             filterByDirector(name) {
                 this.pushNavState();
                 this.switchTab('catalogo');
+                this.resetCatalogFilters();
                 const key = normalizeKey(name);
 
                 // Limpa outros filtros de diretor ativos e seleciona só este,
@@ -4715,6 +4780,7 @@
             filterByGenre(name) {
                 this.pushNavState();
                 this.switchTab('catalogo');
+                this.resetCatalogFilters();
                 const key = normalizeKey(name);
 
                 this.selectedGenres = new Set([key]);
@@ -5521,6 +5587,53 @@
                 this.handleFilter();
             }
 
+            // --- Filtro de onde assistiram (Cinema / Ricardo / Outros) ---
+            handleLocalFilterChange(value) {
+                this.localFilter = LOCAL_BUCKETS.some(b => b.key === value) ? value : 'all';
+                const sel = document.getElementById('localFilter');
+                if (sel) sel.value = this.localFilter;
+                this.handleFilter();
+            }
+
+            // Atalho vindo das Estatísticas ou do detalhe do filme: catálogo filtrado pelo lugar
+            filterByLocal(bucket) {
+                this.pushNavState();
+                if (this.editingId !== null) this.closeModal();
+                this.switchTab('catalogo');
+                this.resetCatalogFilters();
+                this.handleLocalFilterChange(bucket);
+            }
+
+            // Volta todos os filtros do catálogo ao padrão (a ordenação escolhida é mantida)
+            clearCatalogFilters() {
+                this.resetCatalogFilters();
+                this.handleFilter();
+            }
+            resetCatalogFilters() {
+                this.selectedYears.clear(); this.selectedDirectors.clear(); this.selectedGenres.clear();
+                document.querySelectorAll('#yearOptionsList input, #directorOptionsList input, #genreOptionsList input').forEach(cb => { cb.checked = false; });
+                ['yearOptAll', 'directorOptAll', 'genreOptAll'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = true; });
+                this.updateYearFilterButtonLabel(); this.updateDirectorFilterButtonLabel(); this.updateGenreFilterButtonLabel();
+                this.localFilter = 'all'; this.reviewFilter = 'all';
+                document.getElementById('localFilter').value = 'all';
+                document.getElementById('reviewFilter').value = 'all';
+                document.getElementById('searchInput').value = '';
+                document.querySelector('header').classList.remove('m-has-query');
+            }
+
+            // Destaca os filtros em uso e mostra o "Limpar filtros" só quando há algo para limpar
+            updateFilterStates() {
+                const states = [
+                    ['yearFilterBtn', this.selectedYears.size > 0], ['directorFilterBtn', this.selectedDirectors.size > 0],
+                    ['genreFilterBtn', this.selectedGenres.size > 0], ['localFilter', this.localFilter !== 'all'],
+                    ['reviewFilter', this.reviewFilter !== 'all']
+                ];
+                states.forEach(([id, on]) => { const el = document.getElementById(id); if (el) el.classList.toggle('is-active', on); });
+                const any = states.some(s => s[1]) || !!document.getElementById('searchInput').value.trim();
+                const btn = document.getElementById('clearFiltersBtn');
+                if (btn) btn.hidden = !any;
+            }
+
             // --- Filtro de resenha (Com Resenha exige as duas: Israel E Ricardo) ---
             handleReviewFilterChange(value) {
                 this.reviewFilter = value;
@@ -5551,6 +5664,9 @@
                         return gs.some(g => this.selectedGenres.has(normalizeKey(g)));
                     });
                 }
+
+                // Onde assistiram
+                if (this.localFilter !== 'all') list = list.filter(m => localBucket(m.local) === this.localFilter);
 
                 // Resenha: "Com Resenha" exige texto tanto do Israel quanto do Ricardo;
                 // se faltar a de qualquer um dos dois, o filme conta como "Sem Resenha".
@@ -5601,6 +5717,7 @@
                 list.sort(comparators[this.sortBy] || comparators.avg);
 
                 this.filtered = list;
+                this.updateFilterStates();
                 this.renderGrid();
                 this.updateDashboard(list);
             }
@@ -5894,7 +6011,9 @@
                 // Datas
                 const [y,mm,dd] = m.date.split('-');
                 document.getElementById('mData').innerText = `Data: ${dd}/${mm}/${y}`;
-                document.getElementById('mLocal').innerText = `Local: ${m.local}`;
+                document.getElementById('mLocal').innerHTML = m.local
+                    ? `Local: <a href="#" class="m-local-link" title="Ver os filmes assistidos em ${escapeHtml(localBucketLabel(m.local).toLowerCase())}" onclick="event.preventDefault(); app.filterByLocal('${localBucket(m.local)}')">${escapeHtml(m.local)}</a>`
+                    : 'Local: -';
                 this.renderSessions(m);
 
                 // Resenhas
@@ -6249,7 +6368,6 @@
                 const avgImdb = avgOver(withImdbAll, m => m.scImdb);
                 const ratedList = list.filter(m => m.avg > 0);
                 const avgNossa = avgOver(ratedList, m => m.avg);
-                const pendingCount = list.filter(m => missingScores(m).length > 0).length;
 
                 // Tempo total e sessões: cada sessão no período conta
                 let mins = 0, sessions = 0;
@@ -6304,12 +6422,10 @@
                 const topGenresByCount = [...genArr].sort((a,b) => b.count - a.count || byName(a, b));
                 const topGenresByAvg = genArr.filter(g => g.count >= 2).sort((a,b) => b.avg - a.avg || b.count - a.count || byName(a, b));
 
-                // Locais em ordem decrescente: os 4 principais + "Outros" (a barra de
-                // proporção comporta mais fatias legíveis do que a antiga rosca)
-                const allLocalsFull = buildGroup(m => [m.local || '(sem local)'], false).sort((a,b) => b.count - a.count);
-                const allLocals = allLocalsFull.slice(0, 4);
-                const outrosCount = allLocalsFull.slice(4).reduce((s, l) => s + l.count, 0);
-                if (outrosCount > 0) allLocals.push({ name: 'Outros', count: outrosCount, other: true });
+                // Onde assistiram: Cinema / Ricardo / Outros (mesmo agrupamento do filtro do catálogo);
+                // tocar em um lugar abre o catálogo filtrado por ele
+                const localBuckets = LOCAL_BUCKETS.map(b => ({ key: b.key, name: b.label, color: b.color, count: list.filter(m => localBucket(m.local) === b.key).length,
+                    click: `app.filterByLocal('${b.key}')` })).filter(b => b.count > 0);
 
                 // Filme mais bem e mais mal avaliado (pela nossa média), dentro do período filtrado
                 let bestMovie = null, worstMovie = null;
@@ -6361,8 +6477,8 @@
 
                 return {
                     total, mins, sessions, avgIsr, avgRic, avgImdb, imdbN: withImdbAll.length, avgNossa,
-                    ratedN: ratedList.length, pendingCount, directorsN: dirArr.length,
-                    topDirectorsByCount, topDirectorsByAvg, topGenresByCount, topGenresByAvg, allLocals,
+                    ratedN: ratedList.length, directorsN: dirArr.length,
+                    topDirectorsByCount, topDirectorsByAvg, topGenresByCount, topGenresByAvg, localBuckets, genresN: genArr.length,
                     bestMovie, worstMovie, yearlyScores, decadeScores, longestMovie, shortestMovie, mostRewatched,
                     monthOfYear, weekdayCount, timeline, imdbCorrelation, imdbPairs, imdbPairAvg
                 };
@@ -6381,14 +6497,11 @@
             compareCfg() {
                 return {
                     key: 'm', noun: ['filme', 'filmes'],
-                    ratedLabel: 'Filmes com nota', pendingLabel: 'Filmes sem a nota dele',
-                    placarSub: 'Todo o histórico. Nota 0 conta como "sem nota".',
                     emptyAll: 'Ainda não há notas de Israel nem de Ricardo.',
                     yearNote: 'pelo ano em que assistiram',
                     open: 'app.openModal',
                     yearLabel: m => m.year,
                     yearOf: m => (m.date || '').slice(0, 4),
-                    pendingPool: this.movies,
                     groups: [
                         { key: 'gen', label: 'Gêneros', singular: 'Gênero', min: 3, fn: m => (m.genres || '').split(',').map(g => g.trim()).filter(Boolean),
                           click: name => `app.filterByGenre('${escapeJsString(name)}')` },
@@ -6415,15 +6528,17 @@
                 const open = m => `app.openModal(${m.id})`;
 
                 // --- Visão geral ---
-                const rewatchTxt = s.sessions > s.total ? ` em ${pl(s.sessions, 'sessão', 'sessões')}` : '';
+                const cinema = s.localBuckets.find(b => b.key === 'cinema');
+                const cinemaPct = cinema ? Math.round(cinema.count / s.total * 100) : 0;
+                const rewatchTxt = s.sessions > s.total ? `${pl(s.sessions, 'sessão', 'sessões')}, contando ${pl(s.sessions - s.total, 'filme revisto', 'filmes revistos')}` : '';
                 const hero = buildStatsHero({
-                    n: s.total, nLabel: `filmes ${periodTxt}`, sub: `${this.formatDuration(s.mins)} de tela${rewatchTxt}`,
-                    avg: s.avgNossa, avgSub: `${s.ratedN} de ${s.total} com nota`,
+                    n: s.total, nLabel: `filmes ${periodTxt}`, sub: rewatchTxt,
+                    avg: s.avgNossa, avgSub: s.imdbN ? `IMDb ${s.avgImdb.toFixed(2)}` : '',
                     figs: [
-                        [this.formatDuration(s.mins), 'Tempo de tela', s.sessions > s.total ? `${s.sessions - s.total} revistos` : ''],
-                        [s.imdbN ? s.avgImdb.toFixed(2) : '—', 'Média IMDb', `${s.imdbN} com nota`],
+                        [this.formatDuration(s.mins), 'Tempo de tela', ''],
+                        [s.genresN, 'Gêneros', 'diferentes'],
                         [s.directorsN, 'Diretores', 'diferentes'],
-                        [s.pendingCount, 'Sem nota', s.pendingCount ? `<a href="#" onclick="event.preventDefault(); app.showPendingInCatalog()">ver no catálogo</a>` : 'tudo avaliado']
+                        [`${cinemaPct}%`, 'No cinema', cinema ? `<a href="#" onclick="event.preventDefault(); app.filterByLocal('cinema')">${pl(cinema.count, 'filme', 'filmes')} · ver</a>` : 'nenhum filme']
                     ],
                     isr: s.avgIsr, ric: s.avgRic, cmpTab: 'perfis'
                 });
@@ -6432,24 +6547,24 @@
                 const MONTHS_L = ['J','F','M','A','M','J','J','A','S','O','N','D'];
                 const MONTHS_FULL = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
                 const ritmo = `
-                    ${stPanel('Linha do tempo', 'sessões por mês' + (years.size ? '' : ', desde o primeiro registro'), buildTimeline(s.timeline, ['sessão', 'sessões']))}
+                    ${stPanel('Linha do tempo', 'sessões por mês', buildTimeline(s.timeline, ['sessão', 'sessões']))}
                     <div class="st-grid-2">
-                        ${stPanel('Mês do ano', 'todas as sessões, somando os anos', buildColumns(s.monthOfYear, MONTHS_L, (i, v) => `${MONTHS_FULL[i]}: ${pl(v, 'sessão', 'sessões')}`))}
-                        ${stPanel('Dia da semana', 'em que dia vocês mais assistem', buildColumns(s.weekdayCount, WEEKDAY_ABBR, (i, v) => `${WEEKDAY_ORDER[i]}: ${pl(v, 'sessão', 'sessões')}`))}
+                        ${stPanel('Mês do ano', '', buildColumns(s.monthOfYear, MONTHS_L, (i, v) => `${MONTHS_FULL[i]}: ${pl(v, 'sessão', 'sessões')}`))}
+                        ${stPanel('Dia da semana', '', buildColumns(s.weekdayCount, WEEKDAY_ABBR, (i, v) => `${WEEKDAY_ORDER[i]}: ${pl(v, 'sessão', 'sessões')}`))}
                     </div>
-                    ${stPanel('Onde assistem', '', buildStackBar(s.allLocals, F))}`;
+                    ${stPanel('Onde assistem', '', buildStackBar(s.localBuckets, F))}`;
 
                 // --- Gostos ---
                 const dirClick = d => `app.filterByDirector('${escapeJsString(d.name)}')`;
                 const genClick = g => `app.filterByGenre('${escapeJsString(g.name)}')`;
-                const rankPanel = (title, key, byCount, byAvg, clickFn, minNote) => stPanel(title, `barra = quantidade · selo = nossa média · toque para filtrar o catálogo${minNote}`,
+                const rankPanel = (title, key, byCount, byAvg, clickFn, minNote) => stPanel(title, minNote,
                     `<div ${paneAttrs(key, 'count', 'count')}>${buildRankRows(byCount, { key: key + '-c', nameFn: x => x.name, countFn: x => x.count, avgFn: x => x.avg, unit: F, clickFn })}</div>
                      <div ${paneAttrs(key, 'avg', 'count')}>${buildRankRows(byAvg, { key: key + '-a', nameFn: x => x.name, countFn: x => x.count, avgFn: x => x.avg, unit: F, clickFn })}</div>`,
                     '', segHtml(key, [['count', 'Mais vistos'], ['avg', 'Melhor nota']], 'count', 'seg-sm'));
                 const gostos = `
                     <div class="st-grid-2">
-                        ${rankPanel('Diretores', 'm-st-dir', s.topDirectorsByCount, s.topDirectorsByAvg, dirClick, ' · mín. 2 filmes')}
-                        ${rankPanel('Gêneros', 'm-st-gen', s.topGenresByCount, s.topGenresByAvg, genClick, ' · melhor nota: mín. 2 filmes')}
+                        ${rankPanel('Diretores', 'm-st-dir', s.topDirectorsByCount, s.topDirectorsByAvg, dirClick, 'mín. 2 filmes')}
+                        ${rankPanel('Gêneros', 'm-st-gen', s.topGenresByCount, s.topGenresByAvg, genClick, '')}
                     </div>`;
 
                 // --- Notas ---
@@ -6466,13 +6581,13 @@
                                 <div class="mini-stat"><div class="mini-v">${r.toFixed(2)}</div><div class="mini-l">Correlação</div><div class="mini-s">${corrLabel(r)} e ${r >= 0 ? 'positiva' : 'negativa'}</div></div>
                             </div>
                         </div>
-                        <p class="st-foot-note">Cada ponto é um filme. Acima da linha tracejada, o IMDb gostou mais do que vocês; abaixo, vocês gostaram mais.</p>`;
+                        <p class="st-foot-note">Cada ponto é um filme. Acima da linha, o IMDb gostou mais do que vocês.</p>`;
                 }
                 const notas = `
-                    ${stPanel('Ano a ano', 'pelo ano em que assistiram · sempre o histórico completo, mesmo com o filtro de período', buildYearTable(s.yearlyScores, F))}
+                    ${stPanel('Ano a ano', years.size ? 'sempre o histórico completo' : '', buildYearTable(s.yearlyScores, F))}
                     <div class="st-grid-2">
-                        ${stPanel('Por década de lançamento', 'filmes com nota, em ordem cronológica', buildRankRows(s.decadeScores, { key: 'm-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: F, noPos: true, limit: 12 }))}
-                        ${stPanel('Vocês × IMDb', 'nossa média × nota do IMDb', imdbBody)}
+                        ${stPanel('Por década de lançamento', '', buildRankRows(s.decadeScores, { key: 'm-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: F, noPos: true, limit: 12 }))}
+                        ${stPanel('Vocês × IMDb', '', imdbBody)}
                     </div>`;
 
                 // --- Recordes ---
@@ -6490,25 +6605,8 @@
                     stSection('m-st-ritmo', 'Ritmo', 'Quando e onde assistem', '', ritmo) +
                     stSection('m-st-gostos', 'Gostos', 'Diretores e gêneros', '', gostos) +
                     stSection('m-st-notas', 'Notas', 'Como as notas se comportam', '', notas) +
-                    stSection('m-st-recordes', 'Recordes', 'Os extremos do período', 'Toque em um filme para abri-lo.', recordes);
+                    stSection('m-st-recordes', 'Recordes', 'Os extremos do período', '', recordes);
                 wireJumpNav(host);
-            }
-
-            // Atalho do topo das Estatísticas: mostra no catálogo os filmes que ainda não têm a nota dos dois
-            showPendingInCatalog() {
-                this.pushNavState();
-                this.switchTab('catalogo');
-                // limpa os outros filtros do catálogo, para aparecerem todos os filmes sem nota
-                this.selectedYears.clear(); this.selectedDirectors.clear(); this.selectedGenres.clear();
-                document.querySelectorAll('#yearOptionsList input, #directorOptionsList input, #genreOptionsList input').forEach(cb => { cb.checked = false; });
-                ['yearOptAll', 'directorOptAll', 'genreOptAll'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = true; });
-                this.updateYearFilterButtonLabel(); this.updateDirectorFilterButtonLabel(); this.updateGenreFilterButtonLabel();
-                document.getElementById('searchInput').value = '';
-                document.querySelector('header').classList.remove('m-has-query');
-                this.reviewFilter = 'pending';
-                const sel = document.getElementById('reviewFilter');
-                if (sel) sel.value = 'pending';
-                this.handleFilter();
             }
 
             // --- Recap do ano ---
@@ -8491,12 +8589,12 @@
                 const hero = buildStatsHero({
                     n: s.total, nLabel: s.total === 1 ? 'série no catálogo' : 'séries no catálogo',
                     sub: `${pl(s.doneN, 'concluída', 'concluídas')} · ${pl(s.inProgressN, 'em andamento', 'em andamento')}`,
-                    avg: s.avgNossa, avgSub: `${pl(s.ratedN, 'série avaliada', 'séries avaliadas')}`,
+                    avg: s.avgNossa, avgSub: 'das séries concluídas',
                     figs: [
                         [this.dur(s.minsWatched), 'Tempo assistido', ''],
                         [s.epsWatched, 'Episódios', `${pl(s.seasonsDone, 'temporada completa', 'temporadas completas')}`],
                         [s.imdbN ? s.avgImdb.toFixed(2) : '—', 'Média IMDb', 'das concluídas'],
-                        [s.needRating, 'Aguardando nota', s.needRating ? 'concluídas sem as duas notas' : 'tudo avaliado']
+                        [s.creatorsCount.length, 'Criadores', 'diferentes']
                     ],
                     isr: s.avgIsr, ric: s.avgRic, cmpTab: 's-perfis'
                 });
@@ -8506,14 +8604,14 @@
                 const progresso = `
                     <div class="st-grid-2">
                         ${stPanel('Situação do catálogo', '', buildStackBar(s.status, S))}
-                        ${stPanel('O que ainda falta', 'pelos episódios já lançados', `
+                        ${stPanel('O que ainda falta', '', `
                             <div class="prog-big"><div class="prog-bar"><i style="width:${pct}%"></i></div><div class="prog-txt"><b>${pct}%</b> dos episódios lançados já vistos · ${s.epsWatched} de ${s.epsTotal}</div></div>
                             <div class="mini-grid mini-grid-2">
                                 <div class="mini-stat"><div class="mini-v">${this.dur(s.remainingMin)}</div><div class="mini-l">Para terminar</div><div class="mini-s">${pl(s.inProgressN, 'série em andamento', 'séries em andamento')}</div></div>
                                 <div class="mini-stat"><div class="mini-v">${this.dur(s.queueMin)}</div><div class="mini-l">Tempo da fila</div><div class="mini-s">séries não iniciadas</div></div>
                             </div>`)}
                     </div>
-                    ${s.yearly.length ? stPanel('Concluídas por ano', 'pela data em que terminaram · selo = nossa média', buildYearTable(s.yearly, S)) : ''}`;
+                    ${s.yearly.length ? stPanel('Concluídas por ano', '', buildYearTable(s.yearly, S)) : ''}`;
 
                 // --- Gostos ---
                 const creatorClick = d => `sapp.filterByCreator('${escapeJsString(d.name)}')`;
@@ -8522,7 +8620,7 @@
                 const avgMap = list => new Map(list.map(x => [normalizeKey(x.name), x.avg]));
                 const rankPanel = (title, key, byCount, byAvgAll, byAvg, clickFn) => {
                     const am = avgMap(byAvgAll);
-                    return stPanel(title, 'barra = quantidade · selo = nossa média (só concluídas) · toque para filtrar',
+                    return stPanel(title, '',
                         `<div ${paneAttrs(key, 'count', 'count')}>${buildRankRows(byCount, { key: key + '-c', nameFn: x => x.name, countFn: x => x.count, avgFn: x => am.get(normalizeKey(x.name)) || 0, unit: S, clickFn })}</div>
                          <div ${paneAttrs(key, 'avg', 'count')}>${buildRankRows(byAvg, { key: key + '-a', nameFn: x => x.name, countFn: x => x.count, avgFn: x => x.avg, unit: ['série avaliada', 'séries avaliadas'], clickFn, empty: 'Nenhum grupo com 2 ou mais séries avaliadas ainda.' })}</div>`,
                         '', segHtml(key, [['count', 'Mais vistas'], ['avg', 'Melhor nota']], 'count', 'seg-sm'));
@@ -8550,12 +8648,12 @@
                                 <div class="mini-stat"><div class="mini-v">${r.toFixed(2)}</div><div class="mini-l">Correlação</div><div class="mini-s">${corrLabel(r)} e ${r >= 0 ? 'positiva' : 'negativa'}</div></div>
                             </div>
                         </div>
-                        <p class="st-foot-note">Só entram séries 100% assistidas. Acima da linha tracejada, o IMDb gostou mais do que vocês.</p>`;
+                        <p class="st-foot-note">Cada ponto é uma série. Acima da linha, o IMDb gostou mais do que vocês.</p>`;
                 }
                 const notas = `
                     <div class="st-grid-2">
-                        ${stPanel('Por década de estreia', 'séries concluídas e avaliadas', buildRankRows(s.decades, { key: 's-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: S, noPos: true, limit: 12 }))}
-                        ${stPanel('Vocês × IMDb', 'nossa média × nota do IMDb', imdbBody)}
+                        ${stPanel('Por década de estreia', '', buildRankRows(s.decades, { key: 's-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: S, noPos: true, limit: 12 }))}
+                        ${stPanel('Vocês × IMDb', '', imdbBody)}
                     </div>`;
 
                 const recordes = buildRecords([
@@ -8571,8 +8669,8 @@
                     stSection('s-st-geral', 'Visão geral', 'Os números de vocês', '', hero) +
                     stSection('s-st-prog', 'Progresso', 'Onde vocês estão', '', progresso) +
                     stSection('s-st-gostos', 'Gostos', 'Criadores e gêneros', '', gostos) +
-                    stSection('s-st-notas', 'Notas', 'Como as notas se comportam', 'Notas e IMDb só entram quando a série é concluída.', notas) +
-                    stSection('s-st-recordes', 'Recordes', 'Os extremos', 'Toque em uma série para abri-la.', recordes);
+                    stSection('s-st-notas', 'Notas', 'Como as notas se comportam', '', notas) +
+                    stSection('s-st-recordes', 'Recordes', 'Os extremos', '', recordes);
                 wireJumpNav(host);
             }
 
@@ -8588,14 +8686,11 @@
                 // Mínimos menores que nos filmes: há bem menos séries do que filmes no histórico
                 host.innerHTML = buildComparePage(rated, {
                     key: 's', noun: ['série', 'séries'], fem: true,
-                    ratedLabel: 'Séries com nota', pendingLabel: 'Concluídas sem a nota dele',
-                    placarSub: 'Séries concluídas e avaliadas.',
                     emptyAll: 'Ainda não há notas em séries concluídas.',
                     yearNote: 'pelo ano em que terminaram',
                     open: 'sapp.openModal',
                     yearLabel: s => s.yearStart,
                     yearOf: s => (s.finishedDate || '').slice(0, 4),
-                    pendingPool: this.series.filter(s => s._m.complete),
                     groups: [
                         { key: 'gen', label: 'Gêneros', singular: 'Gênero', min: 2, fn: s => genresOf(s), click: name => `sapp.filterByGenre('${escapeJsString(name)}')` },
                         { key: 'cre', label: 'Criadores', singular: 'Criador', min: 2, fn: s => s.creators, click: name => `sapp.filterByCreator('${escapeJsString(name)}')` },
