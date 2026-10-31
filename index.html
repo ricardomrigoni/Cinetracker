@@ -9419,10 +9419,19 @@
                 document.title = `CineTracker - Livro do ano ${year}`; // vira o nome sugerido do PDF
                 const done = () => {
                     document.body.classList.remove('yb-printing');
+                    const ps = document.getElementById('ybPageStyle'); if (ps) ps.remove();
                     document.title = prevTitle;
                     window.removeEventListener('afterprint', done);
                 };
                 window.addEventListener('afterprint', done);
+                // Margem zero em todas as páginas só enquanto o livro é impresso (as cores vão até a borda).
+                // Fica num <style> temporário para não mudar a impressão normal do site.
+                if (!document.getElementById('ybPageStyle')) {
+                    const ps = document.createElement('style');
+                    ps.id = 'ybPageStyle';
+                    ps.textContent = '@page { size: 210mm 297mm; margin: 0 !important; } @media print { html, body { margin: 0 !important; padding: 0 !important; width: 210mm; } }';
+                    document.head.appendChild(ps);
+                }
                 document.body.classList.add('yb-printing');
                 setTimeout(() => window.print(), 60);
             }
