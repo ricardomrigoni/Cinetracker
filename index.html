@@ -2041,12 +2041,13 @@
         .yb-fig:first-child { border-left: none; }
         .yb-fig-v { font-size: 30pt; line-height: 0.95; color: var(--yb-ink); }
         .yb-fig-l { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1.2mm; }
-        .yb-collage { display: flex; justify-content: center; gap: 3.5mm; margin-top: auto; }
-        .yb-collage figure { margin: 0; width: 29mm; }
-        .yb-collage img { display: block; width: 29mm; height: 43.5mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; box-shadow: 0 0.8mm 2mm rgba(42,29,20,0.25); }
+        .yb-cover-in { justify-content: center; }
+        .yb-collage { display: flex; justify-content: center; gap: 3.5mm; margin-top: 14mm; }
+        .yb-collage figure { margin: 0; width: 31mm; }
+        .yb-collage img { display: block; width: 31mm; height: 46.5mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; box-shadow: 0 0.8mm 2mm rgba(42,29,20,0.25); }
         .yb-collage figcaption { font-size: 6.5pt; font-weight: 800; color: var(--yb-muted); margin-top: 1.2mm; letter-spacing: 0.08em; }
         .yb-collage-note { font-size: 7pt; color: var(--yb-soft); margin-top: 2.5mm; letter-spacing: 0.04em; }
-        .yb-issued { font-size: 7.5pt; color: var(--yb-muted); margin-top: 7mm; letter-spacing: 0.08em; }
+        .yb-issued { position: absolute; left: 0; right: 0; bottom: 7mm; font-size: 7.5pt; color: var(--yb-muted); letter-spacing: 0.08em; }
 
         .yb-back-in { justify-content: center; }
         .yb-fim { font-size: 120pt; line-height: 0.85; color: var(--yb-red); }
@@ -9202,7 +9203,7 @@
                     <div class="yb-collage">${top.map((e, i) => `
                         <figure><img ${this.imgAttrs(e.m)} alt=""><figcaption>Nº ${i + 1}</figcaption></figure>`).join('')}
                     </div>
-                    <div class="yb-collage-note">Os ${top.length === 1 ? 'melhor' : top.length + ' melhores'} do ano pela nossa média</div>` : '<div style="margin-top:auto"></div>';
+                    <div class="yb-collage-note">Os ${top.length === 1 ? 'melhor' : top.length + ' melhores'} do ano pela nossa média</div>` : '';
                 return `
                     <section class="yb-page yb-cover">
                         ${this.strip('top')}
