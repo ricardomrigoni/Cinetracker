@@ -1982,6 +1982,169 @@
             #sStatsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
             #sStatsGrid > .stat-card:nth-child(7):last-child { grid-column: span 2; }
         }
+
+        /* ============================================================
+           LIVRO DO ANO — versão para impressão em A4 (só filmes)
+           Paleta própria e fixa (igual nos dois temas): é um impresso.
+           Fica escondido na tela; só aparece ao imprimir o livro.
+           ============================================================ */
+        #ybPrint { display: none; }
+        @page ybA4 { size: A4 portrait; margin: 0; }
+        @media print {
+            body.yb-printing > *:not(#ybPrint) { display: none !important; }
+            body.yb-printing { background: #ffffff !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
+            body.yb-printing #ybPrint { display: block !important; }
+        }
+        @media (max-width: 640px) { .st-page-tools .yb-trigger { grid-column: 1 / -1; } }
+        .yb-modal-note { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 18px; }
+        .yb-modal-count { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin: 12px 0 14px; min-height: 1.4em; }
+        .yb-modal-count.is-empty { color: var(--score-low); }
+        #ybYearSelect { width: 100%; }
+
+        #ybPrint {
+            --yb-paper: #f6ecd8; --yb-sheet: #fffcf6; --yb-ink: #2a1d14; --yb-muted: #6f5a46; --yb-soft: #9a876f;
+            --yb-red: #a6272c; --yb-gold: #b8912c; --yb-film: #1d1510; --yb-line: #e3d4b4;
+            --yb-isr: #c07a1e; --yb-ric: #2c6e6b;
+        }
+        .yb-page {
+            page: ybA4; width: 210mm; height: 297mm; position: relative; overflow: hidden; box-sizing: border-box;
+            break-after: page; page-break-after: always; break-inside: avoid;
+            background: var(--yb-sheet); color: var(--yb-ink);
+            font-family: 'Manrope', 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; line-height: 1.35;
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        }
+        .yb-page:last-child { break-after: auto; page-break-after: auto; }
+        .yb-page * { box-sizing: border-box; }
+        .yb-bebas { font-family: 'Bebas Neue', 'Oswald', Impact, sans-serif; font-weight: 400; letter-spacing: 0.02em; }
+
+        /* Película: faixas com perfurações */
+        .yb-strip { position: absolute; left: 0; right: 0; height: 11mm; background: var(--yb-film); display: flex; align-items: center; overflow: hidden; }
+        .yb-strip.top { top: 0; } .yb-strip.bottom { bottom: 0; }
+        .yb-holes { display: flex; gap: 3.2mm; padding: 0 3mm; }
+        .yb-holes i { flex: 0 0 4.2mm; height: 3.2mm; border-radius: 0.8mm; background: var(--yb-paper); }
+
+        /* Capa e contracapa */
+        .yb-cover, .yb-back { background: var(--yb-paper); }
+        .yb-frame { position: absolute; inset: 17mm 12mm; border: 0.6mm solid var(--yb-gold); }
+        .yb-frame::after { content: ''; position: absolute; inset: 1.6mm; border: 0.25mm solid var(--yb-gold); }
+        .yb-cover-in, .yb-back-in { position: absolute; inset: 17mm 12mm; padding: 14mm 14mm 12mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .yb-kicker { font-size: 8.5pt; font-weight: 800; letter-spacing: 0.32em; color: var(--yb-muted); text-transform: uppercase; }
+        .yb-kicker b { color: var(--yb-red); font-weight: 800; }
+        .yb-cover-year { font-size: 150pt; line-height: 0.82; color: var(--yb-red); margin: 9mm 0 3mm; }
+        .yb-cover-title { font-size: 21pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
+        .yb-cover-period { font-size: 9.5pt; color: var(--yb-muted); font-weight: 600; margin-top: 3mm; }
+        .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); margin: 8mm 0 7mm; width: 70mm; }
+        .yb-orn::before, .yb-orn::after { content: ''; flex: 1; height: 0.3mm; background: var(--yb-gold); }
+        .yb-orn span { font-size: 9pt; }
+        .yb-figs { display: flex; justify-content: center; width: 100%; }
+        .yb-fig { padding: 0 8mm; border-left: 0.3mm solid var(--yb-line); }
+        .yb-fig:first-child { border-left: none; }
+        .yb-fig-v { font-size: 30pt; line-height: 0.95; color: var(--yb-ink); }
+        .yb-fig-l { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1.2mm; }
+        .yb-collage { display: flex; justify-content: center; gap: 3.5mm; margin-top: auto; }
+        .yb-collage figure { margin: 0; width: 29mm; }
+        .yb-collage img { display: block; width: 29mm; height: 43.5mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; box-shadow: 0 0.8mm 2mm rgba(42,29,20,0.25); }
+        .yb-collage figcaption { font-size: 6.5pt; font-weight: 800; color: var(--yb-muted); margin-top: 1.2mm; letter-spacing: 0.08em; }
+        .yb-collage-note { font-size: 7pt; color: var(--yb-soft); margin-top: 2.5mm; letter-spacing: 0.04em; }
+        .yb-issued { font-size: 7.5pt; color: var(--yb-muted); margin-top: 7mm; letter-spacing: 0.08em; }
+
+        .yb-back-in { justify-content: center; }
+        .yb-fim { font-size: 120pt; line-height: 0.85; color: var(--yb-red); }
+        .yb-fim-sub { font-size: 18pt; letter-spacing: 0.08em; margin-top: 2mm; }
+        .yb-back-lede { font-size: 10.5pt; line-height: 1.6; max-width: 120mm; margin: 0 auto; color: var(--yb-ink); }
+        .yb-back-lede b { color: var(--yb-red); }
+        .yb-back-pair { display: flex; gap: 10mm; justify-content: center; margin-top: 8mm; }
+        .yb-back-pair div { width: 62mm; }
+        .yb-back-pair small { display: block; font-size: 7pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-back-pair b { display: block; font-size: 10pt; margin-top: 1mm; line-height: 1.3; }
+        .yb-back-pair span { font-size: 8pt; color: var(--yb-muted); }
+        .yb-quote { font-size: 10pt; font-style: italic; color: var(--yb-muted); margin-top: 12mm; }
+        .yb-back-foot { position: absolute; left: 0; right: 0; bottom: 6mm; font-size: 7.5pt; color: var(--yb-muted); letter-spacing: 0.08em; }
+
+        /* Páginas internas */
+        .yb-inner { padding: 13mm 14mm 0; }
+        .yb-run { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 2mm; border-bottom: 0.5mm solid var(--yb-gold); }
+        .yb-run-brand { font-size: 11pt; letter-spacing: 0.12em; }
+        .yb-run-brand span { color: var(--yb-red); }
+        .yb-run-sec { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-foot { position: absolute; left: 14mm; right: 14mm; bottom: 8mm; display: flex; justify-content: space-between; font-size: 7pt; color: var(--yb-muted); border-top: 0.25mm solid var(--yb-line); padding-top: 2mm; letter-spacing: 0.04em; }
+        .yb-h { font-size: 28pt; line-height: 1; margin: 6mm 0 1mm; }
+        .yb-hsub { font-size: 8.5pt; color: var(--yb-muted); margin: 0 0 4mm; }
+        .yb-sec-title { font-size: 15pt; line-height: 1; margin: 0 0 2.5mm; display: flex; align-items: center; gap: 2.5mm; }
+        .yb-sec-title::after { content: ''; flex: 1; height: 0.25mm; background: var(--yb-line); }
+
+        /* Pódio */
+        .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; margin-bottom: 6mm; }
+        .yb-pod { min-width: 0; }
+        .yb-pod-img { position: relative; }
+        .yb-pod-img img { display: block; width: 100%; height: 54mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
+        .yb-pod-n { position: absolute; left: 1.5mm; bottom: 0; font-size: 26pt; line-height: 1; color: #fff8ec; text-shadow: 0 0.5mm 2mm rgba(0,0,0,0.85); }
+        .yb-pod-t { font-size: 8pt; font-weight: 800; line-height: 1.2; margin-top: 1.8mm; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 7.8mm; }
+        .yb-pod-d { font-size: 6.8pt; color: var(--yb-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.5mm; }
+        .yb-chip { display: inline-block; min-width: 9mm; text-align: center; color: #fff; font-weight: 800; font-size: 8pt; border-radius: 1mm; padding: 0.5mm 1.5mm; margin-top: 1.2mm; }
+
+        .yb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
+        .yb-cols > div { min-width: 0; }
+        .yb-rows { display: flex; flex-direction: column; }
+        .yb-row { display: grid; grid-template-columns: 24mm minmax(0, 1fr) auto; gap: 2mm; align-items: baseline; padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); }
+        .yb-row:last-child { border-bottom: none; }
+        .yb-row-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-row-v { font-size: 8.5pt; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-row-s { font-size: 7.5pt; color: var(--yb-muted); white-space: nowrap; }
+        .yb-facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 5mm; }
+        .yb-fact { padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); min-width: 0; }
+        .yb-fact-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-fact-v { font-size: 9pt; font-weight: 800; margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-fact-s { font-size: 7pt; color: var(--yb-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .yb-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+        .yb-person { border-left: 1mm solid var(--pc); padding: 0.5mm 0 0.5mm 3mm; min-width: 0; }
+        .yb-person-n { font-size: 15pt; line-height: 1; color: var(--pc); }
+        .yb-person-avg { font-size: 22pt; line-height: 1; margin-top: 1mm; }
+        .yb-person-l { font-size: 7.5pt; color: var(--yb-muted); margin-top: 0.8mm; line-height: 1.35; }
+        .yb-person-l b { color: var(--yb-ink); }
+        .yb-duo-line { font-size: 8pt; margin-top: 3mm; padding-top: 2mm; border-top: 0.25mm solid var(--yb-line); line-height: 1.45; }
+        .yb-duo-line b { font-weight: 800; }
+
+        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5mm; align-items: end; height: 50mm; }
+        .yb-mcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 1mm; }
+        .yb-mcount { font-size: 7pt; font-weight: 800; color: var(--yb-muted); min-height: 3mm; }
+        .yb-mbar { width: 100%; background: var(--yb-gold); border-radius: 0.6mm 0.6mm 0 0; min-height: 0.6mm; }
+        .yb-mcol.is-top .yb-mbar { background: var(--yb-red); }
+        .yb-mcol.is-top .yb-mcount { color: var(--yb-red); }
+        .yb-mbar.is-zero { background: var(--yb-line); }
+        .yb-mcol.is-future .yb-mbar { background: transparent; border: 0.25mm dashed var(--yb-line); height: 6mm !important; }
+        .yb-mlbl { font-size: 7pt; font-weight: 800; color: var(--yb-muted); }
+        .yb-mnote { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2mm; }
+        .yb-series { font-size: 8pt; color: var(--yb-muted); padding-top: 2.5mm; border-top: 0.25mm dashed var(--yb-line); line-height: 1.45; }
+        .yb-series b { color: var(--yb-ink); }
+
+        /* Fichas da lista */
+        .yb-list { display: flex; flex-direction: column; gap: 3.5mm; margin-top: 4mm; }
+        .yb-card { display: grid; grid-template-columns: 27mm minmax(0, 1fr); gap: 4.5mm; height: 43mm; padding: 1.8mm; border: 0.3mm solid var(--yb-line); border-radius: 1.6mm; background: #fffefb; break-inside: avoid; page-break-inside: avoid; }
+        .yb-card img { display: block; width: 27mm; height: 39.4mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
+        .yb-body { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 1mm 1.5mm 0.6mm 0; }
+        .yb-top { display: flex; gap: 3.5mm; align-items: flex-start; }
+        .yb-pos { font-size: 27pt; line-height: 0.85; color: var(--yb-gold); flex: none; min-width: 11mm; }
+        .yb-tt { min-width: 0; }
+        .yb-title { font-size: 12pt; font-weight: 800; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .yb-yr { color: var(--yb-muted); font-weight: 600; font-size: 10pt; }
+        .yb-orig { font-size: 7.5pt; font-style: italic; color: var(--yb-soft); margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-dir { font-size: 8.5pt; color: var(--yb-muted); margin-top: 1mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-dir b { color: var(--yb-ink); font-weight: 700; }
+        .yb-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 3mm; }
+        .yb-when { font-size: 8pt; color: var(--yb-muted); line-height: 1.45; min-width: 0; }
+        .yb-when b { color: var(--yb-ink); font-weight: 800; }
+        .yb-scores { display: flex; align-items: stretch; gap: 1.8mm; flex: none; }
+        .yb-sc { width: 17mm; text-align: center; border: 0.3mm solid var(--yb-line); border-radius: 1.2mm; padding: 1.2mm 0 1mm; }
+        .yb-sc span, .yb-avg span { display: block; font-size: 6pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-sc b { display: block; font-size: 15pt; line-height: 1.05; margin-top: 0.6mm; }
+        .yb-sc i { display: block; font-size: 7pt; font-style: italic; color: var(--yb-soft); margin-top: 2.2mm; }
+        .yb-avg { width: 22mm; text-align: center; border-radius: 1.2mm; padding: 1.2mm 0 1mm; color: #fff; }
+        .yb-avg span { color: rgba(255,255,255,0.85); }
+        .yb-avg b { display: block; font-size: 20pt; line-height: 1; margin-top: 0.4mm; }
+        .yb-avg.is-none { background: #efe4cc; color: var(--yb-muted); }
+        .yb-avg.is-none span { color: var(--yb-muted); }
     </style>
 </head>
 <body data-mode="movies">
@@ -2154,6 +2317,7 @@
                         </div>
                     </div>
                     <button type="button" class="btn recap-trigger-btn" onclick="app.openRecap()">✨ Recap do ano</button>
+                    <button type="button" class="btn yb-trigger" onclick="yearBook.open()" title="Gerar um PDF em A4 com os filmes de um ano, para imprimir">🖨️ Livro do ano</button>
                     <div class="multi-select" id="statsExportMenuWrap">
                         <button type="button" class="btn multi-select-btn st-tool-export" onclick="app.toggleStatsExportMenu()">⬇️ Exportar</button>
                         <div class="multi-select-menu multi-select-menu-right" id="statsExportMenu">
@@ -2584,6 +2748,22 @@
             <div id="recapCard"></div>
         </div>
     </div>
+
+    <!-- Livro do ano: escolha do ano e versão para impressão em A4 (só filmes) -->
+    <div class="confirm-overlay" id="ybOverlay" onclick="if (event.target === this) yearBook.close()">
+        <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="ybTitle" style="max-width:400px;">
+            <div class="confirm-title" id="ybTitle">🖨️ Livro do ano</div>
+            <p class="yb-modal-note">Um registro em A4 dos filmes de um ano: capa, destaques, a lista completa pela nossa média e a contracapa. Ele usa os dados do momento em que for emitido.</p>
+            <select id="ybYearSelect" onchange="yearBook.updatePreview()" aria-label="Ano do livro"></select>
+            <div class="yb-modal-count" id="ybCount" aria-live="polite"></div>
+            <p class="yb-modal-note">Na janela que abrir, escolha <b>Salvar como PDF</b> (ou a impressora), papel <b>A4</b>, margens <b>Nenhuma</b> e ative <b>Gráficos de fundo</b>.</p>
+            <div class="confirm-actions">
+                <button type="button" class="btn" onclick="yearBook.close()">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="ybGenerateBtn" onclick="yearBook.generate()">Gerar PDF</button>
+            </div>
+        </div>
+    </div>
+    <div id="ybPrint" aria-hidden="true"></div>
 
     <!-- As bibliotecas de imagem (html2canvas) e PDF (jsPDF) agora só são baixadas
          quando alguém toca em exportar: ver loadScriptOnce() -->
@@ -8867,6 +9047,382 @@
         // Lembra o último modo usado neste aparelho
         try { if (localStorage.getItem('cinetracker_mode') === 'series') app.switchTab('s-catalogo', { skipScroll: true }); } catch (e) {}
         cloud.init(); // busca sessão salva e, se houver, carrega os dados da nuvem
+
+        // ============================================================
+        // LIVRO DO ANO — versão para impressão em A4, só com os filmes
+        // Só LÊ os dados do app (app.movies e, para uma linha, sapp.series):
+        // nada aqui grava, altera ou reordena o catálogo.
+        // Capa → destaques → lista (nossa média, desempate pelo IMDb) → contracapa.
+        // ============================================================
+        const yearBook = {
+            MONTHS: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
+            PER_PAGE: 5,
+
+            open() {
+                const years = this.years();
+                const sel = document.getElementById('ybYearSelect');
+                sel.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+                const cur = todayLocalISO().slice(0, 4);
+                sel.value = this.entries(cur).length ? cur : (years.find(y => this.entries(y).length) || cur);
+                this.updatePreview();
+                document.getElementById('ybOverlay').classList.add('open');
+                this._esc = e => { if (e.key === 'Escape') this.close(); };
+                document.addEventListener('keydown', this._esc);
+            },
+            close() {
+                document.getElementById('ybOverlay').classList.remove('open');
+                if (this._esc) { document.removeEventListener('keydown', this._esc); this._esc = null; }
+            },
+
+            // Anos com sessões registradas + o ano atual e o próximo (mesmo vazios)
+            years() {
+                const cur = Number(todayLocalISO().slice(0, 4));
+                const set = new Set([String(cur), String(cur + 1)]);
+                app.movies.forEach(m => sessionsOf(m).forEach(x => { const y = x.d.slice(0, 4); if (/^\d{4}$/.test(y)) set.add(y); }));
+                return [...set].sort().reverse();
+            },
+
+            // Um item por filme com sessão no ano. Vale a primeira sessão daquele ano;
+            // um filme visto em outro ano também entra no livro daquele ano, normalmente.
+            entries(year) {
+                return app.movies.map(m => {
+                    const ss = sessionsOf(m).filter(x => x.d.slice(0, 4) === year).map(x => x.d).sort();
+                    return ss.length ? { m, date: ss[0], dates: ss } : null;
+                }).filter(Boolean);
+            },
+
+            updatePreview() {
+                const year = document.getElementById('ybYearSelect').value;
+                const n = this.entries(year).length;
+                const el = document.getElementById('ybCount');
+                const btn = document.getElementById('ybGenerateBtn');
+                el.classList.toggle('is-empty', !n);
+                el.textContent = n ? `${n} ${n === 1 ? 'filme' : 'filmes'} em ${year}.` : `Ainda não há filmes assistidos em ${year}.`;
+                btn.disabled = !n;
+            },
+
+            // ---------- Formatação ----------
+            n1(v) { return v.toFixed(1).replace('.', ','); },
+            n2(v) { return v.toFixed(2).replace('.', ','); },
+            hours(mins) {
+                const h = Math.floor(mins / 60), mm = Math.round(mins % 60);
+                return h ? `${h}h${mm ? String(mm).padStart(2, '0') : ''}` : `${mm} min`;
+            },
+            pl(n, um, varios) { return `${n} ${n === 1 ? um : varios}`; },
+            color(v) { return v >= 7.5 ? '#3f7d4a' : v >= 5 ? '#c07a1e' : '#a6272c'; },
+            poster(m) { return m.poster || placeholderPoster(m.title || 'Sem capa'); },
+            imgAttrs(m) { return `src="${this.poster(m)}" data-t="${escapeHtml(m.title || 'Sem capa')}"`; },
+            dirs(m) { return (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director); },
+
+            // ---------- Dados do ano ----------
+            compute(year) {
+                const list = this.entries(year);
+                const byTitle = (a, b) => (a.m.title || '').localeCompare(b.m.title || '', 'pt-BR', { sensitivity: 'base' });
+                // Ordem do livro: nossa média (maior primeiro), desempate pela nota do IMDb
+                list.sort((a, b) => (b.m.avg - a.m.avg) || ((Number(b.m.scImdb) || 0) - (Number(a.m.scImdb) || 0)) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) || byTitle(a, b));
+
+                const sum = arr => arr.reduce((x, y) => x + y, 0);
+                const sessions = sum(list.map(e => e.dates.length));
+                const mins = sum(list.map(e => movieMinutes(e.m) * e.dates.length));
+                const rated = list.filter(e => e.m.avg > 0);
+                const avg = rated.length ? sum(rated.map(e => e.m.avg)) / rated.length : 0;
+
+                const months = new Array(12).fill(0);
+                list.forEach(e => e.dates.forEach(d => { const i = parseInt(d.slice(5, 7), 10) - 1; if (i >= 0 && i < 12) months[i]++; }));
+                const topMonth = Math.max(...months) > 0 ? months.indexOf(Math.max(...months)) : -1;
+
+                // Agrupamento sem diferenciar acentos/maiúsculas, como nas Estatísticas
+                const pickTop = fn => {
+                    const g = {};
+                    list.forEach(e => {
+                        const seen = new Set();
+                        fn(e.m).forEach(raw => {
+                            const v = (raw || '').trim(); if (!v) return;
+                            const k = normalizeKey(v); if (seen.has(k)) return; seen.add(k);
+                            if (!g[k]) g[k] = { count: 0, labels: {} };
+                            g[k].count++; g[k].labels[v] = (g[k].labels[v] || 0) + 1;
+                        });
+                    });
+                    const arr = Object.values(g).sort((a, b) => b.count - a.count);
+                    return { top: arr[0] ? { name: pickMostCommonLabel(arr[0].labels), count: arr[0].count } : null, distinct: arr.length };
+                };
+                const genres = pickTop(m => (m.genres || '').split(','));
+                const directors = pickTop(m => this.dirs(m));
+                const locals = pickTop(m => [m.local]);
+                const cinema = list.filter(e => localBucket(e.m.local) === 'cinema').length;
+
+                const best = rated[0] || null;
+                const worst = rated.length >= 2 ? rated[rated.length - 1] : null;
+                const timed = list.filter(e => movieMinutes(e.m) > 0);
+                const longest = timed.length ? timed.reduce((a, b) => movieMinutes(b.m) > movieMinutes(a.m) ? b : a) : null;
+                const shortest = timed.length >= 2 ? timed.reduce((a, b) => movieMinutes(b.m) < movieMinutes(a.m) ? b : a) : null;
+
+                const people = [
+                    { name: 'Israel', color: '#c07a1e', sc: m => Number(m.scIsr) || 0 },
+                    { name: 'Ricardo', color: '#2c6e6b', sc: m => Number(m.scRic) || 0 }
+                ].map(p => {
+                    const mine = list.filter(e => p.sc(e.m) > 0);
+                    if (!mine.length) return { ...p, n: 0 };
+                    const fav = [...mine].sort((a, b) => (p.sc(b.m) - p.sc(a.m)) || (b.m.avg - a.m.avg) || byTitle(a, b))[0];
+                    return { ...p, n: mine.length, avg: sum(mine.map(e => p.sc(e.m))) / mine.length, fav, high: mine.filter(e => p.sc(e.m) >= 9).length };
+                });
+                let divergence = null;
+                list.forEach(e => {
+                    const a = Number(e.m.scIsr) || 0, b = Number(e.m.scRic) || 0;
+                    if (!(a > 0 && b > 0)) return;
+                    const d = Math.abs(a - b);
+                    if (d >= 1 && (!divergence || d > divergence.d)) divergence = { e, d, a, b };
+                });
+
+                const chrono = [...list].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : compareInsertion(a.m, b.m)));
+                const series = (typeof sapp !== 'undefined' ? sapp.series : [])
+                    .filter(s => s._m && s._m.complete && (s.finishedDate || '').slice(0, 4) === year)
+                    .map(s => s.title).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+                const today = todayLocalISO();
+                const curYear = today.slice(0, 4);
+                const inProgress = year >= curYear;
+                const lastMonth = year === curYear ? parseInt(today.slice(5, 7), 10) - 1 : 11;
+
+                return { year, list, sessions, mins, rated, avg, months, topMonth, genres, directors, locals, cinema,
+                         best, worst, longest, shortest, people, divergence, chrono, series, inProgress, lastMonth, today };
+            },
+
+            // ---------- Páginas ----------
+            strip(pos) { return `<div class="yb-strip ${pos}"><div class="yb-holes">${'<i></i>'.repeat(28)}</div></div>`; },
+            run(sec) { return `<div class="yb-run"><div class="yb-run-brand yb-bebas"><span>CINETRACKER</span> · ISRAEL &amp; RICARDO</div><div class="yb-run-sec">${sec}</div></div>`; },
+            foot(r, page, total) { return `<div class="yb-foot"><span>Livro do ano ${escapeHtml(r.year)} · emitido em ${formatDateBR(r.today)}</span><span>pág. ${page} de ${total}</span></div>`; },
+
+            coverHtml(r) {
+                const period = r.year < r.today.slice(0, 4)
+                    ? `Janeiro a dezembro de ${r.year}`
+                    : `Janeiro a ${this.MONTHS[Math.max(0, r.lastMonth)]} de ${r.year} · ano em andamento`;
+                const top = r.rated.slice(0, 5);
+                const collage = top.length ? `
+                    <div class="yb-collage">${top.map((e, i) => `
+                        <figure><img ${this.imgAttrs(e.m)} alt=""><figcaption>Nº ${i + 1}</figcaption></figure>`).join('')}
+                    </div>
+                    <div class="yb-collage-note">Os ${top.length === 1 ? 'melhor' : top.length + ' melhores'} do ano pela nossa média</div>` : '<div style="margin-top:auto"></div>';
+                return `
+                    <section class="yb-page yb-cover">
+                        ${this.strip('top')}
+                        <div class="yb-frame"></div>
+                        <div class="yb-cover-in">
+                            <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
+                            <div class="yb-cover-year yb-bebas">${escapeHtml(r.year)}</div>
+                            <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
+                            <div class="yb-cover-period">${period}</div>
+                            <div class="yb-orn"><span>✦</span></div>
+                            <div class="yb-figs">
+                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.list.length}</div><div class="yb-fig-l">${r.list.length === 1 ? 'filme' : 'filmes'}</div></div>
+                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.mins ? this.hours(r.mins) : '—'}</div><div class="yb-fig-l">de tela</div></div>
+                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.avg ? this.n2(r.avg) : '—'}</div><div class="yb-fig-l">nossa média</div></div>
+                            </div>
+                            ${collage}
+                            <div class="yb-issued">Emitido em ${formatDateBR(r.today)}</div>
+                        </div>
+                        ${this.strip('bottom')}
+                    </section>`;
+            },
+
+            highlightsHtml(r, page, total) {
+                const esc = escapeHtml;
+                const top = r.rated.slice(0, 5);
+                const podium = top.length ? `
+                    <div class="yb-podium">${top.map((e, i) => `
+                        <div class="yb-pod">
+                            <div class="yb-pod-img"><img ${this.imgAttrs(e.m)} alt=""><span class="yb-pod-n yb-bebas">${i + 1}</span></div>
+                            <div class="yb-pod-t">${esc(e.m.title)}</div>
+                            <div class="yb-pod-d">${esc(this.dirs(e.m).join(', ') || 'Diretor não informado')}</div>
+                            <span class="yb-chip" style="background:${this.color(e.m.avg)}">${this.n1(e.m.avg)}</span>
+                        </div>`).join('')}
+                    </div>` : `<p class="yb-hsub">Os filmes deste ano ainda não têm nota.</p>`;
+
+                const row = (l, v, s) => `<div class="yb-row"><span class="yb-row-l">${l}</span><span class="yb-row-v">${v}</span><span class="yb-row-s">${s}</span></div>`;
+                const extremes = [
+                    r.best && row('Melhor avaliado', esc(r.best.m.title), `média ${this.n1(r.best.m.avg)}`),
+                    r.worst && r.worst !== r.best && row('Pior avaliado', esc(r.worst.m.title), `média ${this.n1(r.worst.m.avg)}`),
+                    r.longest && row('Mais longo', esc(r.longest.m.title), esc(r.longest.m.duration)),
+                    r.shortest && r.shortest !== r.longest && row('Mais curto', esc(r.shortest.m.title), esc(r.shortest.m.duration))
+                ].filter(Boolean).join('');
+
+                const fact = (l, v, s) => `<div class="yb-fact"><div class="yb-fact-l">${l}</div><div class="yb-fact-v">${v}</div><div class="yb-fact-s">${s || '&nbsp;'}</div></div>`;
+                const facts = [
+                    fact('Tempo de tela', r.mins ? this.hours(r.mins) : '—', r.sessions > r.list.length ? this.pl(r.sessions, 'sessão', 'sessões') : this.pl(r.list.length, 'filme', 'filmes')),
+                    fact('Mês mais movimentado', r.topMonth >= 0 ? this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase()) : '—', r.topMonth >= 0 ? this.pl(r.months[r.topMonth], 'filme', 'filmes') : ''),
+                    fact('Gênero do ano', r.genres.top ? esc(r.genres.top.name) : '—', r.genres.top ? this.pl(r.genres.top.count, 'filme', 'filmes') : ''),
+                    fact('Diretor do ano', r.directors.top && r.directors.top.count >= 2 ? esc(r.directors.top.name) : '—', r.directors.top && r.directors.top.count >= 2 ? this.pl(r.directors.top.count, 'filme', 'filmes') : 'nenhum repetiu'),
+                    fact('Onde mais assistimos', r.locals.top ? esc(r.locals.top.name) : '—', r.locals.top ? `${Math.round(r.locals.top.count / r.list.length * 100)}% dos filmes` : ''),
+                    fact('No cinema', this.pl(r.cinema, 'filme', 'filmes'), `${Math.round(r.cinema / r.list.length * 100)}% do ano`)
+                ].join('');
+
+                const [pI, pR] = r.people;
+                const person = p => `
+                    <div class="yb-person" style="--pc:${p.color}">
+                        <div class="yb-person-n yb-bebas">${p.name}</div>
+                        ${p.n ? `
+                            <div class="yb-person-avg yb-bebas">${this.n2(p.avg)}</div>
+                            <div class="yb-person-l">média em ${this.pl(p.n, 'filme', 'filmes')}</div>
+                            <div class="yb-person-l">Favorito: <b>${esc(p.fav.m.title)}</b> (${this.n1(p.sc(p.fav.m))})</div>
+                            <div class="yb-person-l">${p.high ? this.pl(p.high, 'nota 9 ou mais', 'notas 9 ou mais') : 'Nenhuma nota 9 ou mais'}</div>`
+                        : `<div class="yb-person-l">Sem notas neste ano.</div>`}
+                    </div>`;
+                const lines = [];
+                if (pI.n && pR.n) {
+                    const d = pI.avg - pR.avg;
+                    lines.push(Math.abs(d) < 0.005 ? 'Os dois deram, em média, a mesma nota.'
+                        : `<b style="color:${d > 0 ? pI.color : pR.color}">${d > 0 ? 'Israel' : 'Ricardo'}</b> foi mais generoso, com ${this.n2(Math.abs(d))} ponto${Math.abs(d) >= 2 ? 's' : ''} a mais na média.`);
+                }
+                if (r.divergence) {
+                    const v = r.divergence;
+                    lines.push(`Maior discordância: <b>${esc(v.e.m.title)}</b>, Israel ${this.n1(v.a)} × Ricardo ${this.n1(v.b)}.`);
+                }
+
+                const maxM = Math.max(...r.months, 1);
+                const ml = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+                const monthsHtml = r.months.map((c, i) => {
+                    const future = r.inProgress && i > r.lastMonth;
+                    return `<div class="yb-mcol${i === r.topMonth ? ' is-top' : ''}${future ? ' is-future' : ''}"><span class="yb-mcount">${c || ''}</span><div class="yb-mbar${c ? '' : ' is-zero'}" style="height:${c ? Math.max(6, c / maxM * 100).toFixed(1) : 1.5}%"></div><span class="yb-mlbl">${ml[i]}</span></div>`;
+                }).join('');
+
+                return `
+                    <section class="yb-page yb-inner">
+                        ${this.run('Destaques do ano')}
+                        <h2 class="yb-h yb-bebas">Destaques de ${esc(r.year)}</h2>
+                        <p class="yb-hsub">${top.length >= 5 ? 'Os cinco melhores' : top.length > 1 ? `Os ${top.length} melhores` : 'O melhor'} pela nossa média (Israel + Ricardo).</p>
+                        ${podium}
+                        <div class="yb-cols">
+                            <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-rows">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
+                            <div><h3 class="yb-sec-title yb-bebas">O ano em números</h3><div class="yb-facts">${facts}</div></div>
+                        </div>
+                        <div class="yb-cols">
+                            <div>
+                                <h3 class="yb-sec-title yb-bebas">Israel × Ricardo</h3>
+                                <div class="yb-duo">${person(pI)}${person(pR)}</div>
+                                ${lines.length ? `<div class="yb-duo-line">${lines.join('<br>')}</div>` : ''}
+                            </div>
+                            <div>
+                                <h3 class="yb-sec-title yb-bebas">Mês a mês</h3>
+                                <div class="yb-months">${monthsHtml}</div>
+                                <div class="yb-mnote">${r.topMonth >= 0 ? `${this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase())} foi o mês com mais filmes.` : ''}${r.inProgress ? ' Os meses tracejados ainda não chegaram.' : ''}</div>
+                            </div>
+                        </div>
+                        ${r.series.length ? `<div class="yb-series"><b>Séries concluídas em ${esc(r.year)}:</b> ${r.series.map(esc).join(', ')}.</div>` : ''}
+                        ${this.foot(r, page, total)}
+                    </section>`;
+            },
+
+            cardHtml(e, pos, digits) {
+                const esc = escapeHtml, m = e.m;
+                const sc = (label, v, color) => `<div class="yb-sc"><span>${label}</span>${v > 0 ? `<b class="yb-bebas" style="color:${color}">${this.n1(v)}</b>` : '<i>pendente</i>'}</div>`;
+                const dirs = this.dirs(m).join(', ');
+                const hasOrig = m.originalTitle && normalizeKey(m.originalTitle) !== normalizeKey(m.title);
+                return `
+                    <article class="yb-card">
+                        <img ${this.imgAttrs(m)} alt="">
+                        <div class="yb-body">
+                            <div class="yb-top">
+                                <span class="yb-pos yb-bebas">${String(pos).padStart(digits, '0')}</span>
+                                <div class="yb-tt">
+                                    <div class="yb-title">${esc(m.title || 'Sem título')}${m.year ? ` <span class="yb-yr">(${esc(String(m.year))})</span>` : ''}</div>
+                                    ${hasOrig ? `<div class="yb-orig">${esc(m.originalTitle)}</div>` : ''}
+                                    <div class="yb-dir">${dirs ? `Direção: <b>${esc(dirs)}</b>` : 'Diretor não informado'}</div>
+                                </div>
+                            </div>
+                            <div class="yb-bottom">
+                                <div class="yb-when">Assistido em <b>${formatDateBR(e.date)}</b>${m.local ? `<br>${esc(m.local)}` : ''}</div>
+                                <div class="yb-scores">
+                                    ${sc('Israel', Number(m.scIsr) || 0, '#c07a1e')}
+                                    ${sc('Ricardo', Number(m.scRic) || 0, '#2c6e6b')}
+                                    ${m.avg > 0
+                                        ? `<div class="yb-avg" style="background:${this.color(m.avg)}"><span>Média</span><b class="yb-bebas">${this.n1(m.avg)}</b></div>`
+                                        : `<div class="yb-avg is-none"><span>Média</span><b class="yb-bebas">—</b></div>`}
+                                </div>
+                            </div>
+                        </div>
+                    </article>`;
+            },
+
+            listPagesHtml(r, firstPage, total) {
+                const digits = Math.max(2, String(r.list.length).length);
+                const pages = [];
+                for (let i = 0; i < r.list.length; i += this.PER_PAGE) {
+                    const chunk = r.list.slice(i, i + this.PER_PAGE);
+                    const first = i === 0;
+                    pages.push(`
+                        <section class="yb-page yb-inner">
+                            ${this.run(`Filmes assistidos · ${i + 1}–${i + chunk.length} de ${r.list.length}`)}
+                            ${first ? `<h2 class="yb-h yb-bebas">Os filmes de ${escapeHtml(r.year)}</h2><p class="yb-hsub" style="margin-bottom:0">Do maior para o menor pela nossa média (Israel + Ricardo). No empate, vale a nota do IMDb.</p>` : ''}
+                            <div class="yb-list">${chunk.map((e, k) => this.cardHtml(e, i + k + 1, digits)).join('')}</div>
+                            ${this.foot(r, firstPage + pages.length, total)}
+                        </section>`);
+                }
+                return pages.join('');
+            },
+
+            backHtml(r) {
+                const first = r.chrono[0], last = r.chrono[r.chrono.length - 1];
+                const parts = [`<b>${this.pl(r.list.length, 'filme', 'filmes')}</b>`];
+                if (r.mins) parts.push(`<b>${this.hours(r.mins)}</b> de tela`);
+                const lede = `${r.inProgress ? 'Até aqui, foram' : 'Foram'} ${parts.join(' e ')}${r.avg ? `, com nossa média de <b>${this.n2(r.avg)}</b>` : ''}.`;
+                return `
+                    <section class="yb-page yb-back">
+                        ${this.strip('top')}
+                        <div class="yb-frame"></div>
+                        <div class="yb-back-in">
+                            <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
+                            <div class="yb-fim yb-bebas" style="margin-top:14mm">Fim</div>
+                            <div class="yb-fim-sub yb-bebas">da sessão de ${escapeHtml(r.year)}</div>
+                            <div class="yb-orn" style="margin:9mm auto"><span>✦</span></div>
+                            <p class="yb-back-lede">${lede}</p>
+                            ${first && last && first !== last ? `
+                                <div class="yb-back-pair">
+                                    <div><small>Abriu o ano</small><b>${escapeHtml(first.m.title)}</b><span>${formatDateBR(first.date)}</span></div>
+                                    <div><small>${r.inProgress ? 'O mais recente' : 'Fechou o ano'}</small><b>${escapeHtml(last.m.title)}</b><span>${formatDateBR(last.date)}</span></div>
+                                </div>` : ''}
+                            <div class="yb-quote">Sessão contínua desde 2022. Que comecem os créditos.</div>
+                            <div class="yb-back-foot">Emitido em ${formatDateBR(r.today)}</div>
+                        </div>
+                        ${this.strip('bottom')}
+                    </section>`;
+            },
+
+            build(year) {
+                const r = this.compute(year);
+                const listPages = Math.ceil(r.list.length / this.PER_PAGE);
+                const total = 2 + listPages + 1;
+                return this.coverHtml(r) + this.highlightsHtml(r, 2, total) + this.listPagesHtml(r, 3, total) + this.backHtml(r);
+            },
+
+            // Monta o livro, espera fontes e capas carregarem e abre a impressão do navegador
+            async generate() {
+                const year = document.getElementById('ybYearSelect').value;
+                if (!this.entries(year).length) return;
+                const btn = document.getElementById('ybGenerateBtn');
+                btn.disabled = true; btn.textContent = 'Preparando…';
+                const host = document.getElementById('ybPrint');
+                host.innerHTML = this.build(year);
+                try {
+                    const imgs = [...host.querySelectorAll('img')];
+                    const loaded = Promise.all(imgs.map(img => img.complete ? null : new Promise(res => { img.onload = img.onerror = res; })));
+                    await Promise.race([Promise.all([loaded, document.fonts ? document.fonts.ready : null]), new Promise(res => setTimeout(res, 10000))]);
+                    // Capa que não carregou (sem internet, link quebrado) vira o cartaz tipográfico
+                    imgs.forEach(img => { if (!img.naturalWidth && !img.src.startsWith('data:')) img.src = placeholderPoster(img.dataset.t || 'Sem capa'); });
+                } catch (e) { /* imprime assim mesmo */ }
+                this.close();
+                btn.disabled = false; btn.textContent = 'Gerar PDF';
+                const prevTitle = document.title;
+                document.title = `CineTracker - Livro do ano ${year}`; // vira o nome sugerido do PDF
+                const done = () => {
+                    document.body.classList.remove('yb-printing');
+                    document.title = prevTitle;
+                    window.removeEventListener('afterprint', done);
+                };
+                window.addEventListener('afterprint', done);
+                document.body.classList.add('yb-printing');
+                setTimeout(() => window.print(), 60);
+            }
+        };
 
         // Fechar com ESC
         window.addEventListener('keydown', e => {
