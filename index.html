@@ -2028,26 +2028,30 @@
         .yb-frame { position: absolute; inset: 17mm 12mm; border: 0.6mm solid var(--yb-gold); }
         .yb-frame::after { content: ''; position: absolute; inset: 1.6mm; border: 0.25mm solid var(--yb-gold); }
         .yb-cover-in, .yb-back-in { position: absolute; inset: 17mm 12mm; padding: 14mm 14mm 12mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .yb-cover-in { padding: 6mm 12mm; justify-content: space-evenly; }
+        .yb-cg { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .yb-cg-band { align-self: stretch; width: auto; }
+        .yb-band { width: 100%; background: var(--yb-film); border-radius: 1.2mm; padding: 2.4mm 0; box-shadow: 0 1.2mm 3mm rgba(42,29,20,0.22); }
+        .yb-band-holes { display: flex; justify-content: space-between; padding: 0 2.5mm; }
+        .yb-band-holes i { flex: 0 0 3.6mm; height: 2.6mm; border-radius: 0.7mm; background: var(--yb-paper); opacity: 0.9; }
+        .yb-band-frames { display: grid; gap: 2.6mm; padding: 2.6mm 3mm; justify-content: center; }
+        .yb-band-frame { position: relative; }
+        .yb-band-frame img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 0.8mm; background: #3a2c22; }
+        .yb-band-n { position: absolute; left: 2mm; bottom: -1mm; font-size: 40pt; line-height: 1; color: var(--yb-paper); text-shadow: 0 0.6mm 2.4mm rgba(0,0,0,0.9); }
+        .yb-band-note { font-size: 7.5pt; color: var(--yb-muted); margin-top: 3mm; letter-spacing: 0.06em; text-align: center; }
         .yb-kicker { font-size: 8.5pt; font-weight: 800; letter-spacing: 0.32em; color: var(--yb-muted); text-transform: uppercase; }
         .yb-kicker b { color: var(--yb-red); font-weight: 800; }
-        .yb-cover-year { font-size: 150pt; line-height: 0.82; color: var(--yb-red); margin: 9mm 0 3mm; }
-        .yb-cover-title { font-size: 21pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
+        .yb-cover-year { font-size: 175pt; line-height: 0.82; color: var(--yb-red); margin: 7mm 0 4mm; }
+        .yb-cover-title { font-size: 24pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
         .yb-cover-period { font-size: 9.5pt; color: var(--yb-muted); font-weight: 600; margin-top: 3mm; }
-        .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); margin: 8mm 0 7mm; width: 70mm; }
+        .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); margin: 0 0 7mm; width: 70mm; }
         .yb-orn::before, .yb-orn::after { content: ''; flex: 1; height: 0.3mm; background: var(--yb-gold); }
         .yb-orn span { font-size: 9pt; }
         .yb-figs { display: flex; justify-content: center; width: 100%; }
         .yb-fig { padding: 0 8mm; border-left: 0.3mm solid var(--yb-line); }
         .yb-fig:first-child { border-left: none; }
-        .yb-fig-v { font-size: 30pt; line-height: 0.95; color: var(--yb-ink); }
+        .yb-fig-v { font-size: 36pt; line-height: 0.95; color: var(--yb-ink); }
         .yb-fig-l { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1.2mm; }
-        .yb-cover-in { justify-content: center; }
-        .yb-collage { display: flex; justify-content: center; gap: 3.5mm; margin-top: 14mm; }
-        .yb-collage figure { margin: 0; width: 31mm; }
-        .yb-collage img { display: block; width: 31mm; height: 46.5mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; box-shadow: 0 0.8mm 2mm rgba(42,29,20,0.25); }
-        .yb-collage figcaption { font-size: 6.5pt; font-weight: 800; color: var(--yb-muted); margin-top: 1.2mm; letter-spacing: 0.08em; }
-        .yb-collage-note { font-size: 7pt; color: var(--yb-soft); margin-top: 2.5mm; letter-spacing: 0.04em; }
-        .yb-issued { position: absolute; left: 0; right: 0; bottom: 7mm; font-size: 7.5pt; color: var(--yb-muted); letter-spacing: 0.08em; }
 
         .yb-back-in { justify-content: center; }
         .yb-fim { font-size: 120pt; line-height: 0.85; color: var(--yb-red); }
@@ -2059,8 +2063,6 @@
         .yb-back-pair small { display: block; font-size: 7pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-back-pair b { display: block; font-size: 10pt; margin-top: 1mm; line-height: 1.3; }
         .yb-back-pair span { font-size: 8pt; color: var(--yb-muted); }
-        .yb-quote { font-size: 10pt; font-style: italic; color: var(--yb-muted); margin-top: 12mm; }
-        .yb-back-foot { position: absolute; left: 0; right: 0; bottom: 6mm; font-size: 7.5pt; color: var(--yb-muted); letter-spacing: 0.08em; }
 
         /* Páginas internas */
         .yb-inner { padding: 13mm 14mm 0; }
@@ -2078,8 +2080,8 @@
         .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; margin-bottom: 6mm; }
         .yb-pod { min-width: 0; }
         .yb-pod-img { position: relative; }
-        .yb-pod-img img { display: block; width: 100%; height: 54mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
-        .yb-pod-n { position: absolute; left: 1.5mm; bottom: 0; font-size: 26pt; line-height: 1; color: #fff8ec; text-shadow: 0 0.5mm 2mm rgba(0,0,0,0.85); }
+        .yb-pod-img img { display: block; width: 100%; height: 62mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
+        .yb-pod-n { position: absolute; left: 1.8mm; bottom: -0.5mm; font-size: 32pt; line-height: 1; color: #fff8ec; text-shadow: 0 0.5mm 2mm rgba(0,0,0,0.85); }
         .yb-pod-t { font-size: 8pt; font-weight: 800; line-height: 1.2; margin-top: 1.8mm; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 7.8mm; }
         .yb-pod-d { font-size: 6.8pt; color: var(--yb-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.5mm; }
         .yb-chip { display: inline-block; min-width: 9mm; text-align: center; color: #fff; font-weight: 800; font-size: 8pt; border-radius: 1mm; padding: 0.5mm 1.5mm; margin-top: 1.2mm; }
@@ -2107,7 +2109,7 @@
         .yb-duo-line { font-size: 8pt; margin-top: 3mm; padding-top: 2mm; border-top: 0.25mm solid var(--yb-line); line-height: 1.45; }
         .yb-duo-line b { font-weight: 800; }
 
-        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5mm; align-items: end; height: 50mm; }
+        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5mm; align-items: end; height: 58mm; }
         .yb-mcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 1mm; }
         .yb-mcount { font-size: 7pt; font-weight: 800; color: var(--yb-muted); min-height: 3mm; }
         .yb-mbar { width: 100%; background: var(--yb-gold); border-radius: 0.6mm 0.6mm 0 0; min-height: 0.6mm; }
@@ -2117,8 +2119,6 @@
         .yb-mcol.is-future .yb-mbar { background: transparent; border: 0.25mm dashed var(--yb-line); height: 6mm !important; }
         .yb-mlbl { font-size: 7pt; font-weight: 800; color: var(--yb-muted); }
         .yb-mnote { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2mm; }
-        .yb-series { font-size: 8pt; color: var(--yb-muted); padding-top: 2.5mm; border-top: 0.25mm dashed var(--yb-line); line-height: 1.45; }
-        .yb-series b { color: var(--yb-ink); }
 
         /* Fichas da lista */
         .yb-list { display: flex; flex-direction: column; gap: 3.5mm; margin-top: 4mm; }
@@ -2219,7 +2219,6 @@
         <button class="btn" id="navBtn-s-perfis" onclick="app.switchTab('s-perfis')"><span class="nav-ico">🎭</span> <span class="nav-lbl" data-short="Perfis">Israel &amp; Ricardo</span></button>
         <button class="btn" id="navBtn-s-sortear" onclick="app.switchTab('s-sortear')"><span class="nav-ico">🎟️</span> <span class="nav-lbl" data-short="Sortear">Sortear Série</span></button>
         </div>
-        <div class="tab-nav-hint">Sessão contínua desde 2022.<br>Que comecem os créditos.</div>
     </nav>
     <main class="app-main">
 
@@ -9051,7 +9050,7 @@
 
         // ============================================================
         // LIVRO DO ANO — versão para impressão em A4, só com os filmes
-        // Só LÊ os dados do app (app.movies e, para uma linha, sapp.series):
+        // Só LÊ os dados dos filmes do app (app.movies):
         // nada aqui grava, altera ou reordena o catálogo.
         // Capa → destaques → lista (nossa média, desempate pelo IMDb) → contracapa.
         // ============================================================
@@ -9176,9 +9175,6 @@
                 });
 
                 const chrono = [...list].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : compareInsertion(a.m, b.m)));
-                const series = (typeof sapp !== 'undefined' ? sapp.series : [])
-                    .filter(s => s._m && s._m.complete && (s.finishedDate || '').slice(0, 4) === year)
-                    .map(s => s.title).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
                 const today = todayLocalISO();
                 const curYear = today.slice(0, 4);
@@ -9186,7 +9182,7 @@
                 const lastMonth = year === curYear ? parseInt(today.slice(5, 7), 10) - 1 : 11;
 
                 return { year, list, sessions, mins, rated, avg, months, topMonth, genres, directors, locals, cinema,
-                         best, worst, longest, shortest, people, divergence, chrono, series, inProgress, lastMonth, today };
+                         best, worst, longest, shortest, people, divergence, chrono, inProgress, lastMonth, today };
             },
 
             // ---------- Páginas ----------
@@ -9199,28 +9195,38 @@
                     ? `Janeiro a dezembro de ${r.year}`
                     : `Janeiro a ${this.MONTHS[Math.max(0, r.lastMonth)]} de ${r.year} · ano em andamento`;
                 const top = r.rated.slice(0, 5);
-                const collage = top.length ? `
-                    <div class="yb-collage">${top.map((e, i) => `
-                        <figure><img ${this.imgAttrs(e.m)} alt=""><figcaption>Nº ${i + 1}</figcaption></figure>`).join('')}
-                    </div>
-                    <div class="yb-collage-note">Os ${top.length === 1 ? 'melhor' : top.length + ' melhores'} do ano pela nossa média</div>` : '';
+                const holes = '<div class="yb-band-holes">' + '<i></i>'.repeat(26) + '</div>';
+                const band = top.length ? `
+                    <div class="yb-cg yb-cg-band">
+                        <div class="yb-band">
+                            ${holes}
+                            <div class="yb-band-frames" style="grid-template-columns:repeat(${Math.max(top.length, 3)}, 1fr)">${top.map((e, i) => `
+                                <div class="yb-band-frame"><img ${this.imgAttrs(e.m)} alt=""><span class="yb-band-n yb-bebas">${i + 1}</span></div>`).join('')}
+                            </div>
+                            ${holes}
+                        </div>
+                        <div class="yb-band-note">${top.length === 1 ? 'O melhor' : `Os ${top.length} melhores`} do ano pela nossa média</div>
+                    </div>` : '';
                 return `
                     <section class="yb-page yb-cover">
                         ${this.strip('top')}
                         <div class="yb-frame"></div>
                         <div class="yb-cover-in">
-                            <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
-                            <div class="yb-cover-year yb-bebas">${escapeHtml(r.year)}</div>
-                            <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
-                            <div class="yb-cover-period">${period}</div>
-                            <div class="yb-orn"><span>✦</span></div>
-                            <div class="yb-figs">
-                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.list.length}</div><div class="yb-fig-l">${r.list.length === 1 ? 'filme' : 'filmes'}</div></div>
-                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.mins ? this.hours(r.mins) : '—'}</div><div class="yb-fig-l">de tela</div></div>
-                                <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.avg ? this.n2(r.avg) : '—'}</div><div class="yb-fig-l">nossa média</div></div>
+                            <div class="yb-cg">
+                                <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
+                                <div class="yb-cover-year yb-bebas">${escapeHtml(r.year)}</div>
+                                <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
+                                <div class="yb-cover-period">${period}</div>
                             </div>
-                            ${collage}
-                            <div class="yb-issued">Emitido em ${formatDateBR(r.today)}</div>
+                            <div class="yb-cg">
+                                <div class="yb-orn"><span>✦</span></div>
+                                <div class="yb-figs">
+                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.list.length}</div><div class="yb-fig-l">${r.list.length === 1 ? 'filme' : 'filmes'}</div></div>
+                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.mins ? this.hours(r.mins) : '—'}</div><div class="yb-fig-l">de tela</div></div>
+                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.avg ? this.n2(r.avg) : '—'}</div><div class="yb-fig-l">nossa média</div></div>
+                                </div>
+                            </div>
+                            ${band}
                         </div>
                         ${this.strip('bottom')}
                     </section>`;
@@ -9308,7 +9314,6 @@
                                 <div class="yb-mnote">${r.topMonth >= 0 ? `${this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase())} foi o mês com mais filmes.` : ''}${r.inProgress ? ' Os meses tracejados ainda não chegaram.' : ''}</div>
                             </div>
                         </div>
-                        ${r.series.length ? `<div class="yb-series"><b>Séries concluídas em ${esc(r.year)}:</b> ${r.series.map(esc).join(', ')}.</div>` : ''}
                         ${this.foot(r, page, total)}
                     </section>`;
             },
@@ -9381,8 +9386,6 @@
                                     <div><small>Abriu o ano</small><b>${escapeHtml(first.m.title)}</b><span>${formatDateBR(first.date)}</span></div>
                                     <div><small>${r.inProgress ? 'O mais recente' : 'Fechou o ano'}</small><b>${escapeHtml(last.m.title)}</b><span>${formatDateBR(last.date)}</span></div>
                                 </div>` : ''}
-                            <div class="yb-quote">Sessão contínua desde 2022. Que comecem os créditos.</div>
-                            <div class="yb-back-foot">Emitido em ${formatDateBR(r.today)}</div>
                         </div>
                         ${this.strip('bottom')}
                     </section>`;
