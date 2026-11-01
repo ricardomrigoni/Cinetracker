@@ -2160,6 +2160,71 @@
         .yb-avg b { display: block; font-size: 20pt; line-height: 1; margin-top: 0.4mm; }
         .yb-avg.is-none { background: #efe4cc; color: var(--yb-muted); }
         .yb-avg.is-none span { color: var(--yb-muted); }
+
+        /* ============================================================
+           CATÁLOGO DE FILMES — 7 filtros (com a década):
+           4 na primeira linha e 3 na segunda; no celular, 2 por linha
+           ============================================================ */
+        #tab-catalogo .filters-controls { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+        #tab-catalogo .filters-controls > * { grid-column: span 3; }
+        #tab-catalogo .filters-controls > :nth-child(n+5) { grid-column: span 4; }
+        @media (max-width: 640px) {
+            #tab-catalogo .filters-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            #tab-catalogo .filters-controls > *, #tab-catalogo .filters-controls > :nth-child(n+5) { grid-column: span 1; }
+            #tab-catalogo .filters-controls > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+        }
+
+        /* ============================================================
+           DETALHE DO FILME — capa inteira (sem corte), fundo com a própria
+           capa desfocada, toque para ampliar; ano, diretor e gênero clicáveis
+           ============================================================ */
+        #modalOverlay .modal-left { overflow: hidden; padding: 28px; }
+        #modalOverlay .modal-left::before {
+            content: ''; position: absolute; inset: -40px; background: var(--m-poster-bg, none) center / cover no-repeat;
+            filter: blur(30px) saturate(1.15); opacity: 0.5; pointer-events: none;
+        }
+        #modalOverlay .modal-left #mPoster {
+            position: relative; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain;
+            border-radius: 10px; box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.6); cursor: zoom-in;
+        }
+        .m-zoom-btn {
+            position: absolute; right: 14px; bottom: 14px; z-index: 2; display: none; align-items: center; gap: 6px;
+            background: rgba(20, 14, 10, 0.72); color: #fff8ec; border: 1px solid rgba(255, 248, 236, 0.25); border-radius: 999px;
+            padding: 7px 12px; font: 700 0.75rem 'Manrope', sans-serif; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        }
+        .m-zoom-btn.show { display: inline-flex; }
+        .m-zoom-btn:hover { background: rgba(20, 14, 10, 0.88); }
+        @media (max-width: 900px) {
+            #modalOverlay .modal-left { height: 320px; padding: 18px; flex: none; }
+        }
+        @media (max-width: 640px) {
+            #modalOverlay .modal-left { height: 300px; }
+        }
+
+        .m-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+        .m-meta .m-sep { color: var(--text-muted); opacity: 0.6; font-weight: 400; }
+        .m-meta .m-dur { color: var(--text-main); font-weight: 700; }
+        .m-meta .m-dur::before { content: '⏱ '; }
+        .m-link {
+            color: inherit; font-weight: 700; text-decoration: underline; text-decoration-color: var(--gold);
+            text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer;
+        }
+        .m-link:hover { color: var(--text-main); text-decoration-color: var(--accent); }
+        button.genre-pill { font-family: inherit; cursor: pointer; transition: 0.15s; }
+        button.genre-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--gold-soft); }
+
+        /* Capa ampliada */
+        .poster-zoom {
+            position: fixed; inset: 0; z-index: 4000; display: none; align-items: center; justify-content: center;
+            background: rgba(10, 7, 3, 0.9); padding: 24px; cursor: zoom-out;
+        }
+        .poster-zoom.open { display: flex; }
+        .poster-zoom img { width: min(100%, calc((100vh - 48px) * 2 / 3)); height: auto; max-height: 100%; object-fit: contain; border-radius: 10px; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6); }
+        .poster-zoom-close {
+            position: absolute; top: 16px; right: 18px; width: 40px; height: 40px; border-radius: 50%;
+            border: 1px solid rgba(255, 248, 236, 0.3); background: rgba(20, 14, 10, 0.6); color: #fff8ec;
+            font-size: 1.6rem; line-height: 1; cursor: pointer;
+        }
     </style>
 </head>
 <body data-mode="movies">
@@ -2284,6 +2349,9 @@
                         <div id="genreOptionsList" class="multi-select-scroll-area"></div>
                     </div>
                 </div>
+                <select id="decadeFilter" onchange="app.handleDecadeFilterChange(this.value)" title="Filtrar pela década de lançamento" aria-label="Década de lançamento">
+                    <option value="all">Todas as décadas</option>
+                </select>
                 <select id="localFilter" onchange="app.handleLocalFilterChange(this.value)" title="Filtrar por onde assistiram" aria-label="Onde assistiram">
                     <option value="all">Todos os lugares</option>
                     <option value="cinema">Cinema</option>
@@ -2569,7 +2637,8 @@
             <div class="modal-close" onclick="app.closeModal()">×</div>
             <div class="modal-content">
                 <div class="modal-left">
-                    <img id="mPoster" src="" alt="Capa">
+                    <img id="mPoster" src="" alt="Capa" onclick="app.zoomPoster()" title="Ampliar capa">
+                    <button type="button" class="m-zoom-btn" id="mZoomBtn" onclick="app.zoomPoster()" aria-label="Ampliar capa">⤢ Ampliar</button>
                     <button type="button" class="retry-poster-btn" id="retryPosterBtn" onclick="app.retryPosterFetch()">🔄 Tentar buscar capa novamente</button>
                 </div>
                 <div class="modal-right">
@@ -2625,7 +2694,7 @@
                             <div style="grid-column: 1 / -1"><label>Gênero</label><input type="text" id="eGenres" spellcheck="true" autocorrect="on" autocapitalize="sentences"></div>
                             
                             <div><label>Data (Assistido)</label><input type="date" id="eDate"></div>
-                            <div><label>Local</label><input type="text" id="eLocal" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Ex: Casa, Cinema..."></div>
+                            <div><label>Local</label><input type="text" id="eLocal" spellcheck="true" autocorrect="on" autocapitalize="sentences" placeholder="Ex: Ricardo, Cinema..."></div>
                             
                             <div><label>Nota Israel</label><input type="number" step="0.1" min="0" max="10" id="eIsrael"></div>
                             <div><label>Nota Ricardo</label><input type="number" step="0.1" min="0" max="10" id="eRicardo"></div>
@@ -4793,6 +4862,7 @@
                 this.sortBy = 'watchedDesc'; // 'watchedDesc' | 'watchedAsc' | 'avg' | 'isr' | 'ric' — padrão: assistido mais recente primeiro
                 this.reviewFilter = 'all'; // 'all' | 'with' | 'without' — filtro de resenha do Catálogo
                 this.localFilter = 'all'; // 'all' | 'cinema' | 'ricardo' | 'outros' — onde assistiram
+                this.decadeFilter = 'all'; // 'all' | '1940' | '2000'... — década de lançamento
                 this.navHistory = []; // pilha de "de onde vim", para o botão Voltar
                 this.init();
             }
@@ -5322,6 +5392,7 @@
                 const genAllOpt = document.getElementById('genreOptAll');
                 if (genAllOpt) genAllOpt.checked = this.selectedGenres.size === 0;
                 this.updateGenreFilterButtonLabel();
+                this.renderDecadeOptions();
 
                 this.fetchPosters();
                 this.renderBackupBanner();
@@ -5798,6 +5869,74 @@
                 this.handleLocalFilterChange(bucket);
             }
 
+            // --- Filtro de década de lançamento ---
+            decadeOf(m) { const y = parseInt(m.year, 10); return y ? Math.floor(y / 10) * 10 : 0; }
+            renderDecadeOptions() {
+                const sel = document.getElementById('decadeFilter');
+                if (!sel) return;
+                const counts = {};
+                this.movies.forEach(m => { const d = this.decadeOf(m); if (d) counts[d] = (counts[d] || 0) + 1; });
+                const decs = Object.keys(counts).map(Number).sort((a, b) => b - a);
+                if (this.decadeFilter !== 'all' && !counts[this.decadeFilter]) this.decadeFilter = 'all';
+                sel.innerHTML = '<option value="all">Todas as décadas</option>' +
+                    decs.map(d => `<option value="${d}">Anos ${d} (${counts[d]})</option>`).join('');
+                sel.value = this.decadeFilter;
+            }
+            handleDecadeFilterChange(value) {
+                this.decadeFilter = /^\d{4}$/.test(String(value)) ? String(value) : 'all';
+                const sel = document.getElementById('decadeFilter');
+                if (sel) {
+                    // Garante a opção mesmo antes de a lista ser montada
+                    if (this.decadeFilter !== 'all' && ![...sel.options].some(o => o.value === this.decadeFilter)) this.renderDecadeOptions();
+                    sel.value = this.decadeFilter;
+                }
+                this.handleFilter();
+            }
+            // Atalho vindo das Estatísticas ou do detalhe do filme: catálogo filtrado pela década
+            filterByDecade(decade) {
+                this.pushNavState();
+                if (this.editingId !== null) this.closeModal();
+                this.switchTab('catalogo');
+                this.resetCatalogFilters();
+                this.handleDecadeFilterChange(String(decade));
+            }
+            // Links do detalhe do filme: fecha o cartão e abre o catálogo filtrado
+            goFilter(kind, value) {
+                if (this.editingId !== null) this.closeModal();
+                if (kind === 'director') this.filterByDirector(value);
+                else if (kind === 'genre') this.filterByGenre(value);
+                else if (kind === 'decade') this.filterByDecade(value);
+            }
+
+            // Capa do filme em tamanho grande (toque/clique fecha; ESC também)
+            zoomPoster() {
+                const m = this.editingMovie();
+                if (!m || !m.poster) return;
+                let box = document.getElementById('posterZoom');
+                if (!box) {
+                    box = document.createElement('div');
+                    box.id = 'posterZoom'; box.className = 'poster-zoom';
+                    box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Capa ampliada');
+                    box.innerHTML = '<button type="button" class="poster-zoom-close" aria-label="Fechar">×</button><img alt="">';
+                    box.addEventListener('click', () => this.closePosterZoom());
+                    document.body.appendChild(box);
+                }
+                const img = box.querySelector('img');
+                img.alt = `Capa de ${m.title}`;
+                img.onerror = () => { if (img.src !== m.poster) img.src = m.poster; };
+                img.src = m.poster;                                    // mostra já a que está em cache
+                const big = m.poster.replace('/t/p/w342/', '/t/p/w780/'); // e troca pela versão maior
+                if (big !== m.poster) { const pre = new Image(); pre.onload = () => { if (box.classList.contains('open')) img.src = big; }; pre.src = big; }
+                box.classList.add('open');
+                this._zoomEsc = e => { if (e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); this.closePosterZoom(); } };
+                window.addEventListener('keydown', this._zoomEsc, true);
+            }
+            closePosterZoom() {
+                const box = document.getElementById('posterZoom');
+                if (box) box.classList.remove('open');
+                if (this._zoomEsc) { window.removeEventListener('keydown', this._zoomEsc, true); this._zoomEsc = null; }
+            }
+
             // Volta todos os filtros do catálogo ao padrão (a ordenação escolhida é mantida)
             clearCatalogFilters() {
                 this.resetCatalogFilters();
@@ -5808,8 +5947,9 @@
                 document.querySelectorAll('#yearOptionsList input, #directorOptionsList input, #genreOptionsList input').forEach(cb => { cb.checked = false; });
                 ['yearOptAll', 'directorOptAll', 'genreOptAll'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = true; });
                 this.updateYearFilterButtonLabel(); this.updateDirectorFilterButtonLabel(); this.updateGenreFilterButtonLabel();
-                this.localFilter = 'all'; this.reviewFilter = 'all';
+                this.localFilter = 'all'; this.reviewFilter = 'all'; this.decadeFilter = 'all';
                 document.getElementById('localFilter').value = 'all';
+                document.getElementById('decadeFilter').value = 'all';
                 document.getElementById('reviewFilter').value = 'all';
                 document.getElementById('searchInput').value = '';
                 document.querySelector('header').classList.remove('m-has-query');
@@ -5820,6 +5960,7 @@
                 const states = [
                     ['yearFilterBtn', this.selectedYears.size > 0], ['directorFilterBtn', this.selectedDirectors.size > 0],
                     ['genreFilterBtn', this.selectedGenres.size > 0], ['localFilter', this.localFilter !== 'all'],
+                    ['decadeFilter', this.decadeFilter !== 'all'],
                     ['reviewFilter', this.reviewFilter !== 'all']
                 ];
                 states.forEach(([id, on]) => { const el = document.getElementById(id); if (el) el.classList.toggle('is-active', on); });
@@ -5861,6 +6002,9 @@
 
                 // Onde assistiram
                 if (this.localFilter !== 'all') list = list.filter(m => localBucket(m.local) === this.localFilter);
+
+                // Década de lançamento (ano do filme, não da exibição)
+                if (this.decadeFilter !== 'all') list = list.filter(m => String(this.decadeOf(m)) === this.decadeFilter);
 
                 // Resenha: "Com Resenha" exige texto tanto do Israel quanto do Ricardo;
                 // se faltar a de qualquer um dos dois, o filme conta como "Sem Resenha".
@@ -6065,7 +6209,7 @@
                     genres: "",
                     scIsr: 0, scRic: 0, scImdb: 0,
                     date: todayLocalISO(),
-                    local: "",
+                    local: "Ricardo", // o lugar mais usado; dá para trocar por Cinema etc.
                     revIsr: "", revRic: "",
                     poster: null,
                     avg: 0
@@ -6162,6 +6306,10 @@
 
                 // Preencher Visualização
                 document.getElementById('mPoster').src = m.poster || placeholderPoster(m.title || 'Sem capa');
+                // Fundo com a própria capa desfocada e botão de ampliar (só quando há capa real)
+                const mLeft = document.querySelector('#modalOverlay .modal-left');
+                if (mLeft) mLeft.style.setProperty('--m-poster-bg', m.poster ? `url("${String(m.poster).replace(/"/g, '%22')}")` : 'none');
+                document.getElementById('mZoomBtn')?.classList.toggle('show', !!m.poster);
                 document.getElementById('mTitle').innerText = m.title || "Sem Título";
 
                 // Mostra um botão de nova tentativa quando a busca automática de capa já
@@ -6181,12 +6329,27 @@
                     otEl.style.display = 'none';
                 }
 
-                document.getElementById('mMeta').innerText = `${m.year} • ${m.director || '-'}`;
+                // Ano (leva à década), diretor(es) e duração; ano e diretor abrem o catálogo filtrado
+                const metaEl = document.getElementById('mMeta');
+                const dec = this.decadeOf(m);
+                const dirNames = (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director);
+                const mins = movieMinutes(m);
+                const sep = '<span class="m-sep">•</span>';
+                const metaParts = [];
+                if (m.year) metaParts.push(dec
+                    ? `<a href="#" class="m-link" title="Ver os filmes dos anos ${dec}" onclick="event.preventDefault(); app.goFilter('decade', ${dec})">${escapeHtml(String(m.year))}</a>`
+                    : escapeHtml(String(m.year)));
+                metaParts.push(dirNames.length
+                    ? `<span>${dirNames.map(d => `<a href="#" class="m-link" title="Ver os filmes de ${escapeHtml(d)}" onclick="event.preventDefault(); app.goFilter('director', '${escapeHtml(escapeJsString(d))}')">${escapeHtml(d)}</a>`).join(', ')}</span>`
+                    : 'Diretor não informado');
+                if (mins) metaParts.push(`<span class="m-dur">${mins >= 60 ? `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}min` : `${mins} min`}</span>`);
+                metaEl.classList.add('m-meta');
+                metaEl.innerHTML = metaParts.join(sep);
 
-                // Gêneros como "pills" separadas, em vez de texto corrido
+                // Gêneros como "pills" clicáveis (abrem o catálogo filtrado pelo gênero)
                 const genreNames = (m.genres || '').split(',').map(g => g.trim()).filter(Boolean);
                 const pillsEl = document.getElementById('mGenrePills');
-                pillsEl.innerHTML = genreNames.map(g => `<span class="genre-pill">${escapeHtml(g)}</span>`).join('');
+                pillsEl.innerHTML = genreNames.map(g => `<button type="button" class="genre-pill" title="Ver os filmes de ${escapeHtml(g.toLowerCase())}" onclick="app.goFilter('genre', '${escapeHtml(escapeJsString(g))}')">${escapeHtml(g)}</button>`).join('');
 
                 const scoreTxt = v => v > 0 ? v.toFixed(1) : '<span class="s-pending">pendente</span>';
                 document.getElementById('sIsrael').innerHTML = scoreTxt(m.scIsr);
@@ -6649,7 +6812,7 @@
                     decCount[dec] = (decCount[dec] || 0) + 1;
                 });
                 const decadeScores = Object.keys(decSum).map(Number).sort((a,b) => a-b)
-                    .map(dec => ({ name: `Anos ${dec}`, avg: decSum[dec]/decCount[dec], count: decCount[dec] }));
+                    .map(dec => ({ name: `Anos ${dec}`, dec, avg: decSum[dec]/decCount[dec], count: decCount[dec] }));
 
                 // Filme mais longo e mais curto (a partir da duração "H:MM")
                 let longestMovie = null, shortestMovie = null;
@@ -6701,7 +6864,8 @@
                           click: name => `app.filterByGenre('${escapeJsString(name)}')` },
                         { key: 'dir', label: 'Diretores', singular: 'Diretor', min: 2, fn: m => (m.directors && m.directors.length) ? m.directors : splitDirectors(m.director),
                           click: name => `app.filterByDirector('${escapeJsString(name)}')` },
-                        { key: 'dec', label: 'Décadas', singular: 'Década', fem: true, min: 3, fn: m => { const y = parseInt(m.year, 10); return y ? ['Anos ' + Math.floor(y / 10) * 10] : []; } }
+                        { key: 'dec', label: 'Décadas', singular: 'Década', fem: true, min: 3, fn: m => { const y = parseInt(m.year, 10); return y ? ['Anos ' + Math.floor(y / 10) * 10] : []; },
+                          click: name => `app.filterByDecade(${parseInt(String(name).replace(/\D/g, ''), 10)})` }
                     ]
                 };
             }
@@ -6780,7 +6944,7 @@
                 const notas = `
                     ${stPanel('Ano a ano', years.size ? 'sempre o histórico completo' : '', buildYearTable(s.yearlyScores, F))}
                     <div class="st-grid-2">
-                        ${stPanel('Por década de lançamento', '', buildRankRows(s.decadeScores, { key: 'm-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: F, noPos: true, limit: 12 }))}
+                        ${stPanel('Por década de lançamento', '', buildRankRows(s.decadeScores, { key: 'm-st-dec', nameFn: d => d.name, countFn: d => d.count, avgFn: d => d.avg, unit: F, noPos: true, limit: 12, clickFn: d => `app.filterByDecade(${d.dec})` }))}
                         ${stPanel('Vocês × IMDb', '', imdbBody)}
                     </div>`;
 
@@ -6815,7 +6979,7 @@
                 const yearOf = m => (m.date || '').slice(0, 4);
                 const list = this.movies.filter(m => yearOf(m) === year);
                 const seriesDone = (typeof sapp !== 'undefined' ? sapp.series : [])
-                    .filter(s => s._m && s._m.complete && (s.finishedDate || '').slice(0, 4) === year)
+                    .filter(s => s._m && s._m.group === 'finalizadas' && (s.finishedDate || '').slice(0, 4) === year) // só séries encerradas e vistas até o fim
                     .sort((a, b) => (b.avg - a.avg) || a.title.localeCompare(b.title, 'pt-BR'));
                 const hasRewatch = this.movies.some(m => normalizeRewatches(m.rewatches).some(x => x.d.slice(0, 4) === year));
                 if (!list.length && !seriesDone.length && !hasRewatch) return null;
@@ -6909,7 +7073,7 @@
             recapYears() {
                 const years = new Set(this.movies.flatMap(m => sessionsOf(m).map(x => x.d.slice(0, 4))).filter(y => /^\d{4}$/.test(y)));
                 if (typeof sapp !== 'undefined') {
-                    sapp.series.forEach(s => { const y = (s.finishedDate || '').slice(0, 4); if (s._m && s._m.complete && /^\d{4}$/.test(y)) years.add(y); });
+                    sapp.series.forEach(s => { const y = (s.finishedDate || '').slice(0, 4); if (s._m && s._m.group === 'finalizadas' && /^\d{4}$/.test(y)) years.add(y); });
                 }
                 return [...years].sort().reverse();
             }
