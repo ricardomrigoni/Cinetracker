@@ -1984,12 +1984,12 @@
         }
 
         /* ============================================================
-           LIVRO DO ANO — versão para impressão em A4 (só filmes)
+           LIVRO DO ANO — versão para impressão em A4 paisagem (só filmes)
            Paleta própria e fixa (igual nos dois temas): é um impresso.
            Fica escondido na tela; só aparece ao imprimir o livro.
            ============================================================ */
         #ybPrint { display: none; }
-        @page ybA4 { size: A4 portrait; margin: 0; }
+        @page ybA4 { size: A4 landscape; margin: 0; }
         @media print {
             body.yb-printing > *:not(#ybPrint) { display: none !important; }
             body.yb-printing { background: #ffffff !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; }
@@ -2007,7 +2007,7 @@
             --yb-isr: #c07a1e; --yb-ric: #2c6e6b;
         }
         .yb-page {
-            page: ybA4; width: 210mm; height: 297mm; position: relative; overflow: hidden; box-sizing: border-box;
+            page: ybA4; width: 297mm; height: 210mm; position: relative; overflow: hidden; box-sizing: border-box;
             break-after: page; page-break-after: always; break-inside: avoid;
             background: var(--yb-sheet); color: var(--yb-ink);
             font-family: 'Manrope', 'Helvetica Neue', Arial, sans-serif; font-size: 9pt; line-height: 1.35;
@@ -2020,37 +2020,37 @@
         /* Capa e contracapa: um ingresso de cinema sobre o papel branco.
            A margem branca faz parte do desenho (a impressora não imprime até a borda). */
         .yb-cover, .yb-back { background: #ffffff; }
-        .yb-ticket { position: absolute; inset: 14mm; background: var(--yb-paper); border-radius: 3mm; display: flex; flex-direction: column; overflow: hidden; }
+        .yb-ticket { position: absolute; inset: 14mm; background: var(--yb-paper); border-radius: 3mm; display: flex; flex-direction: row; overflow: hidden; }
         .yb-ticket::before { content: ''; position: absolute; inset: 7mm; border: 0.5mm solid var(--yb-gold); border-radius: 1.5mm; pointer-events: none; }
         .yb-ticket::after { content: ''; position: absolute; inset: 8.5mm; border: 0.2mm solid var(--yb-gold); border-radius: 1mm; pointer-events: none; }
         .yb-tk-corner { position: absolute; width: 10mm; height: 10mm; border-radius: 50%; background: #ffffff; z-index: 2; }
         .yb-tk-corner.tl { top: -5mm; left: -5mm; } .yb-tk-corner.tr { top: -5mm; right: -5mm; }
         .yb-tk-corner.bl { bottom: -5mm; left: -5mm; } .yb-tk-corner.br { bottom: -5mm; right: -5mm; }
-        .yb-tk-main { flex: 1; min-height: 0; padding: 16mm 16mm 9mm; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; text-align: center; position: relative; }
-        .yb-tk-perf { position: relative; height: 0; border-top: 0.6mm dashed var(--yb-soft); margin: 0 12mm; }
-        .yb-tk-notch { position: absolute; top: -6mm; width: 12mm; height: 12mm; border-radius: 50%; background: #ffffff; z-index: 2; }
-        .yb-tk-notch.l { left: -18mm; } .yb-tk-notch.r { right: -18mm; }
-        .yb-tk-stub { height: 44mm; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; justify-items: center; padding: 4mm 14mm 11mm; position: relative; }
+        .yb-tk-main { flex: 1; min-width: 0; padding: 13mm 15mm 12mm 16mm; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; text-align: center; position: relative; }
+        .yb-tk-perf { position: relative; width: 0; border-left: 0.6mm dashed var(--yb-soft); margin: 12mm 0; }
+        .yb-tk-notch { position: absolute; left: -6mm; width: 12mm; height: 12mm; border-radius: 50%; background: #ffffff; z-index: 2; }
+        .yb-tk-notch.l { top: -18mm; } .yb-tk-notch.r { bottom: -18mm; }
+        .yb-tk-stub { width: 66mm; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; justify-items: center; padding: 14mm 12mm 14mm 6mm; position: relative; }
         .yb-tk-stub-side { text-align: center; }
         .yb-tk-stub-side small, .yb-tk-cap { display: block; font-size: 6.8pt; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-tk-big { display: block; font-size: 40pt; line-height: 0.9; color: var(--yb-red); margin-top: 1mm; }
         .yb-tk-stub-mid { text-align: center; padding: 1mm 3mm; }
-        .yb-tk-names { font-size: 24pt; line-height: 1; letter-spacing: 0.06em; color: var(--yb-ink); margin-top: 1.5mm; }
+        .yb-tk-names { font-size: 22pt; line-height: 1; letter-spacing: 0.06em; color: var(--yb-ink); margin-top: 1.5mm; }
         .yb-tk-sub { font-size: 7.5pt; color: var(--yb-muted); margin-top: 1.5mm; }
 
         .yb-cg { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .yb-kicker { font-size: 8.5pt; font-weight: 800; letter-spacing: 0.32em; color: var(--yb-muted); text-transform: uppercase; }
         .yb-kicker b { color: var(--yb-red); font-weight: 800; }
-        .yb-cover-year { font-size: 160pt; line-height: 0.82; color: var(--yb-red); margin: 5mm 0 4mm; }
-        .yb-cover-title { font-size: 23pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
+        .yb-cover-year { font-size: 132pt; line-height: 0.82; color: var(--yb-red); margin: 3mm 0 3mm; }
+        .yb-cover-title { font-size: 21pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
         .yb-cover-period { font-size: 9.5pt; color: var(--yb-muted); font-weight: 600; margin-top: 2.5mm; }
         .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); width: 70mm; }
         .yb-orn::before, .yb-orn::after { content: ''; flex: 1; height: 0.3mm; background: var(--yb-gold); }
         .yb-orn span { font-size: 9pt; }
-        .yb-figs { display: flex; justify-content: center; }
-        .yb-fig { padding: 0 9mm; border-left: 0.3mm solid var(--yb-line); text-align: center; }
-        .yb-fig:first-child { border-left: none; }
-        .yb-fig-v { font-size: 32pt; line-height: 0.95; color: var(--yb-ink); }
+        .yb-figs { display: flex; flex-direction: column; align-items: center; }
+        .yb-fig { padding: 5mm 4mm; border-top: 0.3mm solid var(--yb-line); text-align: center; width: 100%; }
+        .yb-fig:first-child { border-top: none; }
+        .yb-fig-v { font-size: 36pt; line-height: 0.95; color: var(--yb-ink); }
         .yb-fig-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1mm; }
 
         /* Faixa de película com as 5 melhores e os títulos completos embaixo */
@@ -2063,10 +2063,10 @@
         .yb-band-frame img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 0.8mm; background: #3a2c22; }
         .yb-band-n { position: absolute; left: 1.8mm; bottom: -1mm; font-size: 38pt; line-height: 1; color: var(--yb-paper); text-shadow: 0 0.6mm 2.4mm rgba(0,0,0,0.9); }
         .yb-band-titles { margin-top: 2.6mm; align-items: start; }
-        .yb-band-t { font-size: 11.5pt; line-height: 1.05; letter-spacing: 0.03em; color: var(--yb-ink); text-align: center; overflow-wrap: break-word; hyphens: manual; }
+        .yb-band-t { font-size: 11pt; line-height: 1.05; letter-spacing: 0.03em; color: var(--yb-ink); text-align: center; overflow-wrap: break-word; hyphens: manual; }
         .yb-band-note { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2.6mm; letter-spacing: 0.06em; text-align: center; }
 
-        .yb-fim { font-size: 130pt; line-height: 0.85; color: var(--yb-red); }
+        .yb-fim { font-size: 115pt; line-height: 0.85; color: var(--yb-red); }
         .yb-fim-sub { font-size: 20pt; letter-spacing: 0.08em; margin-top: 2mm; }
         .yb-back-lede { font-size: 10.5pt; line-height: 1.6; max-width: 125mm; margin: 0 auto; color: var(--yb-ink); }
         .yb-back-lede b { color: var(--yb-red); }
@@ -2077,19 +2077,23 @@
         .yb-back-pair span { font-size: 8pt; color: var(--yb-muted); }
 
         /* Páginas internas */
-        .yb-inner { padding: 13mm 14mm 0; }
+        .yb-inner { padding: 11mm 13mm 0; }
         .yb-run { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 2mm; border-bottom: 0.5mm solid var(--yb-gold); }
         .yb-run-brand { font-size: 11pt; letter-spacing: 0.12em; }
         .yb-run-brand span { color: var(--yb-red); }
         .yb-run-sec { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--yb-muted); }
-        .yb-foot { position: absolute; left: 14mm; right: 14mm; bottom: 8mm; display: flex; justify-content: space-between; font-size: 7pt; color: var(--yb-muted); border-top: 0.25mm solid var(--yb-line); padding-top: 2mm; letter-spacing: 0.04em; }
-        .yb-h { font-size: 28pt; line-height: 1; margin: 6mm 0 1mm; }
-        .yb-hsub { font-size: 8.5pt; color: var(--yb-muted); margin: 0 0 4mm; }
+        .yb-foot { position: absolute; left: 13mm; right: 13mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 7pt; color: var(--yb-muted); border-top: 0.25mm solid var(--yb-line); padding-top: 2mm; letter-spacing: 0.04em; }
+        .yb-h { font-size: 26pt; line-height: 1; margin: 4.5mm 0 0.5mm; }
+        .yb-hsub { font-size: 8.5pt; color: var(--yb-muted); margin: 0 0 3.5mm; }
         .yb-sec-title { font-size: 15pt; line-height: 1; margin: 0 0 2.5mm; display: flex; align-items: center; gap: 2.5mm; }
         .yb-sec-title::after { content: ''; flex: 1; height: 0.25mm; background: var(--yb-line); }
 
         /* Pódio */
-        .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; margin-bottom: 6mm; }
+        .yb-hl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 9mm; }
+        .yb-hl-col { min-width: 0; display: flex; flex-direction: column; gap: 6mm; }
+        .yb-hl-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
+        .yb-hl-pair > div { min-width: 0; }
+        .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3.5mm; }
         .yb-pod { min-width: 0; display: flex; flex-direction: column; }
         .yb-pod .yb-chip { align-self: flex-start; margin-top: auto; }
         .yb-pod-d { margin-bottom: 1.4mm; }
@@ -2100,10 +2104,10 @@
         .yb-pod-d { font-size: 6.8pt; color: var(--yb-muted); margin-top: 0.5mm; line-height: 1.25; }
         .yb-chip { display: inline-block; min-width: 9mm; text-align: center; color: #fff; font-weight: 800; font-size: 8pt; border-radius: 1mm; padding: 0.5mm 1.5mm; margin-top: 1.2mm; }
 
-        .yb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
+        .yb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; }
         .yb-cols > div { min-width: 0; }
         .yb-rows { display: flex; flex-direction: column; }
-        .yb-row { display: grid; grid-template-columns: 24mm minmax(0, 1fr) auto; gap: 2mm; align-items: start; padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); }
+        .yb-row { display: grid; grid-template-columns: 19mm minmax(0, 1fr) auto; gap: 2mm; align-items: start; padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); }
         .yb-row:last-child { border-bottom: none; }
         .yb-row-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-row-v { font-size: 8.5pt; font-weight: 800; line-height: 1.25; overflow-wrap: break-word; }
@@ -2123,7 +2127,7 @@
         .yb-duo-line { font-size: 8pt; margin-top: 3mm; padding-top: 2mm; border-top: 0.25mm solid var(--yb-line); line-height: 1.45; }
         .yb-duo-line b { font-weight: 800; }
 
-        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5mm; align-items: end; height: 58mm; }
+        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.8mm; align-items: end; height: 72mm; }
         .yb-mcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 1mm; }
         .yb-mcount { font-size: 7pt; font-weight: 800; color: var(--yb-muted); min-height: 3mm; }
         .yb-mbar { width: 100%; background: var(--yb-gold); border-radius: 0.6mm 0.6mm 0 0; min-height: 0.6mm; }
@@ -2134,32 +2138,42 @@
         .yb-mlbl { font-size: 7pt; font-weight: 800; color: var(--yb-muted); }
         .yb-mnote { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2mm; }
 
-        /* Fichas da lista */
-        .yb-list { display: flex; flex-direction: column; gap: 3.5mm; margin-top: 4mm; }
-        .yb-card { display: grid; grid-template-columns: 26.3mm minmax(0, 1fr); gap: 4.5mm; height: 43mm; padding: 1.8mm; border: 0.3mm solid var(--yb-line); border-radius: 1.6mm; background: #fffefb; break-inside: avoid; page-break-inside: avoid; }
-        .yb-card img { display: block; width: 26.3mm; height: 39.4mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
-        .yb-body { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 1mm 1.5mm 0.6mm 0; }
-        .yb-top { display: flex; gap: 3.5mm; align-items: flex-start; }
-        .yb-pos { font-size: 27pt; line-height: 0.85; color: var(--yb-gold); flex: none; min-width: 11mm; }
+        /* Fichas da lista: 4 por página (2 × 2), capa grande + ficha técnica */
+        .yb-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: 80mm 80mm; gap: 5mm 6mm; position: absolute; left: 13mm; right: 13mm; top: 23.5mm; }
+        .yb-card { display: grid; grid-template-columns: 48.9mm minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 80mm; overflow: hidden; gap: 5mm; min-height: 0; padding: 3mm; border: 0.3mm solid var(--yb-line); border-radius: 2mm; background: #fffefb; break-inside: avoid; page-break-inside: avoid; }
+        .yb-card img { display: block; width: 48.9mm; height: 73.4mm; object-fit: cover; border-radius: 1.2mm; background: #3a2c22; }
+        .yb-body { min-width: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 0.8mm 0.5mm 0 0; }
+        .yb-top { display: flex; gap: 3mm; align-items: flex-start; }
+        .yb-pos { font-size: 34pt; line-height: 0.8; color: var(--yb-gold); flex: none; }
         .yb-tt { min-width: 0; }
-        .yb-title { font-size: 12pt; font-weight: 800; line-height: 1.18; overflow-wrap: break-word; }
-        .yb-yr { color: var(--yb-muted); font-weight: 600; font-size: 10pt; }
-        .yb-orig { font-size: 7.5pt; font-style: italic; color: var(--yb-soft); margin-top: 0.4mm; line-height: 1.25; }
-        .yb-dir { font-size: 8.5pt; color: var(--yb-muted); margin-top: 1mm; line-height: 1.25; }
-        .yb-dir b { color: var(--yb-ink); font-weight: 700; }
-        .yb-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 3mm; }
-        .yb-when { font-size: 8pt; color: var(--yb-muted); line-height: 1.45; min-width: 0; }
-        .yb-when b { color: var(--yb-ink); font-weight: 800; }
-        .yb-scores { display: flex; align-items: stretch; gap: 1.8mm; flex: none; }
-        .yb-sc { width: 17mm; text-align: center; border: 0.3mm solid var(--yb-line); border-radius: 1.2mm; padding: 1.2mm 0 1mm; }
-        .yb-sc span, .yb-avg span { display: block; font-size: 6pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); }
-        .yb-sc b { display: block; font-size: 15pt; line-height: 1.05; margin-top: 0.6mm; }
-        .yb-sc i { display: block; font-size: 7pt; font-style: italic; color: var(--yb-soft); margin-top: 2.2mm; }
-        .yb-avg { width: 22mm; text-align: center; border-radius: 1.2mm; padding: 1.2mm 0 1mm; color: #fff; }
+        .yb-title { font-size: 14pt; font-weight: 800; line-height: 1.15; overflow-wrap: break-word; }
+        .yb-orig { font-size: 8pt; font-style: italic; color: var(--yb-soft); margin-top: 0.8mm; line-height: 1.25; }
+        .yb-facts-card { display: grid; grid-template-columns: 23mm minmax(0, 1fr); column-gap: 2.5mm; margin: 3.5mm 0 0; padding-top: 2.5mm; border-top: 0.3mm solid var(--yb-line); align-content: start; flex: none; }
+        .yb-facts-card dt { font-size: 6.6pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--yb-muted); padding: 1.15mm 0; }
+        .yb-facts-card dd { margin: 0; font-size: 8.8pt; font-weight: 700; color: var(--yb-ink); line-height: 1.3; padding: 0.7mm 0; overflow-wrap: break-word; }
+        .yb-facts-card dd span { font-weight: 500; color: var(--yb-muted); }
+        .yb-scores { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 2mm; flex: none; margin-top: auto; padding-top: 2mm; }
+        .yb-sc { text-align: center; border: 0.3mm solid var(--yb-line); border-radius: 1.4mm; padding: 1.6mm 0 1.2mm; }
+        .yb-sc span, .yb-avg span { display: block; font-size: 6.4pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-sc b { display: block; font-size: 20pt; line-height: 1.05; margin-top: 0.6mm; }
+        .yb-sc i { display: block; font-size: 8pt; font-style: italic; color: var(--yb-soft); margin-top: 3.4mm; margin-bottom: 1.8mm; }
+        .yb-avg { text-align: center; border-radius: 1.4mm; padding: 1.6mm 0 1.2mm; color: #fff; }
         .yb-avg span { color: rgba(255,255,255,0.85); }
-        .yb-avg b { display: block; font-size: 20pt; line-height: 1; margin-top: 0.4mm; }
+        .yb-avg b { display: block; font-size: 26pt; line-height: 1; margin-top: 0.4mm; }
         .yb-avg.is-none { background: #efe4cc; color: var(--yb-muted); }
         .yb-avg.is-none span { color: var(--yb-muted); }
+        .yb-card.is-tight .yb-title { font-size: 12pt; }
+        .yb-card.is-tight .yb-pos { font-size: 28pt; }
+        .yb-card.is-tight .yb-facts-card { margin-top: 2.5mm; padding-top: 1.8mm; }
+        .yb-card.is-tight .yb-facts-card dt { padding: 0.8mm 0; }
+        .yb-card.is-tight .yb-facts-card dd { font-size: 8pt; padding: 0.4mm 0; }
+        .yb-card.is-tighter .yb-title { font-size: 10.5pt; }
+        .yb-card.is-tighter .yb-orig { font-size: 7pt; }
+        .yb-card.is-tighter .yb-facts-card dd { font-size: 7.4pt; line-height: 1.2; }
+        .yb-card.is-tighter .yb-sc b { font-size: 16pt; }
+        .yb-card.is-tighter .yb-avg b { font-size: 21pt; }
+        .yb-card.is-tighter .yb-facts-card dt { padding: 0.5mm 0; font-size: 6pt; }
+        .yb-card.is-tighter .yb-sc, .yb-card.is-tighter .yb-avg { padding: 1mm 0 0.8mm; }
 
         /* ============================================================
            CATÁLOGO DE FILMES — 7 filtros (com a década):
@@ -2870,7 +2884,7 @@
             <p class="yb-modal-note">Um registro em A4 dos filmes de um ano: capa, destaques, a lista completa pela nossa média e a contracapa. Ele usa os dados do momento em que for emitido.</p>
             <select id="ybYearSelect" onchange="yearBook.updatePreview()" aria-label="Ano do livro"></select>
             <div class="yb-modal-count" id="ybCount" aria-live="polite"></div>
-            <p class="yb-modal-note">Na janela que abrir, escolha <b>Salvar como PDF</b> (ou a impressora), papel <b>A4</b>, margens <b>Nenhuma</b> e ative <b>Gráficos de fundo</b>.</p>
+            <p class="yb-modal-note">Na janela que abrir, escolha <b>Salvar como PDF</b> (ou a impressora), papel <b>A4</b> (o livro já sai deitado, em paisagem), margens <b>Nenhuma</b> e ative <b>Gráficos de fundo</b>.</p>
             <div class="confirm-actions">
                 <button type="button" class="btn" onclick="yearBook.close()">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="ybGenerateBtn" onclick="yearBook.generate()">Gerar PDF</button>
@@ -9313,7 +9327,7 @@
         // ============================================================
         const yearBook = {
             MONTHS: ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
-            PER_PAGE: 5,
+            PER_PAGE: 4,
 
             open() {
                 const years = this.years();
@@ -9555,26 +9569,31 @@
                     return `<div class="yb-mcol${i === r.topMonth ? ' is-top' : ''}${future ? ' is-future' : ''}"><span class="yb-mcount">${c || ''}</span><div class="yb-mbar${c ? '' : ' is-zero'}" style="height:${c ? Math.max(6, c / maxM * 100).toFixed(1) : 1.5}%"></div><span class="yb-mlbl">${ml[i]}</span></div>`;
                 }).join('');
 
+                const monthNote = `${r.topMonth >= 0 ? `${this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase())} foi o mês com mais filmes.` : ''}${r.inProgress ? ' Os meses tracejados ainda não chegaram.' : ''}`;
                 return `
                     <section class="yb-page yb-inner">
                         ${this.run('Destaques do ano')}
                         <h2 class="yb-h yb-bebas">Destaques de ${esc(r.year)}</h2>
                         <p class="yb-hsub">${top.length >= 5 ? 'Os cinco melhores' : top.length > 1 ? `Os ${top.length} melhores` : 'O melhor'} pela nossa média (Israel + Ricardo).</p>
-                        ${podium}
-                        <div class="yb-cols">
-                            <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-rows">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
-                            <div><h3 class="yb-sec-title yb-bebas">O ano em números</h3><div class="yb-facts">${facts}</div></div>
-                        </div>
-                        <div class="yb-cols">
-                            <div>
-                                <h3 class="yb-sec-title yb-bebas">Israel × Ricardo</h3>
-                                <div class="yb-duo">${person(pI)}${person(pR)}</div>
-                                ${lines.length ? `<div class="yb-duo-line">${lines.join('<br>')}</div>` : ''}
+                        <div class="yb-hl">
+                            <div class="yb-hl-col">
+                                ${podium}
+                                <div class="yb-hl-pair">
+                                    <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-rows">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
+                                    <div>
+                                        <h3 class="yb-sec-title yb-bebas">Israel × Ricardo</h3>
+                                        <div class="yb-duo">${person(pI)}${person(pR)}</div>
+                                        ${lines.length ? `<div class="yb-duo-line">${lines.join('<br>')}</div>` : ''}
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="yb-sec-title yb-bebas">Mês a mês</h3>
-                                <div class="yb-months">${monthsHtml}</div>
-                                <div class="yb-mnote">${r.topMonth >= 0 ? `${this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase())} foi o mês com mais filmes.` : ''}${r.inProgress ? ' Os meses tracejados ainda não chegaram.' : ''}</div>
+                            <div class="yb-hl-col">
+                                <div><h3 class="yb-sec-title yb-bebas">O ano em números</h3><div class="yb-facts">${facts}</div></div>
+                                <div>
+                                    <h3 class="yb-sec-title yb-bebas">Mês a mês</h3>
+                                    <div class="yb-months">${monthsHtml}</div>
+                                    <div class="yb-mnote">${monthNote}</div>
+                                </div>
                             </div>
                         </div>
                         ${this.foot(r, page, total)}
@@ -9586,6 +9605,16 @@
                 const sc = (label, v, color) => `<div class="yb-sc"><span>${label}</span>${v > 0 ? `<b class="yb-bebas" style="color:${color}">${this.n1(v)}</b>` : '<i>pendente</i>'}</div>`;
                 const dirs = this.dirs(m).join(', ');
                 const hasOrig = m.originalTitle && normalizeKey(m.originalTitle) !== normalizeKey(m.title);
+                const mins = movieMinutes(m);
+                const genres = (m.genres || '').split(',').map(g => g.trim()).filter(Boolean).join(', ');
+                const facts = [
+                    ['Direção', dirs ? esc(dirs) : '<span>não informada</span>'],
+                    ['Lançamento', m.year ? esc(String(m.year)) : '<span>—</span>'],
+                    mins ? ['Duração', mins >= 60 ? `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}min` : `${mins} min`] : null,
+                    genres ? ['Gênero', esc(genres)] : null,
+                    ['Assistido em', formatDateBR(e.date)],
+                    m.local ? ['Local', esc(m.local)] : null
+                ].filter(Boolean);
                 return `
                     <article class="yb-card">
                         <img ${this.imgAttrs(m)} alt="">
@@ -9593,20 +9622,17 @@
                             <div class="yb-top">
                                 <span class="yb-pos yb-bebas">${String(pos).padStart(digits, '0')}</span>
                                 <div class="yb-tt">
-                                    <div class="yb-title">${esc(m.title || 'Sem título')}${m.year ? ` <span class="yb-yr">(${esc(String(m.year))})</span>` : ''}</div>
+                                    <div class="yb-title">${esc(m.title || 'Sem título')}</div>
                                     ${hasOrig ? `<div class="yb-orig">${esc(m.originalTitle)}</div>` : ''}
-                                    <div class="yb-dir">${dirs ? `Direção: <b>${esc(dirs)}</b>` : 'Diretor não informado'}</div>
                                 </div>
                             </div>
-                            <div class="yb-bottom">
-                                <div class="yb-when">Assistido em <b>${formatDateBR(e.date)}</b>${m.local ? `<br>${esc(m.local)}` : ''}</div>
-                                <div class="yb-scores">
-                                    ${sc('Israel', Number(m.scIsr) || 0, '#c07a1e')}
-                                    ${sc('Ricardo', Number(m.scRic) || 0, '#2c6e6b')}
-                                    ${m.avg > 0
-                                        ? `<div class="yb-avg" style="background:${this.color(m.avg)}"><span>Média</span><b class="yb-bebas">${this.n1(m.avg)}</b></div>`
-                                        : `<div class="yb-avg is-none"><span>Média</span><b class="yb-bebas">—</b></div>`}
-                                </div>
+                            <dl class="yb-facts-card">${facts.map(([l, v]) => `<dt>${l}</dt><dd>${v}</dd>`).join('')}</dl>
+                            <div class="yb-scores">
+                                ${sc('Israel', Number(m.scIsr) || 0, '#c07a1e')}
+                                ${sc('Ricardo', Number(m.scRic) || 0, '#2c6e6b')}
+                                ${m.avg > 0
+                                    ? `<div class="yb-avg" style="background:${this.color(m.avg)}"><span>Média</span><b class="yb-bebas">${this.n1(m.avg)}</b></div>`
+                                    : `<div class="yb-avg is-none"><span>Média</span><b class="yb-bebas">—</b></div>`}
                             </div>
                         </div>
                     </article>`;
@@ -9617,11 +9643,9 @@
                 const pages = [];
                 for (let i = 0; i < r.list.length; i += this.PER_PAGE) {
                     const chunk = r.list.slice(i, i + this.PER_PAGE);
-                    const first = i === 0;
                     pages.push(`
                         <section class="yb-page yb-inner">
-                            ${this.run(`Filmes assistidos · ${i + 1}–${i + chunk.length} de ${r.list.length}`)}
-                            ${first ? `<h2 class="yb-h yb-bebas">Os filmes de ${escapeHtml(r.year)}</h2><p class="yb-hsub" style="margin-bottom:0">Do maior para o menor pela nossa média (Israel + Ricardo). No empate, vale a nota do IMDb.</p>` : ''}
+                            ${this.run(`Os filmes de ${escapeHtml(r.year)} · pela nossa média · ${i + 1}–${i + chunk.length} de ${r.list.length}`)}
                             <div class="yb-list">${chunk.map((e, k) => this.cardHtml(e, i + k + 1, digits)).join('')}</div>
                             ${this.foot(r, firstPage + pages.length, total)}
                         </section>`);
@@ -9661,6 +9685,21 @@
                 return this.coverHtml(r) + this.highlightsHtml(r, 2, total) + this.listPagesHtml(r, 3, total) + this.backHtml(r);
             },
 
+            // Ficha com conteúdo demais (título longo, muitos gêneros): letra um pouco menor,
+            // em vez de cortar. Mede com o livro montado fora da tela.
+            fitCards(host) {
+                const prev = host.getAttribute('style') || '';
+                host.setAttribute('style', 'display:block !important; position:absolute; left:-10000px; top:0;');
+                host.querySelectorAll('.yb-card').forEach(card => {
+                    const body = card.querySelector('.yb-body');
+                    for (const cls of ['is-tight', 'is-tighter']) {
+                        if (body.scrollHeight <= body.clientHeight + 1) break;
+                        card.classList.add(cls);
+                    }
+                });
+                host.setAttribute('style', prev);
+            },
+
             // Monta o livro, espera fontes e capas carregarem e abre a impressão do navegador
             async generate() {
                 const year = document.getElementById('ybYearSelect').value;
@@ -9676,6 +9715,7 @@
                     // Capa que não carregou (sem internet, link quebrado) vira o cartaz tipográfico
                     imgs.forEach(img => { if (!img.naturalWidth && !img.src.startsWith('data:')) img.src = placeholderPoster(img.dataset.t || 'Sem capa'); });
                 } catch (e) { /* imprime assim mesmo */ }
+                this.fitCards(host);
                 this.close();
                 btn.disabled = false; btn.textContent = 'Gerar PDF';
                 const prevTitle = document.title;
@@ -9692,7 +9732,7 @@
                 if (!document.getElementById('ybPageStyle')) {
                     const ps = document.createElement('style');
                     ps.id = 'ybPageStyle';
-                    ps.textContent = '@page { size: 210mm 297mm; margin: 0 !important; } @media print { html, body { margin: 0 !important; padding: 0 !important; width: 210mm; } }';
+                    ps.textContent = '@page { size: 297mm 210mm; margin: 0 !important; } @media print { html, body { margin: 0 !important; padding: 0 !important; width: 297mm; } }';
                     document.head.appendChild(ps);
                 }
                 document.body.classList.add('yb-printing');
