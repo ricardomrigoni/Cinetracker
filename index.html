@@ -2017,48 +2017,60 @@
         .yb-page * { box-sizing: border-box; }
         .yb-bebas { font-family: 'Bebas Neue', 'Oswald', Impact, sans-serif; font-weight: 400; letter-spacing: 0.02em; }
 
-        /* Película: faixas com perfurações */
-        .yb-strip { position: absolute; left: 0; right: 0; height: 11mm; background: var(--yb-film); display: flex; align-items: center; overflow: hidden; }
-        .yb-strip.top { top: 0; } .yb-strip.bottom { bottom: 0; }
-        .yb-holes { display: flex; gap: 3.2mm; padding: 0 3mm; }
-        .yb-holes i { flex: 0 0 4.2mm; height: 3.2mm; border-radius: 0.8mm; background: var(--yb-paper); }
+        /* Capa e contracapa: um ingresso de cinema sobre o papel branco.
+           A margem branca faz parte do desenho (a impressora não imprime até a borda). */
+        .yb-cover, .yb-back { background: #ffffff; }
+        .yb-ticket { position: absolute; inset: 14mm; background: var(--yb-paper); border-radius: 3mm; display: flex; flex-direction: column; overflow: hidden; }
+        .yb-ticket::before { content: ''; position: absolute; inset: 7mm; border: 0.5mm solid var(--yb-gold); border-radius: 1.5mm; pointer-events: none; }
+        .yb-ticket::after { content: ''; position: absolute; inset: 8.5mm; border: 0.2mm solid var(--yb-gold); border-radius: 1mm; pointer-events: none; }
+        .yb-tk-corner { position: absolute; width: 10mm; height: 10mm; border-radius: 50%; background: #ffffff; z-index: 2; }
+        .yb-tk-corner.tl { top: -5mm; left: -5mm; } .yb-tk-corner.tr { top: -5mm; right: -5mm; }
+        .yb-tk-corner.bl { bottom: -5mm; left: -5mm; } .yb-tk-corner.br { bottom: -5mm; right: -5mm; }
+        .yb-tk-main { flex: 1; min-height: 0; padding: 16mm 16mm 9mm; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; text-align: center; position: relative; }
+        .yb-tk-perf { position: relative; height: 0; border-top: 0.6mm dashed var(--yb-soft); margin: 0 12mm; }
+        .yb-tk-notch { position: absolute; top: -6mm; width: 12mm; height: 12mm; border-radius: 50%; background: #ffffff; z-index: 2; }
+        .yb-tk-notch.l { left: -18mm; } .yb-tk-notch.r { right: -18mm; }
+        .yb-tk-stub { height: 44mm; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; justify-items: center; padding: 4mm 14mm 11mm; position: relative; }
+        .yb-tk-stub-side { text-align: center; }
+        .yb-tk-stub-side small, .yb-tk-cap { display: block; font-size: 6.8pt; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-tk-big { display: block; font-size: 40pt; line-height: 0.9; color: var(--yb-red); margin-top: 1mm; }
+        .yb-tk-stub-mid { text-align: center; padding: 1mm 3mm; }
+        .yb-tk-names { font-size: 24pt; line-height: 1; letter-spacing: 0.06em; color: var(--yb-ink); margin-top: 1.5mm; }
+        .yb-tk-sub { font-size: 7.5pt; color: var(--yb-muted); margin-top: 1.5mm; }
 
-        /* Capa e contracapa */
-        .yb-cover, .yb-back { background: var(--yb-paper); }
-        .yb-frame { position: absolute; inset: 17mm 12mm; border: 0.6mm solid var(--yb-gold); }
-        .yb-frame::after { content: ''; position: absolute; inset: 1.6mm; border: 0.25mm solid var(--yb-gold); }
-        .yb-cover-in, .yb-back-in { position: absolute; inset: 17mm 12mm; padding: 14mm 14mm 12mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .yb-cover-in { padding: 6mm 12mm; justify-content: space-evenly; }
         .yb-cg { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .yb-cg-band { align-self: stretch; width: auto; }
-        .yb-band { width: 100%; background: var(--yb-film); border-radius: 1.2mm; padding: 2.4mm 0; box-shadow: 0 1.2mm 3mm rgba(42,29,20,0.22); }
-        .yb-band-holes { display: flex; justify-content: space-between; padding: 0 2.5mm; }
-        .yb-band-holes i { flex: 0 0 3.6mm; height: 2.6mm; border-radius: 0.7mm; background: var(--yb-paper); opacity: 0.9; }
-        .yb-band-frames { display: grid; gap: 2.6mm; padding: 2.6mm 3mm; justify-content: center; }
-        .yb-band-frame { position: relative; }
-        .yb-band-frame img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 0.8mm; background: #3a2c22; }
-        .yb-band-n { position: absolute; left: 2mm; bottom: -1mm; font-size: 40pt; line-height: 1; color: var(--yb-paper); text-shadow: 0 0.6mm 2.4mm rgba(0,0,0,0.9); }
-        .yb-band-note { font-size: 7.5pt; color: var(--yb-muted); margin-top: 3mm; letter-spacing: 0.06em; text-align: center; }
         .yb-kicker { font-size: 8.5pt; font-weight: 800; letter-spacing: 0.32em; color: var(--yb-muted); text-transform: uppercase; }
         .yb-kicker b { color: var(--yb-red); font-weight: 800; }
-        .yb-cover-year { font-size: 175pt; line-height: 0.82; color: var(--yb-red); margin: 7mm 0 4mm; }
-        .yb-cover-title { font-size: 24pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
-        .yb-cover-period { font-size: 9.5pt; color: var(--yb-muted); font-weight: 600; margin-top: 3mm; }
-        .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); margin: 0 0 7mm; width: 70mm; }
+        .yb-cover-year { font-size: 160pt; line-height: 0.82; color: var(--yb-red); margin: 5mm 0 4mm; }
+        .yb-cover-title { font-size: 23pt; line-height: 1; color: var(--yb-ink); letter-spacing: 0.06em; }
+        .yb-cover-period { font-size: 9.5pt; color: var(--yb-muted); font-weight: 600; margin-top: 2.5mm; }
+        .yb-orn { display: flex; align-items: center; gap: 3mm; color: var(--yb-gold); width: 70mm; }
         .yb-orn::before, .yb-orn::after { content: ''; flex: 1; height: 0.3mm; background: var(--yb-gold); }
         .yb-orn span { font-size: 9pt; }
-        .yb-figs { display: flex; justify-content: center; width: 100%; }
-        .yb-fig { padding: 0 8mm; border-left: 0.3mm solid var(--yb-line); }
+        .yb-figs { display: flex; justify-content: center; }
+        .yb-fig { padding: 0 9mm; border-left: 0.3mm solid var(--yb-line); text-align: center; }
         .yb-fig:first-child { border-left: none; }
-        .yb-fig-v { font-size: 36pt; line-height: 0.95; color: var(--yb-ink); }
-        .yb-fig-l { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1.2mm; }
+        .yb-fig-v { font-size: 32pt; line-height: 0.95; color: var(--yb-ink); }
+        .yb-fig-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); margin-top: 1mm; }
 
-        .yb-back-in { justify-content: center; }
-        .yb-fim { font-size: 120pt; line-height: 0.85; color: var(--yb-red); }
-        .yb-fim-sub { font-size: 18pt; letter-spacing: 0.08em; margin-top: 2mm; }
-        .yb-back-lede { font-size: 10.5pt; line-height: 1.6; max-width: 120mm; margin: 0 auto; color: var(--yb-ink); }
+        /* Faixa de película com as 5 melhores e os títulos completos embaixo */
+        .yb-band { width: 100%; background: var(--yb-film); border-radius: 1.2mm; padding: 2.2mm 0; }
+        .yb-band-holes { display: flex; justify-content: space-between; padding: 0 2.5mm; }
+        .yb-band-holes i { flex: 0 0 3.4mm; height: 2.4mm; border-radius: 0.6mm; background: var(--yb-paper); }
+        .yb-band-frames, .yb-band-titles { display: grid; gap: 3mm; padding: 0 3.5mm; }
+        .yb-band-frames { padding-top: 2.4mm; padding-bottom: 2.4mm; }
+        .yb-band-frame { position: relative; }
+        .yb-band-frame img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 0.8mm; background: #3a2c22; }
+        .yb-band-n { position: absolute; left: 1.8mm; bottom: -1mm; font-size: 38pt; line-height: 1; color: var(--yb-paper); text-shadow: 0 0.6mm 2.4mm rgba(0,0,0,0.9); }
+        .yb-band-titles { margin-top: 2.6mm; align-items: start; }
+        .yb-band-t { font-size: 11.5pt; line-height: 1.05; letter-spacing: 0.03em; color: var(--yb-ink); text-align: center; overflow-wrap: break-word; hyphens: manual; }
+        .yb-band-note { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2.6mm; letter-spacing: 0.06em; text-align: center; }
+
+        .yb-fim { font-size: 130pt; line-height: 0.85; color: var(--yb-red); }
+        .yb-fim-sub { font-size: 20pt; letter-spacing: 0.08em; margin-top: 2mm; }
+        .yb-back-lede { font-size: 10.5pt; line-height: 1.6; max-width: 125mm; margin: 0 auto; color: var(--yb-ink); }
         .yb-back-lede b { color: var(--yb-red); }
-        .yb-back-pair { display: flex; gap: 10mm; justify-content: center; margin-top: 8mm; }
+        .yb-back-pair { display: flex; gap: 10mm; justify-content: center; }
         .yb-back-pair div { width: 62mm; }
         .yb-back-pair small { display: block; font-size: 7pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-back-pair b { display: block; font-size: 10pt; margin-top: 1mm; line-height: 1.3; }
@@ -2078,27 +2090,29 @@
 
         /* Pódio */
         .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; margin-bottom: 6mm; }
-        .yb-pod { min-width: 0; }
+        .yb-pod { min-width: 0; display: flex; flex-direction: column; }
+        .yb-pod .yb-chip { align-self: flex-start; margin-top: auto; }
+        .yb-pod-d { margin-bottom: 1.4mm; }
         .yb-pod-img { position: relative; }
         .yb-pod-img img { display: block; width: 100%; height: 62mm; object-fit: cover; border-radius: 1mm; background: #3a2c22; }
         .yb-pod-n { position: absolute; left: 1.8mm; bottom: -0.5mm; font-size: 32pt; line-height: 1; color: #fff8ec; text-shadow: 0 0.5mm 2mm rgba(0,0,0,0.85); }
-        .yb-pod-t { font-size: 8pt; font-weight: 800; line-height: 1.2; margin-top: 1.8mm; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 7.8mm; }
-        .yb-pod-d { font-size: 6.8pt; color: var(--yb-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.5mm; }
+        .yb-pod-t { font-size: 8pt; font-weight: 800; line-height: 1.2; margin-top: 1.8mm; overflow-wrap: break-word; }
+        .yb-pod-d { font-size: 6.8pt; color: var(--yb-muted); margin-top: 0.5mm; line-height: 1.25; }
         .yb-chip { display: inline-block; min-width: 9mm; text-align: center; color: #fff; font-weight: 800; font-size: 8pt; border-radius: 1mm; padding: 0.5mm 1.5mm; margin-top: 1.2mm; }
 
         .yb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
         .yb-cols > div { min-width: 0; }
         .yb-rows { display: flex; flex-direction: column; }
-        .yb-row { display: grid; grid-template-columns: 24mm minmax(0, 1fr) auto; gap: 2mm; align-items: baseline; padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); }
+        .yb-row { display: grid; grid-template-columns: 24mm minmax(0, 1fr) auto; gap: 2mm; align-items: start; padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); }
         .yb-row:last-child { border-bottom: none; }
         .yb-row-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
-        .yb-row-v { font-size: 8.5pt; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-row-v { font-size: 8.5pt; font-weight: 800; line-height: 1.25; overflow-wrap: break-word; }
         .yb-row-s { font-size: 7.5pt; color: var(--yb-muted); white-space: nowrap; }
         .yb-facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 5mm; }
         .yb-fact { padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); min-width: 0; }
         .yb-fact-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
-        .yb-fact-v { font-size: 9pt; font-weight: 800; margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .yb-fact-s { font-size: 7pt; color: var(--yb-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-fact-v { font-size: 9pt; font-weight: 800; margin-top: 0.4mm; line-height: 1.25; overflow-wrap: break-word; }
+        .yb-fact-s { font-size: 7pt; color: var(--yb-muted); }
 
         .yb-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
         .yb-person { border-left: 1mm solid var(--pc); padding: 0.5mm 0 0.5mm 3mm; min-width: 0; }
@@ -2128,10 +2142,10 @@
         .yb-top { display: flex; gap: 3.5mm; align-items: flex-start; }
         .yb-pos { font-size: 27pt; line-height: 0.85; color: var(--yb-gold); flex: none; min-width: 11mm; }
         .yb-tt { min-width: 0; }
-        .yb-title { font-size: 12pt; font-weight: 800; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .yb-title { font-size: 12pt; font-weight: 800; line-height: 1.18; overflow-wrap: break-word; }
         .yb-yr { color: var(--yb-muted); font-weight: 600; font-size: 10pt; }
-        .yb-orig { font-size: 7.5pt; font-style: italic; color: var(--yb-soft); margin-top: 0.4mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .yb-dir { font-size: 8.5pt; color: var(--yb-muted); margin-top: 1mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .yb-orig { font-size: 7.5pt; font-style: italic; color: var(--yb-soft); margin-top: 0.4mm; line-height: 1.25; }
+        .yb-dir { font-size: 8.5pt; color: var(--yb-muted); margin-top: 1mm; line-height: 1.25; }
         .yb-dir b { color: var(--yb-ink); font-weight: 700; }
         .yb-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 3mm; }
         .yb-when { font-size: 8pt; color: var(--yb-muted); line-height: 1.45; min-width: 0; }
@@ -7234,14 +7248,40 @@
                 const sel = document.getElementById('pendingBy');
                 const title = input.value.trim();
                 if (!title) return;
+                // Título que já está na lista: avisa e não adiciona (evita chance dobrada no sorteio)
+                const dup = this.pending.find(p => this.pendingKey(p) === normalizeKey(title));
+                if (dup) {
+                    showToast(`“${dup.title}” já está na lista de sorteio.`, 'info');
+                    input.value = '';
+                    input.focus();
+                    this.flashPending(dup);
+                    return;
+                }
                 localStorage.setItem('cinetracker_pending_lastby', sel.value);
                 input.value = '';
                 input.focus();
 
                 const saved = await cloud.insertPending({ title, by: sel.value });
                 if (!saved) return; // erro já mostrado pelo cloud.insertPending
-                this.pending.push(saved);
+                // O aviso em tempo real da nuvem pode ter chegado antes e já incluído este item
+                const already = this.pending.findIndex(p => p.id === saved.id);
+                if (already >= 0) this.pending[already] = saved; else this.pending.push(saved);
                 this.renderPending();
+            }
+
+            // Destaca na parede o filme que já estava na lista
+            flashPending(p) {
+                const st = this.pendingState();
+                if (st.search || (st.pool !== 'all' && (p.by || 'Ambos') !== st.pool)) {
+                    st.search = ''; st.pool = 'all';
+                    const s = document.getElementById('pendingSearch'); if (s) s.value = '';
+                    this.renderPending();
+                }
+                const el = [...document.querySelectorAll('#pendingList [data-pkey]')].find(x => x.dataset.pkey === this.pendingKey(p));
+                if (!el) return;
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.transition = 'box-shadow .3s'; el.style.boxShadow = '0 0 0 3px var(--accent, #a6272c)'; el.style.borderRadius = '10px';
+                setTimeout(() => { el.style.boxShadow = ''; }, 1800);
             }
 
             deletePending(id) {
@@ -7301,6 +7341,9 @@
             }
 
             renderPending() {
+                // Garante um item por id (protege contra cópias repetidas do mesmo registro)
+                const ids = new Set();
+                this.pending = this.pending.filter(p => (ids.has(p.id) ? false : (ids.add(p.id), true)));
                 const wrap = document.getElementById('pendingList');
                 if (!wrap) return;
                 const st = this.pendingState();
@@ -9186,7 +9229,16 @@
             },
 
             // ---------- Páginas ----------
-            strip(pos) { return `<div class="yb-strip ${pos}"><div class="yb-holes">${'<i></i>'.repeat(28)}</div></div>`; },
+            // Ingresso: cantos recortados, picote com recortes laterais e canhoto embaixo
+            ticket(main, stub) {
+                return `<div class="yb-ticket">
+                            <i class="yb-tk-corner tl"></i><i class="yb-tk-corner tr"></i><i class="yb-tk-corner bl"></i><i class="yb-tk-corner br"></i>
+                            <div class="yb-tk-main">${main}</div>
+                            <div class="yb-tk-perf"><i class="yb-tk-notch l"></i><i class="yb-tk-notch r"></i></div>
+                            <div class="yb-tk-stub">${stub}</div>
+                        </div>`;
+            },
+            stubSides(r, mid) { return `<div class="yb-tk-stub-mid">${mid}</div>`; },
             run(sec) { return `<div class="yb-run"><div class="yb-run-brand yb-bebas"><span>CINETRACKER</span> · ISRAEL &amp; RICARDO</div><div class="yb-run-sec">${sec}</div></div>`; },
             foot(r, page, total) { return `<div class="yb-foot"><span>Livro do ano ${escapeHtml(r.year)} · emitido em ${formatDateBR(r.today)}</span><span>pág. ${page} de ${total}</span></div>`; },
 
@@ -9195,41 +9247,38 @@
                     ? `Janeiro a dezembro de ${r.year}`
                     : `Janeiro a ${this.MONTHS[Math.max(0, r.lastMonth)]} de ${r.year} · ano em andamento`;
                 const top = r.rated.slice(0, 5);
-                const holes = '<div class="yb-band-holes">' + '<i></i>'.repeat(26) + '</div>';
+                const cols = `grid-template-columns:repeat(${Math.max(top.length, 3)}, 1fr)`;
+                const holes = '<div class="yb-band-holes">' + '<i></i>'.repeat(24) + '</div>';
                 const band = top.length ? `
-                    <div class="yb-cg yb-cg-band">
+                    <div class="yb-cg">
                         <div class="yb-band">
                             ${holes}
-                            <div class="yb-band-frames" style="grid-template-columns:repeat(${Math.max(top.length, 3)}, 1fr)">${top.map((e, i) => `
+                            <div class="yb-band-frames" style="${cols}">${top.map((e, i) => `
                                 <div class="yb-band-frame"><img ${this.imgAttrs(e.m)} alt=""><span class="yb-band-n yb-bebas">${i + 1}</span></div>`).join('')}
                             </div>
                             ${holes}
                         </div>
+                        <div class="yb-band-titles" style="${cols}; width:100%">${top.map(e => `
+                            <div class="yb-band-t yb-bebas">${escapeHtml(e.m.title || 'Sem título')}</div>`).join('')}
+                        </div>
                         <div class="yb-band-note">${top.length === 1 ? 'O melhor' : `Os ${top.length} melhores`} do ano pela nossa média</div>
                     </div>` : '';
-                return `
-                    <section class="yb-page yb-cover">
-                        ${this.strip('top')}
-                        <div class="yb-frame"></div>
-                        <div class="yb-cover-in">
-                            <div class="yb-cg">
-                                <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
-                                <div class="yb-cover-year yb-bebas">${escapeHtml(r.year)}</div>
-                                <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
-                                <div class="yb-cover-period">${period}</div>
-                            </div>
-                            <div class="yb-cg">
-                                <div class="yb-orn"><span>✦</span></div>
-                                <div class="yb-figs">
-                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.list.length}</div><div class="yb-fig-l">${r.list.length === 1 ? 'filme' : 'filmes'}</div></div>
-                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.mins ? this.hours(r.mins) : '—'}</div><div class="yb-fig-l">de tela</div></div>
-                                    <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.avg ? this.n2(r.avg) : '—'}</div><div class="yb-fig-l">nossa média</div></div>
-                                </div>
-                            </div>
-                            ${band}
-                        </div>
-                        ${this.strip('bottom')}
-                    </section>`;
+                const main = `
+                    <div class="yb-cg">
+                        <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
+                        <div class="yb-cover-year yb-bebas">${escapeHtml(r.year)}</div>
+                        <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
+                        <div class="yb-cover-period">${period}</div>
+                    </div>
+                    <div class="yb-orn"><span>✦</span></div>
+                    ${band}`;
+                const mid = `
+                    <div class="yb-figs">
+                        <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.list.length}</div><div class="yb-fig-l">${r.list.length === 1 ? 'filme' : 'filmes'}</div></div>
+                        <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.mins ? this.hours(r.mins) : '—'}</div><div class="yb-fig-l">de tela</div></div>
+                        <div class="yb-fig"><div class="yb-fig-v yb-bebas">${r.avg ? this.n2(r.avg) : '—'}</div><div class="yb-fig-l">nossa média</div></div>
+                    </div>`;
+                return `<section class="yb-page yb-cover">${this.ticket(main, this.stubSides(r, mid))}</section>`;
             },
 
             highlightsHtml(r, page, total) {
@@ -9371,24 +9420,24 @@
                 const parts = [`<b>${this.pl(r.list.length, 'filme', 'filmes')}</b>`];
                 if (r.mins) parts.push(`<b>${this.hours(r.mins)}</b> de tela`);
                 const lede = `${r.inProgress ? 'Até aqui, foram' : 'Foram'} ${parts.join(' e ')}${r.avg ? `, com nossa média de <b>${this.n2(r.avg)}</b>` : ''}.`;
-                return `
-                    <section class="yb-page yb-back">
-                        ${this.strip('top')}
-                        <div class="yb-frame"></div>
-                        <div class="yb-back-in">
-                            <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
-                            <div class="yb-fim yb-bebas" style="margin-top:14mm">Fim</div>
-                            <div class="yb-fim-sub yb-bebas">da sessão de ${escapeHtml(r.year)}</div>
-                            <div class="yb-orn" style="margin:9mm auto"><span>✦</span></div>
-                            <p class="yb-back-lede">${lede}</p>
-                            ${first && last && first !== last ? `
-                                <div class="yb-back-pair">
-                                    <div><small>Abriu o ano</small><b>${escapeHtml(first.m.title)}</b><span>${formatDateBR(first.date)}</span></div>
-                                    <div><small>${r.inProgress ? 'O mais recente' : 'Fechou o ano'}</small><b>${escapeHtml(last.m.title)}</b><span>${formatDateBR(last.date)}</span></div>
-                                </div>` : ''}
-                        </div>
-                        ${this.strip('bottom')}
-                    </section>`;
+                const main = `
+                    <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
+                    <div class="yb-cg">
+                        <div class="yb-fim yb-bebas">Fim</div>
+                        <div class="yb-fim-sub yb-bebas">da sessão de ${escapeHtml(r.year)}</div>
+                    </div>
+                    <div class="yb-orn"><span>✦</span></div>
+                    <p class="yb-back-lede">${lede}</p>
+                    ${first && last && first !== last ? `
+                        <div class="yb-back-pair">
+                            <div><small>Abriu o ano</small><b>${escapeHtml(first.m.title)}</b><span>${formatDateBR(first.date)}</span></div>
+                            <div><small>${r.inProgress ? 'O mais recente' : 'Fechou o ano'}</small><b>${escapeHtml(last.m.title)}</b><span>${formatDateBR(last.date)}</span></div>
+                        </div>` : ''}`;
+                const mid = `
+                    <span class="yb-tk-cap">${r.inProgress ? 'Sessão em andamento' : 'Sessão encerrada'}</span>
+                    <div class="yb-tk-names yb-bebas">Israel &amp; Ricardo</div>
+                    <div class="yb-tk-sub">Até a próxima sessão.</div>`;
+                return `<section class="yb-page yb-back">${this.ticket(main, this.stubSides(r, mid))}</section>`;
             },
 
             build(year) {
