@@ -2089,8 +2089,8 @@
         .yb-sec-title::after { content: ''; flex: 1; height: 0.25mm; background: var(--yb-line); }
 
         /* Pódio */
-        .yb-hl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 9mm; }
-        .yb-hl-col { min-width: 0; display: flex; flex-direction: column; gap: 6mm; }
+        .yb-hl { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 9mm; }
+        .yb-hl-col { min-width: 0; display: flex; flex-direction: column; gap: 5mm; }
         .yb-hl-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
         .yb-hl-pair > div { min-width: 0; }
         .yb-podium { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3.5mm; }
@@ -2112,22 +2112,28 @@
         .yb-row-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-row-v { font-size: 8.5pt; font-weight: 800; line-height: 1.25; overflow-wrap: break-word; }
         .yb-row-s { font-size: 7.5pt; color: var(--yb-muted); white-space: nowrap; }
-        .yb-facts { display: grid; grid-template-columns: 1fr 1fr; column-gap: 5mm; }
+        .yb-facts { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 4mm; }
         .yb-fact { padding: 1.6mm 0; border-bottom: 0.25mm solid var(--yb-line); min-width: 0; }
         .yb-fact-l { font-size: 6.8pt; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-fact-v { font-size: 9pt; font-weight: 800; margin-top: 0.4mm; line-height: 1.25; overflow-wrap: break-word; }
         .yb-fact-s { font-size: 7pt; color: var(--yb-muted); }
 
-        .yb-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+        .yb-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
         .yb-person { border-left: 1mm solid var(--pc); padding: 0.5mm 0 0.5mm 3mm; min-width: 0; }
         .yb-person-n { font-size: 15pt; line-height: 1; color: var(--pc); }
         .yb-person-avg { font-size: 22pt; line-height: 1; margin-top: 1mm; }
-        .yb-person-l { font-size: 7.5pt; color: var(--yb-muted); margin-top: 0.8mm; line-height: 1.35; }
+        .yb-person-l { font-size: 7.3pt; color: var(--yb-muted); margin-top: 0.8mm; line-height: 1.35; }
+        .yb-person-fav { margin-top: 1.6mm; font-size: 8pt; line-height: 1.3; }
+        .yb-person-fav small { display: block; font-size: 6.2pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-person-fav b { font-weight: 800; }
+        .yb-person-fav span { display: inline-block; font-weight: 800; color: var(--pc); }
         .yb-person-l b { color: var(--yb-ink); }
-        .yb-duo-line { font-size: 8pt; margin-top: 3mm; padding-top: 2mm; border-top: 0.25mm solid var(--yb-line); line-height: 1.45; }
+        .yb-duo-line { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; font-size: 8pt; margin-top: 2.6mm; padding-top: 2.2mm; border-top: 0.25mm solid var(--yb-line); line-height: 1.35; }
+        .yb-duo-line > div:only-child { grid-column: 1 / -1; }
+        .yb-duo-line small { display: block; font-size: 6.2pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); margin-bottom: 0.5mm; }
         .yb-duo-line b { font-weight: 800; }
 
-        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.8mm; align-items: end; height: 72mm; }
+        .yb-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.8mm; align-items: end; height: 30mm; }
         .yb-mcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 1mm; }
         .yb-mcount { font-size: 7pt; font-weight: 800; color: var(--yb-muted); min-height: 3mm; }
         .yb-mbar { width: 100%; background: var(--yb-gold); border-radius: 0.6mm 0.6mm 0 0; min-height: 0.6mm; }
@@ -2174,6 +2180,13 @@
         .yb-card.is-tighter .yb-avg b { font-size: 21pt; }
         .yb-card.is-tighter .yb-facts-card dt { padding: 0.5mm 0; font-size: 6pt; }
         .yb-card.is-tighter .yb-sc, .yb-card.is-tighter .yb-avg { padding: 1mm 0 0.8mm; }
+        /* Os extremos: fichas só com texto (as capas já aparecem no pódio) */
+        .yb-exs { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 4mm; }
+        .yb-ex { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3mm; padding: 2.6mm 3.2mm; border: 0.3mm solid var(--yb-line); border-left: 1mm solid var(--yb-gold); border-radius: 1.6mm; background: #fffefb; min-width: 0; }
+        .yb-ex-b { min-width: 0; }
+        .yb-ex-l { font-size: 6.4pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); }
+        .yb-ex-t { font-size: 9.5pt; font-weight: 800; line-height: 1.22; margin-top: 0.8mm; overflow-wrap: break-word; }
+        .yb-ex-v { font-size: 18pt; line-height: 1; color: var(--yb-ink); white-space: nowrap; }
 
         /* ============================================================
            CATÁLOGO DE FILMES — 7 filtros (com a década):
@@ -9375,10 +9388,17 @@
             // ---------- Formatação ----------
             n1(v) { return v.toFixed(1).replace('.', ','); },
             n2(v) { return v.toFixed(2).replace('.', ','); },
-            hours(mins) {
-                const h = Math.floor(mins / 60), mm = Math.round(mins % 60);
-                return h ? `${h}h${mm ? String(mm).padStart(2, '0') : ''}` : `${mm} min`;
+            // Mesmo padrão do app: acima de 1 dia, "10d 5h"; abaixo, "14h 14m"
+            hours(mins) { return app.formatDuration(Math.round(mins)); },
+            // Por extenso, para frases: "10 dias e 5 horas"
+            hoursLong(mins) {
+                mins = Math.round(mins);
+                const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
+                const parts = d ? [this.pl(d, 'dia', 'dias'), h ? this.pl(h, 'hora', 'horas') : '']
+                                : [h ? this.pl(h, 'hora', 'horas') : '', m ? this.pl(m, 'minuto', 'minutos') : ''];
+                return parts.filter(Boolean).join(' e ') || '0 minutos';
             },
+            dur(m) { const v = movieMinutes(m); return v >= 60 ? `${Math.floor(v / 60)}h ${String(v % 60).padStart(2, '0')}min` : `${v} min`; },
             pl(n, um, varios) { return `${n} ${n === 1 ? um : varios}`; },
             color(v) { return v >= 7.5 ? '#3f7d4a' : v >= 5 ? '#c07a1e' : '#a6272c'; },
             poster(m) { return m.poster || placeholderPoster(m.title || 'Sem capa'); },
@@ -9427,6 +9447,8 @@
                 const timed = list.filter(e => movieMinutes(e.m) > 0);
                 const longest = timed.length ? timed.reduce((a, b) => movieMinutes(b.m) > movieMinutes(a.m) ? b : a) : null;
                 const shortest = timed.length >= 2 ? timed.reduce((a, b) => movieMinutes(b.m) < movieMinutes(a.m) ? b : a) : null;
+                const dated = list.filter(e => parseInt(e.m.year, 10) > 0);
+                const oldest = dated.length >= 2 ? dated.reduce((a, b) => parseInt(b.m.year, 10) < parseInt(a.m.year, 10) ? b : a) : null;
 
                 const people = [
                     { name: 'Israel', color: '#c07a1e', sc: m => Number(m.scIsr) || 0 },
@@ -9453,7 +9475,7 @@
                 const lastMonth = year === curYear ? parseInt(today.slice(5, 7), 10) - 1 : 11;
 
                 return { year, list, sessions, mins, rated, avg, months, topMonth, genres, directors, locals, cinema,
-                         best, worst, longest, shortest, people, divergence, chrono, inProgress, lastMonth, today };
+                         best, worst, longest, shortest, oldest, people, divergence, chrono, inProgress, lastMonth, today };
             },
 
             // ---------- Páginas ----------
@@ -9522,12 +9544,20 @@
                         </div>`).join('')}
                     </div>` : `<p class="yb-hsub">Os filmes deste ano ainda não têm nota.</p>`;
 
-                const row = (l, v, s) => `<div class="yb-row"><span class="yb-row-l">${l}</span><span class="yb-row-v">${v}</span><span class="yb-row-s">${s}</span></div>`;
+                // Sem capas aqui (elas já estão no pódio) e sem o "melhor avaliado", que é o nº 1 do pódio
+                const tile = (label, e, value, color) => `
+                    <div class="yb-ex">
+                        <div class="yb-ex-b">
+                            <div class="yb-ex-l">${label}</div>
+                            <div class="yb-ex-t">${esc(e.m.title)}</div>
+                        </div>
+                        <div class="yb-ex-v yb-bebas"${color ? ` style="color:${color}"` : ''}>${value}</div>
+                    </div>`;
                 const extremes = [
-                    r.best && row('Melhor avaliado', esc(r.best.m.title), `média ${this.n1(r.best.m.avg)}`),
-                    r.worst && r.worst !== r.best && row('Pior avaliado', esc(r.worst.m.title), `média ${this.n1(r.worst.m.avg)}`),
-                    r.longest && row('Mais longo', esc(r.longest.m.title), esc(r.longest.m.duration)),
-                    r.shortest && r.shortest !== r.longest && row('Mais curto', esc(r.shortest.m.title), esc(r.shortest.m.duration))
+                    r.worst && r.worst !== r.best && tile('Pior avaliado', r.worst, this.n1(r.worst.m.avg), this.color(r.worst.m.avg)),
+                    r.longest && tile('Mais longo', r.longest, this.dur(r.longest.m)),
+                    r.shortest && r.shortest !== r.longest && tile('Mais curto', r.shortest, this.dur(r.shortest.m)),
+                    r.oldest && tile('Lançamento mais antigo', r.oldest, esc(String(r.oldest.m.year)))
                 ].filter(Boolean).join('');
 
                 const fact = (l, v, s) => `<div class="yb-fact"><div class="yb-fact-l">${l}</div><div class="yb-fact-v">${v}</div><div class="yb-fact-s">${s || '&nbsp;'}</div></div>`;
@@ -9546,20 +9576,19 @@
                         <div class="yb-person-n yb-bebas">${p.name}</div>
                         ${p.n ? `
                             <div class="yb-person-avg yb-bebas">${this.n2(p.avg)}</div>
-                            <div class="yb-person-l">média em ${this.pl(p.n, 'filme', 'filmes')}</div>
-                            <div class="yb-person-l">Favorito: <b>${esc(p.fav.m.title)}</b> (${this.n1(p.sc(p.fav.m))})</div>
-                            <div class="yb-person-l">${p.high ? this.pl(p.high, 'nota 9 ou mais', 'notas 9 ou mais') : 'Nenhuma nota 9 ou mais'}</div>`
+                            <div class="yb-person-l">média em ${this.pl(p.n, 'filme', 'filmes')} · ${p.high ? this.pl(p.high, 'nota 9 ou mais', 'notas 9 ou mais') : 'nenhuma nota 9'}</div>
+                            <div class="yb-person-fav"><small>Favorito</small><b>${esc(p.fav.m.title)}</b> <span>${this.n1(p.sc(p.fav.m))}</span></div>`
                         : `<div class="yb-person-l">Sem notas neste ano.</div>`}
                     </div>`;
                 const lines = [];
                 if (pI.n && pR.n) {
                     const d = pI.avg - pR.avg;
-                    lines.push(Math.abs(d) < 0.005 ? 'Os dois deram, em média, a mesma nota.'
-                        : `<b style="color:${d > 0 ? pI.color : pR.color}">${d > 0 ? 'Israel' : 'Ricardo'}</b> foi mais generoso, com ${this.n2(Math.abs(d))} ponto${Math.abs(d) >= 2 ? 's' : ''} a mais na média.`);
+                    lines.push(Math.abs(d) < 0.005 ? '<div><small>Generosidade</small>Os dois deram, em média, a mesma nota.</div>'
+                        : `<div><small>Mais generoso</small><b style="color:${d > 0 ? pI.color : pR.color}">${d > 0 ? 'Israel' : 'Ricardo'}</b>, com ${this.n2(Math.abs(d))} ponto${Math.abs(d) >= 2 ? 's' : ''} a mais na média</div>`);
                 }
                 if (r.divergence) {
                     const v = r.divergence;
-                    lines.push(`Maior discordância: <b>${esc(v.e.m.title)}</b>, Israel ${this.n1(v.a)} × Ricardo ${this.n1(v.b)}.`);
+                    lines.push(`<div><small>Maior discordância</small><b>${esc(v.e.m.title)}</b>: Israel ${this.n1(v.a)} × Ricardo ${this.n1(v.b)}</div>`);
                 }
 
                 const maxM = Math.max(...r.months, 1);
@@ -9578,16 +9607,14 @@
                         <div class="yb-hl">
                             <div class="yb-hl-col">
                                 ${podium}
-                                <div class="yb-hl-pair">
-                                    <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-rows">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
-                                    <div>
-                                        <h3 class="yb-sec-title yb-bebas">Israel × Ricardo</h3>
-                                        <div class="yb-duo">${person(pI)}${person(pR)}</div>
-                                        ${lines.length ? `<div class="yb-duo-line">${lines.join('<br>')}</div>` : ''}
-                                    </div>
-                                </div>
+                                <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-exs">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
                             </div>
                             <div class="yb-hl-col">
+                                <div>
+                                    <h3 class="yb-sec-title yb-bebas">Israel × Ricardo</h3>
+                                    <div class="yb-duo">${person(pI)}${person(pR)}</div>
+                                    ${lines.length ? `<div class="yb-duo-line">${lines.join('')}</div>` : ''}
+                                </div>
                                 <div><h3 class="yb-sec-title yb-bebas">O ano em números</h3><div class="yb-facts">${facts}</div></div>
                                 <div>
                                     <h3 class="yb-sec-title yb-bebas">Mês a mês</h3>
@@ -9656,7 +9683,7 @@
             backHtml(r) {
                 const first = r.chrono[0], last = r.chrono[r.chrono.length - 1];
                 const parts = [`<b>${this.pl(r.list.length, 'filme', 'filmes')}</b>`];
-                if (r.mins) parts.push(`<b>${this.hours(r.mins)}</b> de tela`);
+                if (r.mins) parts.push(`<b>${this.hoursLong(r.mins)}</b> de tela`);
                 const lede = `${r.inProgress ? 'Até aqui, foram' : 'Foram'} ${parts.join(' e ')}${r.avg ? `, com nossa média de <b>${this.n2(r.avg)}</b>` : ''}.`;
                 const main = `
                     <div class="yb-kicker"><b>CineTracker</b> · Israel &amp; Ricardo</div>
