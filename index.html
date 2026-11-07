@@ -2020,7 +2020,7 @@
         /* Capa e contracapa: um ingresso de cinema sobre o papel branco.
            A margem branca faz parte do desenho (a impressora não imprime até a borda). */
         .yb-cover, .yb-back { background: #ffffff; }
-        .yb-ticket { position: absolute; inset: 14mm; background: var(--yb-paper); border-radius: 3mm; display: flex; flex-direction: row; overflow: hidden; }
+        .yb-ticket { position: absolute; inset: 5mm; background: var(--yb-paper); border-radius: 3mm; display: flex; flex-direction: row; overflow: hidden; }
         .yb-ticket::before { content: ''; position: absolute; inset: 7mm; border: 0.5mm solid var(--yb-gold); border-radius: 1.5mm; pointer-events: none; }
         .yb-ticket::after { content: ''; position: absolute; inset: 8.5mm; border: 0.2mm solid var(--yb-gold); border-radius: 1mm; pointer-events: none; }
         .yb-tk-corner { position: absolute; width: 10mm; height: 10mm; border-radius: 50%; background: #ffffff; z-index: 2; }
@@ -2077,19 +2077,19 @@
         .yb-back-pair span { font-size: 8pt; color: var(--yb-muted); }
 
         /* Páginas internas */
-        .yb-inner { padding: 11mm 13mm 0; }
+        .yb-inner { padding: 5mm 5mm 0; }
         .yb-run { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 2mm; border-bottom: 0.5mm solid var(--yb-gold); }
         .yb-run-brand { font-size: 11pt; letter-spacing: 0.12em; }
         .yb-run-brand span { color: var(--yb-red); }
         .yb-run-sec { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--yb-muted); }
-        .yb-foot { position: absolute; left: 13mm; right: 13mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 7pt; color: var(--yb-muted); border-top: 0.25mm solid var(--yb-line); padding-top: 2mm; letter-spacing: 0.04em; }
+        .yb-foot { position: absolute; left: 5mm; right: 5mm; bottom: 5mm; display: flex; justify-content: space-between; font-size: 7pt; color: var(--yb-muted); border-top: 0.25mm solid var(--yb-line); padding-top: 2mm; letter-spacing: 0.04em; }
         .yb-h { font-size: 26pt; line-height: 1; margin: 4.5mm 0 0.5mm; }
         .yb-hsub { font-size: 8.5pt; color: var(--yb-muted); margin: 0 0 3.5mm; }
         .yb-sec-title { font-size: 15pt; line-height: 1; margin: 0 0 2.5mm; display: flex; align-items: center; gap: 2.5mm; }
         .yb-sec-title::after { content: ''; flex: 1; height: 0.25mm; background: var(--yb-line); }
 
         /* Pódio */
-        .yb-hl { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 9mm; }
+        .yb-hl { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); gap: 9mm; }
         .yb-hl-col { min-width: 0; display: flex; flex-direction: column; gap: 5mm; }
         .yb-hl-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; }
         .yb-hl-pair > div { min-width: 0; }
@@ -2145,9 +2145,9 @@
         .yb-mnote { font-size: 7.5pt; color: var(--yb-muted); margin-top: 2mm; }
 
         /* Fichas da lista: 4 por página (2 × 2), capa grande + ficha técnica */
-        .yb-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: 80mm 80mm; gap: 5mm 6mm; position: absolute; left: 13mm; right: 13mm; top: 23.5mm; }
-        .yb-card { display: grid; grid-template-columns: 48.9mm minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 80mm; overflow: hidden; gap: 5mm; min-height: 0; padding: 3mm; border: 0.3mm solid var(--yb-line); border-radius: 2mm; background: #fffefb; break-inside: avoid; page-break-inside: avoid; }
-        .yb-card img { display: block; width: 48.9mm; height: 73.4mm; object-fit: cover; border-radius: 1.2mm; background: #3a2c22; }
+        .yb-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: 85.5mm 85.5mm; gap: 5mm 6mm; position: absolute; left: 5mm; right: 5mm; top: 17.5mm; }
+        .yb-card { display: grid; grid-template-columns: 52.6mm minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 85.5mm; overflow: hidden; gap: 5mm; min-height: 0; padding: 3mm; border: 0.3mm solid var(--yb-line); border-radius: 2mm; background: #fffefb; break-inside: avoid; page-break-inside: avoid; }
+        .yb-card img { display: block; width: 52.6mm; height: 78.9mm; object-fit: cover; border-radius: 1.2mm; background: #3a2c22; }
         .yb-body { min-width: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 0.8mm 0.5mm 0 0; }
         .yb-top { display: flex; gap: 3mm; align-items: flex-start; }
         .yb-pos { font-size: 34pt; line-height: 0.8; color: var(--yb-gold); flex: none; }
@@ -2193,6 +2193,14 @@
         .yb-gc-fr { aspect-ratio: 1 / 1; border: 0.35mm solid rgba(233, 214, 168, 0.35); border-radius: 1mm; display: flex; align-items: center; justify-content: center; background: #2a1f17; }
         .yb-gc-fr svg { width: 72%; height: 72%; }
         .yb-gc-lede { font-size: 10.5pt; line-height: 1.6; color: var(--yb-muted); max-width: 150mm; margin: 0; }
+        /* Destaques ocupam a página inteira (até o rodapé) */
+        .yb-hlpage { display: flex; flex-direction: column; padding-bottom: 15mm; }
+        .yb-hlpage > .yb-hl { flex: 1 1 auto; min-height: 0; }
+        .yb-hlpage .yb-grow { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .yb-hlpage .yb-grow > .yb-exs { flex: 1 1 auto; grid-auto-rows: 1fr; }
+        .yb-hlpage .yb-grow > .yb-months { flex: 1 1 auto; height: auto; min-height: 30mm; }
+        .yb-hlpage .yb-ex-t { font-size: 10.5pt; }
+        .yb-hlpage .yb-ex-v { font-size: 21pt; }
 
         /* ============================================================
            CATÁLOGO DE FILMES — 7 filtros (com a década):
@@ -9607,14 +9615,14 @@
 
                 const monthNote = `${r.topMonth >= 0 ? `${this.MONTHS[r.topMonth].replace(/^./, c => c.toUpperCase())} foi o mês com mais filmes.` : ''}${r.inProgress ? ' Os meses tracejados ainda não chegaram.' : ''}`;
                 return `
-                    <section class="yb-page yb-inner">
+                    <section class="yb-page yb-inner yb-hlpage">
                         ${this.run('Destaques do ano')}
                         <h2 class="yb-h yb-bebas">Destaques de ${esc(r.year)}</h2>
                         <p class="yb-hsub">${top.length >= 5 ? 'Os cinco melhores' : top.length > 1 ? `Os ${top.length} melhores` : 'O melhor'} pela nossa média (Israel + Ricardo).</p>
                         <div class="yb-hl">
                             <div class="yb-hl-col">
                                 ${podium}
-                                <div><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-exs">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
+                                <div class="yb-grow"><h3 class="yb-sec-title yb-bebas">Os extremos</h3><div class="yb-exs">${extremes || '<p class="yb-hsub">Sem dados suficientes.</p>'}</div></div>
                             </div>
                             <div class="yb-hl-col">
                                 <div>
@@ -9623,7 +9631,7 @@
                                     ${lines.length ? `<div class="yb-duo-line">${lines.join('')}</div>` : ''}
                                 </div>
                                 <div><h3 class="yb-sec-title yb-bebas">O ano em números</h3><div class="yb-facts">${facts}</div></div>
-                                <div>
+                                <div class="yb-grow">
                                     <h3 class="yb-sec-title yb-bebas">Mês a mês</h3>
                                     <div class="yb-months">${monthsHtml}</div>
                                     <div class="yb-mnote">${monthNote}</div>
