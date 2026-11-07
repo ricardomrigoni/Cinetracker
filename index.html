@@ -2201,6 +2201,21 @@
         .yb-hlpage .yb-grow > .yb-months { flex: 1 1 auto; height: auto; min-height: 30mm; }
         .yb-hlpage .yb-ex-t { font-size: 10.5pt; }
         .yb-hlpage .yb-ex-v { font-size: 21pt; }
+        /* Diário de sessões: lista simples na ordem em que assistimos */
+        .yb-diary { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 3.5mm; }
+        .yb-diary.is-cont { margin-top: 4.5mm; }
+        .yb-diary th { font-size: 6.4pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); text-align: left; padding: 0 2mm 1.6mm; border-bottom: 0.4mm solid var(--yb-gold); }
+        .yb-diary td { font-size: 8.8pt; padding: 1.25mm 2mm; border-bottom: 0.25mm solid var(--yb-line); vertical-align: baseline; line-height: 1.3; overflow-wrap: break-word; }
+        .yb-diary .yb-dn { font-size: 12pt; color: var(--yb-gold); line-height: 1; }
+        .yb-diary .yb-dd b { font-weight: 800; }
+        .yb-diary .yb-dd span { color: var(--yb-muted); font-size: 7.6pt; }
+        .yb-diary .yb-dt { font-weight: 800; }
+        .yb-diary .yb-dy, .yb-diary .yb-dr, .yb-diary .yb-dl { color: var(--yb-muted); }
+        .yb-diary .yb-da { text-align: center; }
+        .yb-diary .yb-da span { display: inline-block; min-width: 9mm; color: #fff; font-weight: 800; font-size: 8pt; border-radius: 1mm; padding: 0.3mm 1.4mm; }
+        .yb-diary .yb-da i { color: var(--yb-soft); }
+        .yb-diary tbody tr:nth-child(even) td { background: rgba(246, 236, 216, 0.45); }
+        .yb-diary tr { break-inside: avoid; }
 
         /* ============================================================
            CATÁLOGO DE FILMES — 7 filtros (com a década):
@@ -2908,7 +2923,7 @@
     <div class="confirm-overlay" id="ybOverlay" onclick="if (event.target === this) yearBook.close()">
         <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="ybTitle" style="max-width:400px;">
             <div class="confirm-title" id="ybTitle">🖨️ Livro do ano</div>
-            <p class="yb-modal-note">Um registro em A4 dos filmes de um ano: capa, destaques, a lista completa pela nossa média e a contracapa. Ele usa os dados do momento em que for emitido.</p>
+            <p class="yb-modal-note">Um registro em A4 dos filmes de um ano: capa, destaques, a lista completa pela nossa média, o diário na ordem em que assistimos e a contracapa. Ele usa os dados do momento em que for emitido.</p>
             <select id="ybYearSelect" onchange="yearBook.updatePreview()" aria-label="Ano do livro"></select>
             <div class="yb-modal-count" id="ybCount" aria-live="polite"></div>
             <p class="yb-modal-note">Na janela que abrir, escolha <b>Salvar como PDF</b> (ou a impressora), papel <b>A4</b> (o livro já sai deitado, em paisagem), margens <b>Nenhuma</b> e ative <b>Gráficos de fundo</b>.</p>
@@ -9720,11 +9735,76 @@
                 return `<section class="yb-page yb-back">${this.ticket(main, this.stubSides(r, mid))}</section>`;
             },
 
+            // Diário: todos os filmes na ordem em que foram assistidos (1º de janeiro → 31 de dezembro),
+            // numa lista corrida única. Lista simples: data, título, ano, direção, local e a nossa média.
+            WEEKDAYS: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+
+            chronoItems(r) { return r.chrono.map((e, i) => ({ e, n: i + 1 })); },
+            chronoRowHtml(r, x) {
+                const esc = escapeHtml;
+                const m = x.e.m, d = x.e.date;
+                const digits = Math.max(2, String(r.list.length).length);
+                const wd = this.WEEKDAYS[new Date(d + 'T12:00:00').getDay()];
+                return `<tr>
+                    <td class="yb-dn yb-bebas">${String(x.n).padStart(digits, '0')}</td>
+                    <td class="yb-dd"><b>${d.slice(8, 10)}/${d.slice(5, 7)}</b> <span>${wd}</span></td>
+                    <td class="yb-dt">${esc(m.title || 'Sem título')}</td>
+                    <td class="yb-dy">${m.year ? esc(String(m.year)) : '—'}</td>
+                    <td class="yb-dr">${esc(this.dirs(m).join(', ') || '—')}</td>
+                    <td class="yb-dl">${m.local ? esc(m.local) : '—'}</td>
+                    <td class="yb-da">${m.avg > 0 ? `<span style="background:${this.color(m.avg)}">${this.n1(m.avg)}</span>` : '<i>—</i>'}</td>
+                </tr>`;
+            },
+            chronoPageHtml(r, items, pi, pageNo, total) {
+                const esc = escapeHtml;
+                const nums = items.map(x => x.n);
+                const range = nums.length ? ` · ${nums[0]}–${nums[nums.length - 1]} de ${r.list.length}` : '';
+                return `
+                    <section class="yb-page yb-inner">
+                        ${this.run(`Diário de ${esc(r.year)} · na ordem em que assistimos${range}`)}
+                        ${pi === 0 ? `<h2 class="yb-h yb-bebas">Diário de sessões</h2><p class="yb-hsub">Todos os filmes de ${esc(r.year)} na ordem em que assistimos, do primeiro ao último.</p>` : ''}
+                        <table class="yb-diary${pi === 0 ? '' : ' is-cont'}">
+                            <colgroup><col style="width:11mm"><col style="width:24mm"><col><col style="width:15mm"><col style="width:62mm"><col style="width:44mm"><col style="width:16mm"></colgroup>
+                            <thead><tr><th>Nº</th><th>Data</th><th>Filme</th><th>Ano</th><th>Direção</th><th>Local</th><th class="yb-da">Média</th></tr></thead>
+                            <tbody>${items.map(x => this.chronoRowHtml(r, x)).join('')}</tbody>
+                        </table>
+                        ${this.foot(r, pageNo, total)}
+                    </section>`;
+            },
+            // Divide em páginas medindo de verdade (montado fora da tela), para nunca invadir o rodapé
+            chronoPages(r) {
+                const items = this.chronoItems(r);
+                const host = document.getElementById('ybPrint');
+                if (!host || !items.length) return items.length ? [items] : [];
+                const prevHtml = host.innerHTML, prevStyle = host.getAttribute('style') || '';
+                host.setAttribute('style', 'display:block !important; position:absolute; left:-10000px; top:0;');
+                const pages = [];
+                let cur = [];
+                const fits = () => {
+                    host.innerHTML = this.chronoPageHtml(r, cur, pages.length, 1, 1);
+                    const t = host.querySelector('.yb-diary'), f = host.querySelector('.yb-foot');
+                    return t.getBoundingClientRect().bottom <= f.getBoundingClientRect().top - 6;
+                };
+                for (const x of items) {
+                    cur.push(x);
+                    if (cur.length > 1 && !fits()) { cur.pop(); pages.push(cur); cur = [x]; }
+                }
+                if (cur.length) pages.push(cur);
+                host.innerHTML = prevHtml;
+                host.setAttribute('style', prevStyle);
+                return pages;
+            },
+            chronoPagesHtml(r, firstPage, total, pages) {
+                return pages.map((items, pi) => this.chronoPageHtml(r, items, pi, firstPage + pi, total)).join('');
+            },
+
             build(year) {
                 const r = this.compute(year);
                 const listPages = Math.ceil(r.list.length / this.PER_PAGE);
-                const total = 2 + listPages + 1;
-                return this.coverHtml(r) + this.highlightsHtml(r, 2, total) + this.listPagesHtml(r, 3, total) + this.backHtml(r);
+                const diary = this.chronoPages(r);
+                const total = 2 + listPages + diary.length + 1;
+                return this.coverHtml(r) + this.highlightsHtml(r, 2, total) + this.listPagesHtml(r, 3, total)
+                     + this.chronoPagesHtml(r, 3 + listPages, total, diary) + this.backHtml(r);
             },
 
             // Ficha com conteúdo demais (título longo, muitos gêneros): letra um pouco menor,
@@ -9749,6 +9829,7 @@
                 const btn = document.getElementById('ybGenerateBtn');
                 btn.disabled = true; btn.textContent = 'Preparando…';
                 const host = document.getElementById('ybPrint');
+                try { await Promise.race([document.fonts ? document.fonts.ready : null, new Promise(res => setTimeout(res, 5000))]); } catch (e) { /* segue */ }
                 host.innerHTML = this.build(year);
                 try {
                     const imgs = [...host.querySelectorAll('img')];
