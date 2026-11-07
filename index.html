@@ -2187,6 +2187,12 @@
         .yb-ex-l { font-size: 6.4pt; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yb-muted); }
         .yb-ex-t { font-size: 9.5pt; font-weight: 800; line-height: 1.22; margin-top: 0.8mm; overflow-wrap: break-word; }
         .yb-ex-v { font-size: 18pt; line-height: 1; color: var(--yb-ink); white-space: nowrap; }
+        /* Capa geral da pasta (coleção) */
+        .yb-gc-brand { font-size: 100pt; line-height: 0.8; color: var(--yb-red); letter-spacing: 0.03em; margin-bottom: 3mm; }
+        .yb-gc-frames { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3mm; padding: 2.4mm 3.5mm; }
+        .yb-gc-fr { aspect-ratio: 1 / 1; border: 0.35mm solid rgba(233, 214, 168, 0.35); border-radius: 1mm; display: flex; align-items: center; justify-content: center; background: #2a1f17; }
+        .yb-gc-fr svg { width: 72%; height: 72%; }
+        .yb-gc-lede { font-size: 10.5pt; line-height: 1.6; color: var(--yb-muted); max-width: 150mm; margin: 0; }
 
         /* ============================================================
            CATÁLOGO DE FILMES — 7 filtros (com a década):
@@ -2898,6 +2904,7 @@
             <select id="ybYearSelect" onchange="yearBook.updatePreview()" aria-label="Ano do livro"></select>
             <div class="yb-modal-count" id="ybCount" aria-live="polite"></div>
             <p class="yb-modal-note">Na janela que abrir, escolha <b>Salvar como PDF</b> (ou a impressora), papel <b>A4</b> (o livro já sai deitado, em paisagem), margens <b>Nenhuma</b> e ative <b>Gráficos de fundo</b>.</p>
+            <p class="yb-modal-note" style="margin-top:-6px;">Para a pasta: <a href="#" onclick="event.preventDefault(); yearBook.printCoverAll()" style="color:var(--accent); font-weight:700;">🎞️ imprimir a capa geral da coleção</a>.</p>
             <div class="confirm-actions">
                 <button type="button" class="btn" onclick="yearBook.close()">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="ybGenerateBtn" onclick="yearBook.generate()">Gerar PDF</button>
@@ -9745,8 +9752,48 @@
                 this.fitCards(host);
                 this.close();
                 btn.disabled = false; btn.textContent = 'Gerar PDF';
+                this.printNow(`CineTracker - Livro do ano ${year}`);
+            },
+
+            // Capa geral da pasta (coleção de todos os anos), em A4 paisagem, sem dados que envelheçam
+            coverAllHtml() {
+                const ic = {
+                    claquete: '<rect x="14" y="30" width="52" height="36" rx="3"/><path d="M14 30 L18 18 L66 14 L64 26 Z"/><path d="M26 17 L30 28 M40 15.5 L44 27 M54 14.5 L58 26"/>',
+                    rolo: '<circle cx="40" cy="40" r="25"/><circle cx="40" cy="40" r="5"/><circle cx="40" cy="25" r="6"/><circle cx="40" cy="55" r="6"/><circle cx="25" cy="40" r="6"/><circle cx="55" cy="40" r="6"/>',
+                    pipoca: '<path d="M24 34 L30 68 H50 L56 34 Z"/><path d="M33 34 L35 68 M47 34 L45 68"/><path d="M22 34 C18 26 26 18 32 22 C34 14 46 14 48 22 C54 18 62 26 58 34 Z"/>',
+                    ingresso: '<path d="M14 26 H66 V34 A6 6 0 0 0 66 46 V54 H14 V46 A6 6 0 0 0 14 34 Z"/><path d="M50 26 V54" stroke-dasharray="3 3"/><path d="M24 36 H42 M24 44 H38"/>',
+                    camera: '<rect x="12" y="34" width="40" height="28" rx="3"/><path d="M52 42 L68 34 V62 L52 54"/><circle cx="22" cy="24" r="9"/><circle cx="42" cy="24" r="9"/>',
+                    poltrona: '<path d="M22 20 H58 V46 H22 Z"/><path d="M14 40 H22 V62 H14 Z M58 40 H66 V62 H58 Z"/><path d="M22 46 H58 V56 H22 Z"/><path d="M18 62 V68 M62 62 V68"/>'
+                };
+                const holes = '<div class="yb-band-holes">' + '<i></i>'.repeat(26) + '</div>';
+                const frames = Object.values(ic).map(d => `<div class="yb-gc-fr"><svg viewBox="0 0 80 80" fill="none" stroke="#e9d6a8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg></div>`).join('');
+                const main = `
+                    <div class="yb-kicker">Israel <b>&amp;</b> Ricardo apresentam</div>
+                    <div class="yb-cg">
+                        <div class="yb-gc-brand yb-bebas">CineTracker</div>
+                        <div class="yb-cover-title yb-bebas">Registro de filmes assistidos</div>
+                    </div>
+                    <div class="yb-orn"><span>✦</span></div>
+                    <div class="yb-band">${holes}<div class="yb-gc-frames">${frames}</div>${holes}</div>
+                    <p class="yb-gc-lede">Todos os filmes que vimos juntos, com as notas de cada um, a nossa média e os melhores de cada temporada.</p>`;
+                const stub = `
+                    <span class="yb-tk-cap">Coleção</span>
+                    <div class="yb-tk-names yb-bebas">Livros do ano</div>
+                    <div class="yb-tk-sub">Um volume para cada ano<br>de sessões juntos.</div>`;
+                return `<section class="yb-page yb-cover">${this.ticket(main, this.stubSides(null, stub))}</section>`;
+            },
+            async printCoverAll() {
+                const host = document.getElementById('ybPrint');
+                host.innerHTML = this.coverAllHtml();
+                try { await Promise.race([document.fonts ? document.fonts.ready : null, new Promise(res => setTimeout(res, 5000))]); } catch (e) { /* imprime assim mesmo */ }
+                this.close();
+                this.printNow('CineTracker - Capa da pasta');
+            },
+
+            // Abre a impressão do navegador com o conteúdo já montado em #ybPrint
+            printNow(title) {
                 const prevTitle = document.title;
-                document.title = `CineTracker - Livro do ano ${year}`; // vira o nome sugerido do PDF
+                document.title = title; // vira o nome sugerido do PDF
                 const done = () => {
                     document.body.classList.remove('yb-printing');
                     const ps = document.getElementById('ybPageStyle'); if (ps) ps.remove();
@@ -9766,7 +9813,6 @@
                 setTimeout(() => window.print(), 60);
             }
         };
-
         // Fechar com ESC
         window.addEventListener('keydown', e => {
             if (e.key !== 'Escape') return;
