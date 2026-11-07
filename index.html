@@ -6069,54 +6069,10 @@
             // e grava só a coluna da nota do IMDb. Diferença muito grande não é gravada: é sinal
             // de que a busca pode ter achado outro filme com o mesmo nome; fica listada para conferir.
             get IMDB_SUSPECT_DIFF() { return 1.5; }
-            // Busca a nota do IMDb CONFERINDO o filme: o ano de lançamento (exato, ou ±1 se não houver exato)
-            // e o diretor precisam bater com o cadastro. Evita pegar original × remake com o mesmo nome
-            // (ex.: "O Silêncio do Lago" de 1988 × a versão americana de 1993).
-            async imdbLookup(m) {
-                const want = parseInt(m.year, 10) || 0;
-                const norm = x => normalizeKey(String(x || '')).replace(/[^a-z0-9]/g, '');
-                const dirsWant = ((m.directors && m.directors.length) ? m.directors : splitDirectors(m.director)).map(norm).filter(Boolean);
-                const dirOk = names => !dirsWant.length || !names.length || names.map(norm).some(n => dirsWant.includes(n));
-                const yOf = r => parseInt(String(r.release_date || r.Year || '').slice(0, 4), 10) || 0;
-                const tmdb = async path => (await fetch(`https://api.themoviedb.org/3/${path}${path.includes('?') ? '&' : '?'}api_key=${API_KEY}`)).json();
-
-                // Candidatos: o que a busca normal acha + busca pelo ano exato (título original e em português)
-                const cands = [];
-                const { bestMatch } = await searchMovieBestMatch(m.title, m.originalTitle, m.year);
-                if (bestMatch) cands.push(bestMatch);
-                if (want && !(bestMatch && yOf(bestMatch) === want)) {
-                    for (const q of [...new Set([m.originalTitle, m.title].filter(Boolean))]) {
-                        const j = await tmdb(`search/movie?query=${encodeURIComponent(q)}&year=${want}`);
-                        cands.push(...(j.results || []));
-                    }
-                }
-                const seen = new Set();
-                const ordered = cands.filter(c => c && !seen.has(c.id) && seen.add(c.id))
-                    .sort((x, y) => (want ? Math.abs(yOf(x) - want) - Math.abs(yOf(y) - want) : 0));
-                if (!ordered.length) throw new Error(`não encontrei "${m.title}" no TMDB`);
-
-                let lastWhy = '';
-                for (const c of ordered.slice(0, 5)) {
-                    if (want && yOf(c) && Math.abs(yOf(c) - want) > 1) { lastWhy = `o filme encontrado é de ${yOf(c)}`; continue; }
-                    const d = await tmdb(`movie/${c.id}?append_to_response=credits`);
-                    if (!d.imdb_id) { lastWhy = 'o TMDB não tem o código do IMDb'; continue; }
-                    const dirs = ((d.credits && d.credits.crew) || []).filter(p => p.job === 'Director').map(p => p.name);
-                    if (want && yOf(d) && Math.abs(yOf(d) - want) > 1) { lastWhy = `o filme encontrado é de ${yOf(d)}`; continue; }
-                    if (!dirOk(dirs)) { lastWhy = `o filme encontrado é de ${dirs.join(', ')}`; continue; }
-                    // OMDb: nota + confere de novo ano e diretor
-                    const res = await fetch(`https://www.omdbapi.com/?i=${encodeURIComponent(d.imdb_id)}&apikey=${encodeURIComponent(OMDB_API_KEY)}`);
-                    const o = await res.json().catch(() => null);
-                    if (!o || o.Response === 'False') throw new Error((o && o.Error) || ('HTTP ' + res.status));
-                    const oy = parseInt(String(o.Year || ''), 10) || 0;
-                    const od = String(o.Director || '').split(',').map(x => x.trim()).filter(x => x && x !== 'N/A');
-                    if (want && oy && Math.abs(oy - want) > 1) { lastWhy = `o IMDb indica ${oy}`; continue; }
-                    if (!dirOk(od)) { lastWhy = `o IMDb indica ${od.join(', ')}`; continue; }
-                    const r = parseFloat(o.imdbRating);
-                    return { rating: Number.isFinite(r) && r > 0 ? r : null, imdbId: d.imdb_id, year: oy || yOf(d), director: od.join(', ') || dirs.join(', ') };
-                }
-                const e = new Error('não confirmado: ' + (lastWhy || 'ano ou diretor diferentes do cadastro'));
-                e.unconfirmed = true;
-                throw e;
+            // Busca a nota do IMDb conferindo o filme pelo DIRETOR (o ano só desempata versões do mesmo
+            // diretor, como "O Silêncio do Lago" de 1988 × 1993). Ver cineImdbLookup.
+            imdbLookup(m) {
+                return cineImdbLookup(m, { API_KEY, OMDB: OMDB_API_KEY, normalizeKey, splitDirectors });
             }
 
             // --- Desfazer a última atualização geral (fica guardado neste aparelho) ---
@@ -6239,7 +6195,7 @@
                         run.done++; paint();
                     }
                 };
-                await Promise.all([worker(), worker(), worker()]);
+                await Promise.all([worker(), worker()]);
                 if (run.changed.length || run.filled.length) {
                     this.saveImdbUndoLog([...run.changed, ...run.filled].map(x => ({ id: x.m.id, title: x.m.title, old: x.old, val: x.val })));
                     this.hasUnsavedChanges = true; this.processData();
@@ -10166,6 +10122,83 @@
                 setTimeout(() => window.print(), 60);
             }
         };
+        // ============================================================
+        // NOTA DO IMDb — identifica o filme certo antes de usar a nota.
+        // Candidatos do TMDB (título em português e original, com e sem o ano) → descarta quem tem
+        // outro diretor → entre os que sobram, o de ano mais próximo do cadastro → nota no OMDb,
+        // conferindo de novo o diretor. Os anos variam entre as bases (estreia no Brasil, nos EUA,
+        // festival), por isso o ano só desempata e aceita até 3 anos de diferença.
+        // ============================================================
+async function cineImdbLookup(m, env) {
+    const want = parseInt(m.year, 10) || 0;
+    const nk = s => env.normalizeKey(String(s || '')).replace(/[^a-z0-9]/g, '');
+    const dirsWant = ((m.directors && m.directors.length) ? m.directors : env.splitDirectors(m.director || '')).map(nk).filter(Boolean);
+    const dirHit = names => names.map(nk).some(n => dirsWant.includes(n));
+    const yr = s => parseInt(String(s || '').slice(0, 4), 10) || 0;
+    const gap = (...ys) => { const v = ys.filter(Boolean).map(y => Math.abs(y - want)); return !want ? 0 : (v.length ? Math.min(...v) : 99); };
+    const getJson = async url => {
+        for (let i = 0; i < 4; i++) {
+            let res;
+            try { res = await fetch(url); } catch (e) { if (i === 3) throw new Error('falha de conexão'); await new Promise(r => setTimeout(r, 800 * (i + 1))); continue; }
+            if (res.status === 429 || res.status >= 500) { await new Promise(r => setTimeout(r, 1200 * (i + 1))); continue; }
+            return res.json();
+        }
+        throw new Error('serviço ocupado, tente de novo');
+    };
+    const tmdb = path => getJson(`https://api.themoviedb.org/3/${path}${path.includes('?') ? '&' : '?'}api_key=${env.API_KEY}`);
+
+    // 1) Candidatos: título em português e original, com e sem o ano
+    const terms = [...new Set([m.title, m.originalTitle].filter(Boolean).map(t => t.trim()))];
+    const lists = await Promise.all(terms.flatMap(t => [
+        tmdb(`search/movie?query=${encodeURIComponent(t)}&language=pt-BR${want ? `&year=${want}` : ''}`),
+        tmdb(`search/movie?query=${encodeURIComponent(t)}&language=pt-BR`)
+    ]));
+    const seen = new Set(), cands = [];
+    lists.forEach(j => (j.results || []).forEach(r => { if (!seen.has(r.id)) { seen.add(r.id); cands.push(r); } }));
+    if (!cands.length) throw new Error(`não encontrei "${m.title}" no TMDB`);
+    const tk = terms.map(nk);
+    const sameTitle = r => tk.includes(nk(r.title)) || tk.includes(nk(r.original_title));
+    const score = r => (sameTitle(r) ? 100 : 0) + (want ? Math.max(0, 40 - gap(yr(r.release_date)) * 8) : 0) + Math.min(15, Math.log10((r.vote_count || 0) + 1) * 4);
+    cands.sort((a, b) => score(b) - score(a));
+
+    // 2) Filtra pelo DIRETOR (é o que identifica o filme; os anos variam entre as bases:
+    //    estreia no Brasil, nos EUA, em festival...). O ano só desempata versões do mesmo diretor.
+    const reasons = [], ok = [];
+    for (const c of cands.slice(0, 6)) {
+        const d = await tmdb(`movie/${c.id}?append_to_response=credits`);
+        const tdirs = ((d.credits && d.credits.crew) || []).filter(p => p.job === 'Director').map(p => p.name);
+        const ty = yr(d.release_date), name = `${d.title || c.title}${ty ? ` (${ty})` : ''}`;
+        if (dirsWant.length && tdirs.length && !dirHit(tdirs)) { reasons.push(`${name} é de ${tdirs.join(', ')}`); continue; }
+        if (!d.imdb_id) { reasons.push(`${name} não tem código do IMDb no TMDB`); continue; }
+        ok.push({ d, tdirs, ty, name, sameTitle: sameTitle(c) || sameTitle(d) });
+    }
+    ok.sort((a, b) => gap(a.ty) - gap(b.ty));
+    let best = null;
+    for (const k of ok.slice(0, 3)) {
+        const o = await getJson(`https://www.omdbapi.com/?i=${encodeURIComponent(k.d.imdb_id)}&apikey=${encodeURIComponent(env.OMDB)}`);
+        if (!o || o.Response === 'False') {
+            const msg = (o && o.Error) || 'erro no OMDb';
+            if (/limit|invalid api key/i.test(msg)) throw new Error(msg);
+            reasons.push(`${k.name}: ${msg}`); continue;
+        }
+        const oy = yr(o.Year);
+        const odirs = String(o.Director || '').split(',').map(x => x.trim()).filter(x => x && x !== 'N/A');
+        const g = gap(k.ty, oy, yr(o.Released));
+        if (dirsWant.length) {
+            if (!(dirHit(odirs) || dirHit(k.tdirs))) { reasons.push(`${k.name}: diretor não confere (${odirs.join(', ') || 'não informado'})`); continue; }
+            if (g > 3) { reasons.push(`${k.name}: ano muito diferente do cadastro`); continue; }
+        } else if (!(k.sameTitle && g <= 1)) { reasons.push(`${k.name}: sem diretor no cadastro para confirmar`); continue; }
+        const r = parseFloat(o.imdbRating);
+        const hit = { rating: Number.isFinite(r) && r > 0 ? r : null, imdbId: k.d.imdb_id, title: o.Title, year: k.ty || oy, director: odirs.join(', ') || k.tdirs.join(', '), g };
+        if (!best || g < best.g) best = hit;
+        if (g === 0) break;
+    }
+    if (best) return best;
+    const e = new Error('não confirmado: ' + (reasons[0] || 'nenhum resultado com o mesmo diretor'));
+    e.unconfirmed = true;
+    throw e;
+}
+
         // Fechar com ESC
         window.addEventListener('keydown', e => {
             if (e.key !== 'Escape') return;
