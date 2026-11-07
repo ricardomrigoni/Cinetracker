@@ -2348,6 +2348,7 @@
         .imdb-undo-list li .imdb-chg { margin-left: 6px; }
         .imdb-undo-one { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: transparent; cursor: pointer; color: var(--accent); font-size: 1rem; }
         .imdb-undo-one:hover { background: var(--gold-soft); border-color: var(--gold); }
+        .imdb-src { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
     </style>
 </head>
 <body data-mode="movies">
@@ -6107,7 +6108,7 @@
                 const when = new Date(log.at);
                 document.getElementById('imdbBulkBody').innerHTML = `
                     <p class="confirm-message" style="margin-bottom:12px;">Atualização de ${when.toLocaleDateString('pt-BR')} às ${when.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}: ${log.items.length} ${log.items.length === 1 ? 'nota mudou' : 'notas mudaram'}. Use ↩ para voltar uma nota ou desfaça tudo.</p>
-                    <ul class="imdb-undo-list">${log.items.map(x => `<li><span>${esc(x.title)} <span class="imdb-chg">${f(x.old)} → ${f(x.val)}</span></span><button type="button" class="imdb-undo-one" onclick="app.undoImdb([${JSON.stringify(x.id).replace(/"/g, '&quot;')}])" title="Voltar para ${f(x.old)}">↩</button></li>`).join('')}</ul>`;
+                    <ul class="imdb-undo-list">${log.items.map(x => `<li><span>${esc(x.title)} <span class="imdb-chg">${f(x.old)} → ${f(x.val)}</span>${x.src ? `<small class="imdb-src">usado: ${esc(x.src)}</small>` : ''}</span><button type="button" class="imdb-undo-one" onclick="app.undoImdb([${JSON.stringify(x.id).replace(/"/g, '&quot;')}])" title="Voltar para ${f(x.old)}">↩</button></li>`).join('')}</ul>`;
                 document.getElementById('imdbBulkActions').innerHTML = `
                     <button type="button" class="btn" onclick="app.openImdbBulk()">Voltar</button>
                     <button type="button" class="btn btn-danger" onclick="app.undoImdb()">↩ Desfazer tudo</button>`;
@@ -6181,7 +6182,7 @@
                                 else {
                                     const err = await cloud.updateMovieImdb(m.id, val);
                                     if (err) run.failed.push({ m, msg: err });
-                                    else { m.scImdb = val; (old > 0 ? run.changed : run.filled).push({ m, old, val }); }
+                                    else { m.scImdb = val; (old > 0 ? run.changed : run.filled).push({ m, old, val, src: `${found.title || ''} (${found.year || '?'}, ${found.director || '?'})` }); }
                                 }
                             }
                         } catch (e) {
@@ -6197,7 +6198,7 @@
                 };
                 await Promise.all([worker(), worker()]);
                 if (run.changed.length || run.filled.length) {
-                    this.saveImdbUndoLog([...run.changed, ...run.filled].map(x => ({ id: x.m.id, title: x.m.title, old: x.old, val: x.val })));
+                    this.saveImdbUndoLog([...run.changed, ...run.filled].map(x => ({ id: x.m.id, title: x.m.title, old: x.old, val: x.val, src: x.src })));
                     this.hasUnsavedChanges = true; this.processData();
                 }
                 this._imdbRun = null;
@@ -6214,10 +6215,10 @@
                     ${run.fatal ? `<p class="imdb-bulk-warn">O OMDb parou de responder (${esc(run.fatal)}). Em geral é o limite diário de consultas: tente de novo amanhã.</p>` : ''}
                     <p class="confirm-message" style="margin-bottom:12px;">${stopped ? `Parado em ${run.done} de ${run.total} filmes.` : `Pronto: ${run.total} ${run.total === 1 ? 'filme conferido' : 'filmes conferidos'}.`}
                         <b>${run.changed.length + run.filled.length}</b> ${run.changed.length + run.filled.length === 1 ? 'nota atualizada' : 'notas atualizadas'}, ${run.same} sem mudança.</p>
-                    ${sec('Notas que mudaram', changed, x => `<li>${esc(x.m.title)} <span class="imdb-chg ${up(x.old, x.val)}">${f(x.old)} → ${f(x.val)}</span></li>`, true)}
-                    ${sec('Ganharam nota do IMDb', run.filled, x => `<li>${esc(x.m.title)} <span class="imdb-chg up">${f(x.val)}</span></li>`, true)}
+                    ${sec('Notas que mudaram', changed, x => `<li><span>${esc(x.m.title)}<small class="imdb-src">usado: ${esc(x.src)}</small></span> <span class="imdb-chg ${up(x.old, x.val)}">${f(x.old)} → ${f(x.val)}</span></li>`, true)}
+                    ${sec('Ganharam nota do IMDb', run.filled, x => `<li><span>${esc(x.m.title)}<small class="imdb-src">usado: ${esc(x.src)}</small></span> <span class="imdb-chg up">${f(x.val)}</span></li>`, true)}
                     ${sec('Não alterados: diferença grande e cadastro sem ano ou diretor', run.suspect, x => `<li>${esc(x.m.title)} <span class="imdb-chg">${f(x.old)} → ${f(x.val)}?</span></li>`, true)}
-                    ${sec('Não alterados: ano ou diretor não batem com o cadastro', run.unconfirmed, x => `<li>${esc(x.m.title)} (${esc(String(x.m.year || '?'))}) <small>${esc(x.msg)}</small></li>`, true)}
+                    ${sec('Não alterados: não deu para confirmar o filme', run.unconfirmed, x => `<li>${esc(x.m.title)} (${esc(String(x.m.year || '?'))}) <small>${esc(x.msg)}</small></li>`, true)}
                     ${sec('Nota ainda não disponível', run.noRating, x => `<li>${esc(x.m.title)} <a class="imdb-open" href="https://www.imdb.com/title/${encodeURIComponent(x.imdbId)}/" target="_blank" rel="noopener">ver no IMDb ↗</a></li>`)}
                     ${run.noRating.length ? '<p class="imdb-bulk-note">Esses filmes foram encontrados, mas a nota do IMDb ainda não chegou à base usada pelo app (OMDb), algo comum em lançamentos. A nota que já estiver no filme é mantida; se quiser, abra no IMDb e digite a nota em Editar.</p>' : ''}
                     ${sec('Não encontrados no TMDB/IMDb', run.notFound, m => `<li>${esc(m.title)}</li>`)}
@@ -10148,6 +10149,12 @@ async function cineImdbLookup(m, env) {
     const tmdb = path => getJson(`https://api.themoviedb.org/3/${path}${path.includes('?') ? '&' : '?'}api_key=${env.API_KEY}`);
 
     // 1) Candidatos: título em português e original, com e sem o ano
+    // O filme é confirmado pelo TÍTULO ORIGINAL e/ou pelo DIRETOR do cadastro.
+    // Ex.: "O Abrigo" é o título no Brasil de "Take Shelter" e de "The Divide": o título original
+    // (ou o diretor) separa os dois. Sem nenhum dos dois no cadastro, a nota não é trocada.
+    const origWant = nk(m.originalTitle && nk(m.originalTitle) !== nk(m.title) ? m.originalTitle : '');
+    const titleHit = (...names) => !!origWant && names.some(n => nk(n) === origWant);
+    if (!dirsWant.length && !origWant) { const e0 = new Error('não confirmado: o cadastro está sem diretor e sem título original (preencha um dos dois)'); e0.unconfirmed = true; throw e0; }
     const terms = [...new Set([m.title, m.originalTitle].filter(Boolean).map(t => t.trim()))];
     const lists = await Promise.all(terms.flatMap(t => [
         tmdb(`search/movie?query=${encodeURIComponent(t)}&language=pt-BR${want ? `&year=${want}` : ''}`),
@@ -10168,11 +10175,16 @@ async function cineImdbLookup(m, env) {
         const d = await tmdb(`movie/${c.id}?append_to_response=credits`);
         const tdirs = ((d.credits && d.credits.crew) || []).filter(p => p.job === 'Director').map(p => p.name);
         const ty = yr(d.release_date), name = `${d.title || c.title}${ty ? ` (${ty})` : ''}`;
+        // Só o título ORIGINAL conta (o título em inglês pode ser igual entre original e remake:
+        // o holandês "Spoorloos" também se chama "The Vanishing" em inglês)
+        const tHit = titleHit(d.original_title, c.original_title);
         if (dirsWant.length && tdirs.length && !dirHit(tdirs)) { reasons.push(`${name} é de ${tdirs.join(', ')}`); continue; }
+        if (!dirsWant.length && origWant && !tHit) { reasons.push(`${name}: título original ${d.original_title} ≠ ${m.originalTitle}`); continue; }
         if (!d.imdb_id) { reasons.push(`${name} não tem código do IMDb no TMDB`); continue; }
-        ok.push({ d, tdirs, ty, name, sameTitle: sameTitle(c) || sameTitle(d) });
+        ok.push({ d, tdirs, ty, name, tHit });
     }
-    ok.sort((a, b) => gap(a.ty) - gap(b.ty));
+    // Primeiro quem bate o título original; depois o ano mais próximo do cadastro
+    ok.sort((a, b) => (b.tHit - a.tHit) || (gap(a.ty) - gap(b.ty)));
     let best = null;
     for (const k of ok.slice(0, 3)) {
         const o = await getJson(`https://www.omdbapi.com/?i=${encodeURIComponent(k.d.imdb_id)}&apikey=${encodeURIComponent(env.OMDB)}`);
@@ -10184,14 +10196,15 @@ async function cineImdbLookup(m, env) {
         const oy = yr(o.Year);
         const odirs = String(o.Director || '').split(',').map(x => x.trim()).filter(x => x && x !== 'N/A');
         const g = gap(k.ty, oy, yr(o.Released));
-        if (dirsWant.length) {
-            if (!(dirHit(odirs) || dirHit(k.tdirs))) { reasons.push(`${k.name}: diretor não confere (${odirs.join(', ') || 'não informado'})`); continue; }
-            if (g > 3) { reasons.push(`${k.name}: ano muito diferente do cadastro`); continue; }
-        } else if (!(k.sameTitle && g <= 1)) { reasons.push(`${k.name}: sem diretor no cadastro para confirmar`); continue; }
+        const dHit = dirHit(odirs) || dirHit(k.tdirs), tHit = k.tHit;
+        if (dirsWant.length && !dHit) { reasons.push(`${k.name}: diretor não confere (${odirs.join(', ') || 'não informado'})`); continue; }
+        if (!dirsWant.length && !tHit) { reasons.push(`${k.name}: título original não confere`); continue; }
+        // Título original + diretor batendo é prova suficiente, mesmo com o ano do cadastro diferente
+        if (g > 3 && !(tHit && dHit)) { reasons.push(`${k.name}: ano muito diferente do cadastro`); continue; }
         const r = parseFloat(o.imdbRating);
-        const hit = { rating: Number.isFinite(r) && r > 0 ? r : null, imdbId: k.d.imdb_id, title: o.Title, year: k.ty || oy, director: odirs.join(', ') || k.tdirs.join(', '), g };
-        if (!best || g < best.g) best = hit;
-        if (g === 0) break;
+        const hit = { rating: Number.isFinite(r) && r > 0 ? r : null, imdbId: k.d.imdb_id, title: o.Title, year: k.ty || oy, director: odirs.join(', ') || k.tdirs.join(', '), g, tHit };
+        if (!best || (tHit && !best.tHit) || (tHit === best.tHit && g < best.g)) best = hit;
+        if (g === 0 && (tHit || !origWant)) break;
     }
     if (best) return best;
     const e = new Error('não confirmado: ' + (reasons[0] || 'nenhum resultado com o mesmo diretor'));
